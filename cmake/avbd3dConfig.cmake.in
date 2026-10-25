@@ -1,0 +1,3 @@
+@PACKAGE_INIT@
+include("${CMAKE_CURRENT_LIST_DIR}/avbd3dTargets.cmake")
+check_required_components(avbd3d)
