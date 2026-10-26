@@ -403,8 +403,6 @@ bool DemoApp::loadInitialScene(const DemoLaunch &launch)
         applyParams();
         demolog::line("--no-sleep: sleepEnabled = 0, wakeAll");
     }
-    if (launch.contactCap >= 0)
-        m_author.params.contactCap = launch.contactCap;
 
     if (launch.camDist > 0.0f)
         m_camDistance = launch.camDist;
@@ -904,7 +902,7 @@ void DemoApp::endFrame(float frameMs)
     X(sleepAngVel, "%g", double) X(sleepDisp, "%g", double) X(sleepFracture, "%g", double)           \
     X(autoKStart, "%d", int) X(dualDamping, "%g", double) X(dualDampVel, "%g", double)               \
     X(killFallenEnabled, "%d", int) X(killHeight, "%g", double) X(grabStrength, "%g", double)             \
-    X(contactCap, "%d", int) X(sleepLeak, "%g", double)
+    X(sleepLeak, "%g", double)
 
 void DemoApp::setLogging(bool on)
 {
@@ -1139,23 +1137,6 @@ void DemoApp::drawUI()
                               "the Z threshold below -- for bodies that missed the floor.");
         ImGui::BeginDisabled(!params.killFallenEnabled);
         ImGui::SliderFloat("Kill height", &params.killHeight, -500.0f, 0.0f, "%.0f m");
-        ImGui::EndDisabled();
-    }
-
-    // The fidelity trade (solver_params.h). Off by default; the switch is read on the next
-    // step, so the trade can be A/B'd live on the same scene.
-    if (ImGui::CollapsingHeader("Fidelity"))
-    {
-        bool capOn = params.contactCap > 0;
-        if (ImGui::Checkbox("Contact cap", &capOn))
-            params.contactCap = capOn ? 4 : 0;
-        itemTooltip("Keep at most N contact points per manifold: the deepest point, then the "
-                    "points that span the largest area. A box resting face-down keeps its "
-                    "support polygon, so it still stands; what is lost is the extra "
-                    "points along an edge that only refine the pressure distribution.");
-        ImGui::BeginDisabled(!capOn);
-        if (capOn)
-            ImGui::SliderInt("Points per manifold", &params.contactCap, 4, 7);
         ImGui::EndDisabled();
     }
 

@@ -15,7 +15,7 @@
  * clamped: StepResult must say so, naming phase and resource with required > capacity,
  * and nothing may crash or go non-finite.
  *
- * Scenarios: Pyramid (sleep off), Pile Settle (sleep on), a settled 24-box tower that is
+ * Scenarios: Pyramid (sleep off), Square Towers 20k (sleep on), a settled 24-box tower that is
  * nudged (explicit wake flood), and a settled jointed column hit by a slug (implicit wake,
  * island flood).
  */
@@ -184,7 +184,7 @@ Run runIsland(VkWorld &w, const Overrides &o)
 
 int main()
 {
-    if (findScene("Pyramid") < 0 || findScene("Pile Settle") < 0)
+    if (findScene("Pyramid") < 0 || findScene("Square Towers 20k") < 0)
     {
         printf("missing scene\n");
         return 2;
@@ -219,7 +219,7 @@ int main()
     };
     const Sc scs[] = {
         {"Pyramid/sleep off", [](VkWorld &w, const Overrides &o) { return runSceneByName(w, o, "Pyramid", false, 100); }},
-        {"Pile Settle/sleep on", [](VkWorld &w, const Overrides &o) { return runSceneByName(w, o, "Pile Settle", true, 150); }},
+        {"Square Towers 20k/sleep on", [](VkWorld &w, const Overrides &o) { return runSceneByName(w, o, "Square Towers 20k", true, 150); }},
         {"tower nudge", runTower},
         {"joint island wake", runIsland},
     };
@@ -298,7 +298,7 @@ int main()
                           {"hard contact cap 8", hc, "narrowphase", "contacts"}};
     for (const Hard &h : hards)
     {
-        const Run r = runSceneByName(vk, h.o, "Pile Settle", false, 40);
+        const Run r = runSceneByName(vk, h.o, "Square Towers 20k", false, 40);
         const bool named = r.truncatedSteps > 0 && r.failPhase && r.failResource &&
                            strcmp(r.failPhase, h.phase) == 0 && strcmp(r.failResource, h.resource) == 0;
         const bool over = r.required > r.capacity;
@@ -315,7 +315,7 @@ int main()
 
     // The world must still work after the ceilings are lifted.
     {
-        const Run r = runSceneByName(vk, Overrides{}, "Pile Settle", false, 20);
+        const Run r = runSceneByName(vk, Overrides{}, "Massive 10k", false, 20);
         const bool ok = r.truncatedSteps == 0 && r.finite;
         printf("recovers after ceiling  %s\n", ok ? "ok" : "FAIL");
         if (!ok)

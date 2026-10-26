@@ -504,7 +504,6 @@ static void printUsage(FILE *f)
             "  --look modern|original rendering preset\n"
             "  --camdist D            camera distance from the look point\n"
             "  --no-sleep             start with sleeping off (\"Never sleep\"), for benchmarks\n"
-            "  --contact-cap N        at most N contact points per manifold (panel: Fidelity)\n"
             "  --verbose              print the selected device and whether validation is on\n"
             "  --log                  start with the session log on (panel: Logging)\n"
             "  --smoke                unattended run of every scene with validation on; the window is\n"
@@ -599,7 +598,6 @@ int main(int argc, char **argv)
         else if (strcmp(a, "--smoke") == 0) smoke = true;
         else if (strcmp(a, "--no-sleep") == 0) launch.noSleep = true;
         else if (strcmp(a, "--log") == 0) launch.log = true;
-        else if (strcmp(a, "--contact-cap") == 0 && hasValue) launch.contactCap = atoi(argv[++i]);
         else if (strcmp(a, "--frames") == 0 && hasValue) launch.benchFrames = atoi(argv[++i]);
         else if (strcmp(a, "--screenshot") == 0 && hasValue) screenshotPath = argv[++i];
         else if (strcmp(a, "--scene") == 0 && hasValue) launch.sceneName = argv[++i];

@@ -107,7 +107,7 @@ int main(int argc, char **argv)
 {
     const int warmup = argc > 1 ? atoi(argv[1]) : 60;
     const int steps = argc > 2 ? atoi(argv[2]) : 120;
-    const char *names[] = {"Pyramid", "Pile Settle", "Massive 10k", "Bridge", "Soft Body"};
+    const char *names[] = {"Pyramid", "Massive 10k", "Bridge", "Soft Body"};
 
     VkWorld vk;
     vk.init();

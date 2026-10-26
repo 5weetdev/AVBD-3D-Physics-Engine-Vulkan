@@ -64,7 +64,6 @@ struct DemoLaunch
     bool unattended = false;          // bench/smoke: step failures go to stderr
     bool noSleep = false;             // start with "Never sleep" ticked (benchmarks)
     bool log = false;                 // start with the session log on (--log)
-    int contactCap = -1;              // >= 0 sets params.contactCap (--contact-cap)
     const char *commandLine = "";     // for the log header
 };
 

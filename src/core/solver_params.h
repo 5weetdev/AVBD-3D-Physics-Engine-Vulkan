@@ -155,7 +155,7 @@ inline SolverParams defaultSolverParams()
     SolverParams params;
     params.dt = 1.0f / 60.0f;
     params.gravity = vec3{0.0f, -10.0f, 0.0f};
-    params.iterations = 8;
+    params.iterations = 12;
 
     // Four cooperative lanes per body; see the field comment for why 4.
     params.primalLanes = 4;
@@ -224,6 +224,10 @@ inline SolverParams defaultSolverParams()
     params.dualDamping = 0.1f;
     params.dualDampVel = 0.1f;
 
+    // Sleeping is off by default: every dynamic body is solved every step. The tuning
+    // below is what the "Never sleep" switch turns back on, and it is still the value
+    // sleeping runs with once enabled.
+    //
     // Half a second of settled behaviour before a body may sleep.
     //
     // A conservative tuning: a body must hold still to within a millimetre for just
@@ -234,7 +238,7 @@ inline SolverParams defaultSolverParams()
     // at 2x, that discards bodies which are plainly in motion without making them wait
     // out the window. It also sets the wake hysteresis, so at 0.4 a sleeper is woken by
     // a neighbour moving at 0.8 m/s or more.
-    params.sleepEnabled = true;
+    params.sleepEnabled = false;
     params.sleepFrames = 64;
     params.sleepLinVel = 0.4f;
     params.sleepAngVel = 0.4f;

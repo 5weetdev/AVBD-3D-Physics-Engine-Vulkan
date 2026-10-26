@@ -1349,7 +1349,7 @@ typedef struct Avbd3dCapsule
    repeated here. Set between steps. */
 typedef struct Avbd3dSolverDef
 {
-	/* Primal/dual iterations per step. Default 8. */
+	/* Primal/dual iterations per step. Default 12. */
 	int32_t iterations;
 
 	/* Cooperating GPU lanes per body in the primal sweep. 1 = one thread per body. Any value

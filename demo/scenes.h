@@ -30,10 +30,8 @@
 #include "scenes/scene_joints.h"
 #include "scenes/scene_towers.h"
 #include "scenes/scene_panel_house.h"
-#include "scenes/scene_skyscrapers.h"
-#include "scenes/scene_trestle_bridge.h"
+#include "scenes/scene_skyscraper.h"
 #include "scenes/scene_suspension_bridge.h"
-#include "scenes/scene_arch_bridge.h"
 #include "scenes/scene_passenger_plane.h"
 
 // The scene sources below are authored z-up (the paper's frame). The solver is y-up, so each
@@ -59,7 +57,6 @@ static SceneView (*gpuScenes[])(SceneBuilder *) = {
     yUpScene<sceneStackRatioGpu>,
     yUpScene<sceneStackRatioDeepGpu>,
     yUpScene<sceneFreshContactsGpu>,
-    yUpScene<scenePileSettleGpu>,
     yUpScene<sceneMassive10kGpu>,
     yUpScene<sceneMassive100kGpu>,
     yUpScene<sceneMassive200kGpu>,
@@ -76,14 +73,11 @@ static SceneView (*gpuScenes[])(SceneBuilder *) = {
     yUpScene<sceneSpringsRatioGpu>,
     yUpScene<sceneSoftBodyGpu>,
     yUpScene<sceneBridgeGpu>,
-    yUpScene<sceneBreakableGpu>,
     yUpScene<sceneRoundTowers20kGpu>,
     yUpScene<sceneSquareTowers20kGpu>,
     yUpScene<scenePanelHouseGpu>,
-    yUpScene<sceneSkyscrapersGpu>,
-    yUpScene<sceneTrestleBridgeGpu>,
+    yUpScene<sceneSkyscraperGpu>,
     yUpScene<sceneSuspensionBridgeGpu>,
-    yUpScene<sceneArchBridgeGpu>,
     yUpScene<scenePassengerPlaneGpu>};
 
 static const char *gpuSceneNames[] = {
@@ -96,7 +90,6 @@ static const char *gpuSceneNames[] = {
     "Stack Ratio",
     "Stack Ratio Deep",
     "Fresh Contacts",
-    "Pile Settle",
     "Massive 10k",
     "Massive 100k",
     "Massive 200k",
@@ -113,14 +106,11 @@ static const char *gpuSceneNames[] = {
     "Spring Ratio",
     "Soft Body",
     "Bridge",
-    "Breakable",
     "Round Towers 20k",
     "Square Towers 20k",
     "Panel House",
-    "Skyscrapers",
-    "Trestle Bridge",
+    "Skyscraper",
     "Suspension Bridge",
-    "Arch Bridge",
     "Passenger Plane"};
 
 static const int gpuSceneCount = sizeof(gpuScenes) / sizeof(gpuScenes[0]);

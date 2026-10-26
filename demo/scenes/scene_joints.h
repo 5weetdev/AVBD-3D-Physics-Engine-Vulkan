@@ -236,29 +236,3 @@ static SceneView sceneBridgeGpu(SceneBuilder *s)
     return {60.0f, 8.0f};
 }
 
-static SceneView sceneBreakableGpu(SceneBuilder *s)
-{
-    const int N = 10;
-    const int M = 5;
-    const float breakForce = 90.0f;
-
-    s->clear();
-    s->addBody({10000.0f, 10000.0f, 1.0f}, 0.0f, 0.5f, {0, 0, 0});
-
-    int prev = -1;
-    for (int i = 0; i <= N; i++)
-    {
-        int curr = s->addBody({1, 1, 0.5f}, 1.0f, 0.5f, {(float)i - N / 2.0f, 0.0f, 6.0f});
-        if (prev >= 0)
-            s->addJoint(prev, curr, {0.5f, 0, 0}, {-0.5f, 0, 0}, INFINITY, INFINITY, breakForce);
-        prev = curr;
-    }
-
-    s->addBody({1, 1, 5}, 0.0f, 0.5f, {-N / 2.0f, 0, 2.5f});
-    s->addBody({1, 1, 5}, 0.0f, 0.5f, {N / 2.0f, 0, 2.5f});
-
-    for (int i = 0; i < M; i++)
-        s->addBody({2, 1, 1}, 1.0f, 0.5f, {0, 0, i * 2.0f + 8.0f});
-
-    return {30.0f, 6.0f};
-}
