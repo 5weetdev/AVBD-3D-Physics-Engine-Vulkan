@@ -19,6 +19,9 @@
 #define NOMINMAX
 #include <windows.h>
 #define VK_USE_PLATFORM_WIN32_KHR
+#else
+#include <unistd.h>
+#define GetCurrentProcessId() getpid()
 #endif
 
 #include "vk_device.h"
@@ -586,9 +589,11 @@ bool Device::evaluateDevice(VkPhysicalDevice d, DeviceInfo &info, std::string &w
     need(f13.synchronization2, "synchronization2");
     if (m_requireAtomicFloat)
         need(info.atomicFloat, "VK_EXT_shader_atomic_float (shaderBufferFloat32AtomicAdd)");
+#ifdef _WIN32
     if (m_externalWin32)
         need(has(VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME) && has(VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME),
              "VK_KHR_external_memory_win32 / VK_KHR_external_semaphore_win32");
+#endif
     if (m_wantPresent)
         need(has(VK_KHR_SWAPCHAIN_EXTENSION_NAME), "VK_KHR_swapchain");
 
@@ -760,6 +765,7 @@ void Device::createLogicalDevice()
     if (m_wantPresent)
         deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
+#ifdef _WIN32
     if (m_externalWin32)
     {
         // Capability extensions (VK_KHR_external_memory_capabilities /
@@ -771,6 +777,7 @@ void Device::createLogicalDevice()
         deviceExtensions.push_back(VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME);
         deviceExtensions.push_back(VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME);
     }
+#endif
 
     VkDeviceCreateInfo dci{VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO};
     dci.pNext = &features2;

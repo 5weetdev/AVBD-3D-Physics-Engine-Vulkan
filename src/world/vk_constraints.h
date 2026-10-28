@@ -31,6 +31,7 @@
 #include "vk_primitives.h"
 
 #include <algorithm>
+#include <cmath>
 #include <cstdint>
 #include <vector>
 

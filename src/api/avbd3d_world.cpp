@@ -388,6 +388,8 @@ void World::applyMassFrame(int b, float mass, vec3 center, vec3 moment, quat pri
         const vec3 oldPos = d.pos[b];
         d.bodyLocalCenter[b] = center;
         d.bodyPrincipalRot[b] = principalRot;
+        if (b < (int)m_hot.size())
+            m_hot[b].plain = 0; // until the next rebuild
         d.rot[b] = normalize(oq * principalRot);
         d.pos[b] = o + rotate(oq, center);
         // The origin keeps its velocity; the centre of mass moves with the body's spin.
@@ -687,6 +689,8 @@ void World::destroyBody(int b)
     while (!r.joints.empty())
         destroyJoint(r.joints.back());
     r.alive = false;
+    if (b < (int)m_hot.size())
+        m_hot[b].movable = 0; // the read fast path (snapshotFor) trusts the hot record
     r.gen = (uint16_t)(r.gen + 1 ? r.gen + 1 : 1);
     r.enabled = false;
     r.primary = -1;
@@ -1479,6 +1483,9 @@ void World::rebuildLists()
         {
             m_movable.push_back(b);
             m_hot[b].movable = 1;
+            const vec3 c = d.bodyLocalCenter[b];
+            const quat q = d.bodyPrincipalRot[b];
+            m_hot[b].plain = (c.x == 0 && c.y == 0 && c.z == 0 && q.x == 0 && q.y == 0 && q.z == 0 && q.w == 1) ? 1 : 0;
         }
         if (r.type == avbd3d_dynamicBody && d.mass[b] > 0.0f)
         {

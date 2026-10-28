@@ -693,41 +693,87 @@ void avbd3d_World_SetSolverDef(avbd3d_WorldId id, const avbd3d_SolverDef *d)
 
 // ---- batched body access ------------------------------------------------------------------
 
-int avbd3d_World_GetBodyData(avbd3d_WorldId id, const avbd3d_BodyId *ids, int count, avbd3d_BodyDataType type, void *data)
+extern "C++" {
+// One body read through the mirror (syncBody pulls it from the snapshot when stale).
+static void readBodyMirror(World *w, int b, avbd3d_BodyDataType type, unsigned char *out, size_t sz)
 {
-    World *w = settled(id);
-    static const size_t sizes[] = {sizeof(avbd3d_Vec3), sizeof(avbd3d_Quat), sizeof(avbd3d_Transform),
-                                   sizeof(avbd3d_Vec3), sizeof(avbd3d_Vec3), 1};
-    if (!w || type < 0 || type >= avbd3d_bodyDataTypeCount)
-        return 0;
-    const size_t sz = sizes[type];
-    unsigned char *out = (unsigned char *)data;
-    int valid = 0;
-    for (int i = 0; i < count; i++, out += sz)
+    w->syncBody(b);
+    switch (type)
     {
-        std::memset(out, 0, sz);
-        if (!w->bodyValid(ids[i]))
-            continue;
+    case avbd3d_bodyDataPosition: { avbd3d_Vec3 v = fromV(w->originPos(b)); std::memcpy(out, &v, sz); break; }
+    case avbd3d_bodyDataRotation: { avbd3d_Quat q = fromQ(w->originRot(b)); std::memcpy(out, &q, sz); break; }
+    case avbd3d_bodyDataTransform:
+    {
+        avbd3d_Transform t{fromV(w->originPos(b)), fromQ(w->originRot(b))};
+        std::memcpy(out, &t, sz);
+        break;
+    }
+    case avbd3d_bodyDataLinearVelocity: { avbd3d_Vec3 v = fromV(w->desc.velLin[b]); std::memcpy(out, &v, sz); break; }
+    case avbd3d_bodyDataAngularVelocity: { avbd3d_Vec3 v = fromV(w->desc.velAng[b]); std::memcpy(out, &v, sz); break; }
+    case avbd3d_bodyDataAwake: *out = w->isAwake(b) ? 1 : 0; break;
+    default: break;
+    }
+}
+
+// The batch loop with the type fixed at compile time. A movable body the mirror is behind on
+// (and no host write holds) is read straight from the finished snapshot: no mirror or proxy
+// bookkeeping, same values syncBody would have copied. Anything else goes through the mirror.
+template <avbd3d_BodyDataType T, size_t SZ>
+static int readBodies(World *w, const avbd3d_BodyId *ids, int count, unsigned char *out)
+{
+    int valid = 0;
+    for (int i = 0; i < count; i++, out += SZ)
+    {
+        bool plain = false;
+        const VkWorld::SnapshotView *sv = w->snapshotFor(ids[i], &plain);
         const int b = ids[i].index1;
-        valid++;
-        w->syncBody(b);
-        switch (type)
+        if (!sv)
         {
-        case avbd3d_bodyDataPosition: { avbd3d_Vec3 v = fromV(w->originPos(b)); std::memcpy(out, &v, sz); break; }
-        case avbd3d_bodyDataRotation: { avbd3d_Quat q = fromQ(w->originRot(b)); std::memcpy(out, &q, sz); break; }
-        case avbd3d_bodyDataTransform:
-        {
-            avbd3d_Transform t{fromV(w->originPos(b)), fromQ(w->originRot(b))};
-            std::memcpy(out, &t, sz);
-            break;
+            std::memset(out, 0, SZ);
+            if (!w->bodyValid(ids[i]))
+                continue;
+            valid++;
+            readBodyMirror(w, b, T, out, SZ);
+            continue;
         }
-        case avbd3d_bodyDataLinearVelocity: { avbd3d_Vec3 v = fromV(w->desc.velLin[b]); std::memcpy(out, &v, sz); break; }
-        case avbd3d_bodyDataAngularVelocity: { avbd3d_Vec3 v = fromV(w->desc.velAng[b]); std::memcpy(out, &v, sz); break; }
-        case avbd3d_bodyDataAwake: *out = w->isAwake(b) ? 1 : 0; break;
-        default: break;
+        valid++;
+        if (T == avbd3d_bodyDataLinearVelocity) { avbd3d_Vec3 v = fromV(sv->velLin[b]); std::memcpy(out, &v, SZ); }
+        else if (T == avbd3d_bodyDataAngularVelocity) { avbd3d_Vec3 v = fromV(sv->velAng[b]); std::memcpy(out, &v, SZ); }
+        else if (T == avbd3d_bodyDataAwake) *out = sv->awake[b] ? 1 : 0;
+        else
+        {
+            // plain: the origin is the centre of mass and the principal frame is the body frame
+            const quat oq = plain ? sv->rot[b] : sv->rot[b] * conjugate(w->desc.bodyPrincipalRot[b]);
+            if (T == avbd3d_bodyDataRotation) { avbd3d_Quat q = fromQ(oq); std::memcpy(out, &q, SZ); }
+            else
+            {
+                const avbd3d_Vec3 p = plain ? fromV(sv->pos[b]) : fromV(sv->pos[b] - rotate(oq, w->desc.bodyLocalCenter[b]));
+                if (T == avbd3d_bodyDataPosition) std::memcpy(out, &p, SZ);
+                else { avbd3d_Transform t{p, fromQ(oq)}; std::memcpy(out, &t, SZ); }
+            }
         }
     }
     return valid;
+}
+
+} // extern "C++"
+
+int avbd3d_World_GetBodyData(avbd3d_WorldId id, const avbd3d_BodyId *ids, int count, avbd3d_BodyDataType type, void *data)
+{
+    World *w = settled(id);
+    if (!w || type < 0 || type >= avbd3d_bodyDataTypeCount)
+        return 0;
+    unsigned char *out = (unsigned char *)data;
+    switch (type)
+    {
+    case avbd3d_bodyDataPosition: return readBodies<avbd3d_bodyDataPosition, sizeof(avbd3d_Vec3)>(w, ids, count, out);
+    case avbd3d_bodyDataRotation: return readBodies<avbd3d_bodyDataRotation, sizeof(avbd3d_Quat)>(w, ids, count, out);
+    case avbd3d_bodyDataTransform: return readBodies<avbd3d_bodyDataTransform, sizeof(avbd3d_Transform)>(w, ids, count, out);
+    case avbd3d_bodyDataLinearVelocity: return readBodies<avbd3d_bodyDataLinearVelocity, sizeof(avbd3d_Vec3)>(w, ids, count, out);
+    case avbd3d_bodyDataAngularVelocity: return readBodies<avbd3d_bodyDataAngularVelocity, sizeof(avbd3d_Vec3)>(w, ids, count, out);
+    case avbd3d_bodyDataAwake: return readBodies<avbd3d_bodyDataAwake, 1>(w, ids, count, out);
+    default: return 0;
+    }
 }
 
 int avbd3d_World_SetBodyData(avbd3d_WorldId id, const avbd3d_BodyId *ids, int count, avbd3d_BodyDataType type, const void *data)

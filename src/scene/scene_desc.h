@@ -22,6 +22,7 @@
 #include "scene_types.h"
 #include "solver_params.h"
 
+#include <cstdint>
 #include <vector>
 
 struct SceneDesc

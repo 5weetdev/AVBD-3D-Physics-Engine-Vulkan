@@ -291,6 +291,26 @@ public:
         if (b > 0 && b < (int)m_bodySerial.size() && m_bodySerial[b] < m_vk.snapshotSerial())
             pullBody(b);
     }
+    // Read fast path: the finished snapshot when body b is movable, not held by a host write
+    // and its mirror is behind the snapshot (syncBody would copy exactly these values). Writes
+    // no mirror or proxy bookkeeping. Returns null otherwise (use the mirror).
+    // Also checks the id from the packed hot records (no BodyRec touched); a destroyed body
+    // clears its movable flag, a reused slot has a new generation.
+    const VkWorld::SnapshotView *snapshotFor(avbd3d_BodyId id, bool *plain = nullptr)
+    {
+        const int b = id.index1;
+        if (b <= 0 || b >= (int)m_hot.size() || b >= (int)m_bodySerial.size() || id.world0 != worldIndex)
+            return nullptr;
+        const BodyHot &h = m_hot[b];
+        if (!h.movable || h.gen != id.generation || m_bodySerial[b] >= m_vk.snapshotSerial())
+            return nullptr;
+        const VkWorld::SnapshotView &v = view();
+        if (v.serial == 0 || v.serial < m_bodyHold[b] || b >= v.count)
+            return nullptr;
+        if (plain)
+            *plain = h.plain != 0;
+        return &v;
+    }
     // Every movable body (world-level reads: queries, sensors, joint creation).
     void syncBodies();
     void setBodyUser(int b, void *u)
@@ -406,6 +426,7 @@ private:
         void *user = nullptr;
         uint16_t gen = 0;
         uint8_t movable = 0; // in m_movable
+        uint8_t plain = 0;   // origin == centre of mass, no principal rotation: pose == snapshot pose
     };
     std::vector<BodyHot> m_hot;
     VkWorld::SnapshotView m_view; // the host copy of the newest snapshot (view())
