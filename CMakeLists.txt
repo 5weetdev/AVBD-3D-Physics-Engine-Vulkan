@@ -283,7 +283,7 @@ if(AVBD3D_BUILD_TESTS)
     target_link_libraries(avbd3d_test_device_error PRIVATE avbd3d)
 
     # The remaining tests use only the public C API.
-    foreach(name api_world api_shapes api_joints api_events api_query api_filter_material api_sleep_wake)
+    foreach(name api_world api_shapes api_joints api_events api_query api_filter_material api_sleep_wake api_grab)
         add_executable(avbd3d_test_${name} tests/${name}.cpp)
         target_link_libraries(avbd3d_test_${name} PRIVATE avbd3d)
         add_test(NAME avbd3d_test_${name} COMMAND avbd3d_test_${name})

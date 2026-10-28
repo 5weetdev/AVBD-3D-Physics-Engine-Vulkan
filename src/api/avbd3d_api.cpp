@@ -739,7 +739,7 @@ static int readBodies(World *w, const avbd3d_BodyId *ids, int count, unsigned ch
         valid++;
         if (T == avbd3d_bodyDataLinearVelocity) { avbd3d_Vec3 v = fromV(sv->velLin[b]); std::memcpy(out, &v, SZ); }
         else if (T == avbd3d_bodyDataAngularVelocity) { avbd3d_Vec3 v = fromV(sv->velAng[b]); std::memcpy(out, &v, SZ); }
-        else if (T == avbd3d_bodyDataAwake) *out = sv->awake[b] ? 1 : 0;
+        else if (T == avbd3d_bodyDataAwake) *out = sv->awake[b] || w->wakePending(b, sv->serial) ? 1 : 0;
         else
         {
             // plain: the origin is the centre of mass and the principal frame is the body frame

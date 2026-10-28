@@ -311,6 +311,8 @@ public:
             *plain = h.plain != 0;
         return &v;
     }
+    // A wake the snapshot's step began too early to apply: the body reads awake until one has.
+    bool wakePending(int b, uint64_t serial) const { return b < (int)m_wakeHold.size() && serial < m_wakeHold[b]; }
     // Every movable body (world-level reads: queries, sensors, joint creation).
     void syncBodies();
     void setBodyUser(int b, void *u)
@@ -418,6 +420,10 @@ private:
     // The read model (syncBody): per body, the snapshot serial its mirror holds and the first
     // serial it may be pulled from (a host write holds it until its step has finished).
     std::vector<uint64_t> m_bodySerial, m_bodyHold;
+    // A wake holds only the awake flag (the first serial that has applied it): it changes no pose or
+    // velocity, so the mirror keeps following the device. A body woken every frame (a grab) would
+    // otherwise be held for good and read back frozen.
+    std::vector<uint64_t> m_wakeHold;
     // What the per-step loops (pullBody, moveEvents) need of a BodyRec, packed: a BodyRec is
     // ~200 bytes, and walking 100k of them cost ~4 ms a step in cache misses. Rebuilt with the
     // solver lists; a body changed since is held (holdBody) until the flush that rebuilds them.
@@ -442,6 +448,11 @@ private:
     {
         if (b < (int)m_bodyHold.size())
             m_bodyHold[b] = m_vk.stepSerial() + 1;
+    }
+    void holdWake(int b)
+    {
+        if (b < (int)m_wakeHold.size())
+            m_wakeHold[b] = m_vk.stepSerial() + 1;
     }
     std::vector<int> m_sensors; // live sensor shapes, ascending
     int m_vkBodies = 0, m_vkShapes = 0, m_vkJoints = 0, m_vkSprings = 0;

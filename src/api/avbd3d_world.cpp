@@ -74,6 +74,7 @@ World::World(const avbd3d_WorldDef &def, Device *shared) : m_vk(shared)
     awake.push_back(0);
     m_bodySerial.push_back(0);
     m_bodyHold.push_back(0);
+    m_wakeHold.push_back(0);
 
     // Test hook: the Nth step submission of this world reports VK_ERROR_DEVICE_LOST.
     const char *f = shared ? nullptr : std::getenv("AVBD_DEBUG_FAIL_SUBMIT");
@@ -203,6 +204,7 @@ int World::allocBody()
     awake.push_back(1);
     m_bodySerial.push_back(0);
     m_bodyHold.push_back(m_vk.stepSerial() + 1);
+    m_wakeHold.push_back(0);
     return s;
 }
 
@@ -827,7 +829,18 @@ void World::setAwake(int b, bool a)
         desc.velAng[b] = vec3{0, 0, 0};
     }
     unsigned char v = a ? 1 : 0;
-    queue(b, BodyWrite::Awake, &v, 1);
+    if (!a)
+    {
+        queue(b, BodyWrite::Awake, &v, 1);
+        return;
+    }
+    // A wake moves nothing: hold the awake flag, not the pose (see m_wakeHold).
+    holdWake(b);
+    Op op;
+    op.body = b;
+    op.type = BodyWrite::Awake;
+    op.data[0] = v;
+    m_ops.push_back(op);
 }
 
 void World::setEnabled(int b, bool e)
@@ -1797,7 +1810,7 @@ void World::pullBody(int b)
                 m_proxyDirty.push_back(b);
             }
         }
-        awake[b] = v.awake[b];
+        awake[b] = v.awake[b] || wakePending(b, v.serial);
     }
     m_bodySerial[b] = v.serial;
 }
