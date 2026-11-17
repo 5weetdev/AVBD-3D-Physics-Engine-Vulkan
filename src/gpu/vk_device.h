@@ -179,6 +179,7 @@ public:
     // capability-extension prerequisites are core in the 1.3 instance this backend
     // already requests, so no instance extensions are needed). init() aborts if the
     // selected device does not support them.
+    // Windows only: on other platforms this is a no-op and hasExternalWin32() stays false.
     void enableExternalWin32();
     bool hasExternalWin32() const { return m_externalWin32; }
 

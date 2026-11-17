@@ -15,7 +15,7 @@
 | `avbd3d_body_get_closest_point` | Includes shape radii, unlike Box3D | Subtract the radius yourself if you need the core distance |
 | Determinism | Not guaranteed. Results can differ between GPUs, drivers and `primalLanes` values | Do not use it for lock-step networking |
 | Subgroup size | The cooperative kernels assume 32. The device is not rejected if its size differs, and other sizes are untested | Use an NVIDIA GPU |
-| Platforms | Tested on Windows 10 with one NVIDIA GPU only. Linux and macOS (MoltenVK) build scripts exist and are **untested** | Report what breaks |
+| Platforms | Tested on Windows 10 with one NVIDIA GPU only. Linux and macOS (MoltenVK) build scripts exist and Windows-only code is guarded, but a full build and test run is **untested**; D3D11 interop (`enableExternalWin32`) is Windows only | Report what breaks |
 | Thread safety | None. One world, one thread at a time | Serialise calls |
 | Colours | A scene whose constraint graph needs more than 128 colours reports a failed step | Reduce the number of constraints per body |
 | Not offered | Recording, double precision, task system, pre-solve and custom-filter callbacks, cloth, level of detail | - |

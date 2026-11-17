@@ -25,6 +25,10 @@ You need a GPU and driver with Vulkan 1.3. The build is tested on one machine: R
 | Vulkan SDK | <https://vulkan.lunarg.com/sdk/home>. Source its `setup-env.sh` so `VULKAN_SDK` is set and `slangc` is on `PATH`. |
 | SDL2 build dependencies (demo only) | See SDL's `docs/README-linux.md` (X11 or Wayland headers) |
 
+Fedora package names (use the `-devel` equivalents elsewhere): `gcc-c++ cmake ninja-build python3 vulkan-loader-devel vulkan-headers`, plus the X11/Wayland headers SDL needs (`libX11-devel libXext-devel libXrandr-devel libXcursor-devel libXfixes-devel libXi-devel libXScrnSaver-devel libxkbcommon-devel libXrender-devel`).
+
+The code is written to compile on Linux: Windows-only calls and the `VK_KHR_*_win32` interop extensions are guarded by `_WIN32`, and `enableExternalWin32()` is a no-op elsewhere. A full Linux build and test run has not been done yet.
+
 Open a new terminal after installing so `PATH` picks everything up.
 
 ## 2. Get the source

@@ -31,6 +31,7 @@
 #include "vk_primitives.h"
 
 #include <algorithm>
+#include <cmath>
 #include <cstdint>
 #include <vector>
 
@@ -150,7 +151,7 @@ public:
                        int firstRound, int count, VkDeviceAddress dynamicCountAddr = 0);
     // The rounds to record blind: a slowly decaying peak of recent convergence rounds + 2,
     // at least 8. Rounds jitter step to step, and every shortfall costs a rerun.
-    int jpBound() const { return std::min(std::max(8, (int)ceilf(m_peakRounds) + 2), kMaxJpRounds); }
+    int jpBound() const { return std::min(std::max(8, (int)std::ceil(m_peakRounds) + 2), kMaxJpRounds); }
     // Same cap as the old host loop (AVBD_MAX_COLORS * 4 rounds).
     static const int kMaxJpRounds = AVBD_MAX_COLORS_VK * 4;
 
