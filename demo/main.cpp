@@ -21,6 +21,8 @@
 // the public avbd3d_* API: it creates the GPU, shares its device and draws what the
 // World_Write* calls produce.
 
+#include <thread>
+#include <atomic>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_vulkan.h>
 
@@ -580,6 +582,69 @@ static void onAbort(int)
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "avbd3d_demo: fatal error", msg, nullptr);
 }
 
+
+// One ImGui frame with centered text, presented and waited on. Used only before the main
+// loop starts, while no other thread touches the queue.
+static void drawLoadingFrame(const char *text)
+{
+    vkWaitForFences(g_device.device(), 1, &g_inFlight[g_frameIdx], VK_TRUE, UINT64_MAX);
+    uint32_t imageIndex = 0;
+    if (vkAcquireNextImageKHR(g_device.device(), g_swapchain, UINT64_MAX, g_imageAvail[g_frameIdx],
+                              VK_NULL_HANDLE, &imageIndex) != VK_SUCCESS)
+        return;
+    vkResetFences(g_device.device(), 1, &g_inFlight[g_frameIdx]);
+
+    VkCommandBuffer cmd = g_cmdBufs[g_frameIdx];
+    vkResetCommandBuffer(cmd, 0);
+    VkCommandBufferBeginInfo bi{VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO};
+    VK_CHECK(vkBeginCommandBuffer(cmd, &bi));
+
+    VkClearValue clears[2]{};
+    clears[0].color = {{0.08f, 0.09f, 0.11f, 1.0f}};
+    clears[1].depthStencil = {1.0f, 0};
+    VkRenderPassBeginInfo rpbi{VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
+    rpbi.renderPass = g_renderPass;
+    rpbi.framebuffer = g_framebuffers[imageIndex];
+    rpbi.renderArea = {{0, 0}, g_swapExtent};
+    rpbi.clearValueCount = 2;
+    rpbi.pClearValues = clears;
+    vkCmdBeginRenderPass(cmd, &rpbi, VK_SUBPASS_CONTENTS_INLINE);
+
+    ImGui_ImplVulkan_NewFrame();
+    ImGui_ImplSDL2_NewFrame();
+    ImGui::NewFrame();
+    const ImVec2 size = ImGui::GetIO().DisplaySize;
+    const ImVec2 ts = ImGui::CalcTextSize(text);
+    ImGui::GetBackgroundDrawList()->AddText(ImVec2((size.x - ts.x) * 0.5f, (size.y - ts.y) * 0.5f),
+                                            IM_COL32(220, 225, 235, 255), text);
+    ImGui::Render();
+    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd);
+
+    vkCmdEndRenderPass(cmd);
+    VK_CHECK(vkEndCommandBuffer(cmd));
+
+    VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    VkSubmitInfo si{VK_STRUCTURE_TYPE_SUBMIT_INFO};
+    si.waitSemaphoreCount = 1;
+    si.pWaitSemaphores = &g_imageAvail[g_frameIdx];
+    si.pWaitDstStageMask = &waitStage;
+    si.commandBufferCount = 1;
+    si.pCommandBuffers = &cmd;
+    si.signalSemaphoreCount = 1;
+    si.pSignalSemaphores = &g_renderDonePerImage[imageIndex];
+    VK_CHECK(vkQueueSubmit(g_device.queue(), 1, &si, g_inFlight[g_frameIdx]));
+
+    VkPresentInfoKHR pi{VK_STRUCTURE_TYPE_PRESENT_INFO_KHR};
+    pi.waitSemaphoreCount = 1;
+    pi.pWaitSemaphores = &g_renderDonePerImage[imageIndex];
+    pi.swapchainCount = 1;
+    pi.pSwapchains = &g_swapchain;
+    pi.pImageIndices = &imageIndex;
+    vkQueuePresentKHR(g_device.queue(), &pi);
+    vkQueueWaitIdle(g_device.queue());
+    g_frameIdx = (g_frameIdx + 1) % kFramesInFlight;
+}
+
 int main(int argc, char **argv)
 {
     DemoLaunch launch;
@@ -689,8 +754,6 @@ int main(int argc, char **argv)
         fprintf(stderr, "avbd_vk: initial swapchain creation failed (window minimized?)\n");
         return 1;
     }
-    g_renderer.init(g_device, g_renderPass, g_swapExtent.width, g_swapExtent.height);
-
     VkCommandPoolCreateInfo poolInfo{VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO};
     poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
     poolInfo.queueFamilyIndex = g_device.queueFamily();
@@ -730,6 +793,26 @@ int main(int argc, char **argv)
     vii.DescriptorPoolSize = 8;
     ImGui_ImplVulkan_Init(&vii);
 
+    // Shader/pipeline compilation (renderer + first world) can take many seconds on a cold
+    // pipeline cache. Show a loading frame, then run the work on a worker thread while this
+    // thread keeps pumping events so the OS does not flag the window as unresponsive.
+    drawLoadingFrame("Compiling shaders...");
+    std::atomic<bool> loadDone{false};
+    bool sceneOk = true;
+    std::thread loader([&] {
+        g_renderer.init(g_device, g_renderPass, g_swapExtent.width, g_swapExtent.height);
+        loadDone = true;
+    });
+    while (!loadDone)
+    {
+        SDL_Event le;
+        while (SDL_PollEvent(&le))
+        {
+        }
+        SDL_Delay(16);
+    }
+    loader.join();
+
     if (verbose)
         fprintf(stdout, "avbd3d_demo: validation layers %s\n",
                 (smoke || getenv("AVBD_VK_VALIDATION")) ? "ON" : "off");
@@ -752,7 +835,21 @@ int main(int argc, char **argv)
 
     app.init(host);
 
-    if (!app.loadInitialScene(launch))
+    loadDone = false;
+    std::thread sceneLoader([&] {
+        sceneOk = app.loadInitialScene(launch);
+        loadDone = true;
+    });
+    while (!loadDone)
+    {
+        SDL_Event le;
+        while (SDL_PollEvent(&le))
+        {
+        }
+        SDL_Delay(16);
+    }
+    sceneLoader.join();
+    if (!sceneOk)
         return 2;
 
     g_perfFreq = SDL_GetPerformanceFrequency();
