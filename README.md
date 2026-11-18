@@ -2,7 +2,7 @@
 
 A rigid-body physics engine that runs the whole simulation step on the GPU through Vulkan compute, with a C API.
 
-**Status: experimental, v1.0.0, ABI 1.0.** Windows with an NVIDIA GPU is the only configuration that has been tested. Linux and macOS (MoltenVK) are intended targets and have not been built or run. See [limitations](docs/limitations.md).
+**Status: experimental, waiting for human review, v1.0.0, ABI 1.0.** Windows with an NVIDIA GPU is the only configuration that has been tested. Linux and macOS (MoltenVK) are intended targets and have not been built or run. See [limitations](docs/limitations.md).
 
 ## What it is
 
