@@ -45,7 +45,7 @@ void VkWorld::releaseDragSlots(int first, int count)
 }
 
 
-// the drag path's GpuSolver::dragBodies, step for step: the same per-body stiffness
+// the drag path: the per-body stiffness
 // (5000 * mass * grabStrength * weight), the same "fresh grab" rule (the group changed
 // size, or nothing was held), and the same release of slots the group no longer uses.
 void VkWorld::dragBodies(const int *bodies, const vec3 *targets, const vec3 *locals, int count, const float *weights,

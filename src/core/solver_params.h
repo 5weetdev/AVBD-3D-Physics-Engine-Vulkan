@@ -125,7 +125,7 @@ struct SolverParams
     // the rotation update, capped at a quarter turn per step. Off is the legacy 2 vec(dq) / dt,
     // which loses (w dt)^2 / 8 of the spin every step (a free sphere at 8 rad/s lost 11% in 1 s,
     // and a rolling one slowed with no rolling resistance). On by default since 2026-10-15; off
-    // exists only so the golden gates can replay the frozen CUDA solver, which used the legacy form.
+    // exists only so the golden gates can replay the frozen goldens, which used the legacy form.
     bool exactSpinVelocity;
 
     // ---- Fidelity trade. Off by default, and with it off the step is bit-identical to a

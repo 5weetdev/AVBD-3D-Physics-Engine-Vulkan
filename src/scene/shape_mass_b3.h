@@ -11,7 +11,7 @@
 
 #pragma once
 
-// Mass from shapes (docs/SOLVER_3D_ROADMAP.md, Phase 1.4), host only. Each shape's mass data
+// Mass from shapes, host only. Each shape's mass data
 // comes from Box3D's own b3ComputeHullMass / b3ComputeSphereMass / b3ComputeCapsuleMass; the
 // shapes are summed about the combined centre with the parallel-axis theorem, and the 3x3
 // inertia is diagonalised (Jacobi) into principal moments and a principal rotation, so the

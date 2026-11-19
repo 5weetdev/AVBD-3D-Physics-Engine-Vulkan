@@ -33,10 +33,10 @@ namespace avbdvk
 struct NarrowphasePipelines
 {
     Pipeline narrowphase;
-    // Phase 1.3: hull pairs. Both stay empty (hullReady() false) until initHull runs.
+    // hull pairs. Both stay empty (hullReady() false) until initHull runs.
     Pipeline hullArgs, hull;
     bool hullInit = false;
-    // Phase 1.5a: mesh pairs (narrowphase_mesh.slang). Empty until initMesh runs.
+    // mesh pairs (narrowphase_mesh.slang). Empty until initMesh runs.
     Pipeline meshArgs, meshChildCount, meshMidphase, meshChild, meshChildFilter;
     bool meshInit = false;
 
@@ -97,7 +97,7 @@ struct VkNpHullRefs
     uint64_t geomHeapBytes = 0;
 };
 
-// The mesh path (Phase 1.5a) reads the same geometry heap as the hull path, and sorts its child keys
+// The mesh path reads the same geometry heap as the hull path, and sorts its child keys
 // with the broadphase's radix pipelines and scratch (VkWorld owns both). A scene without a mesh shape
 // passes nullptr to record() and the mesh path costs nothing.
 struct VkNpMeshRefs
@@ -161,7 +161,7 @@ public:
     bool overflowed() const { return overflow; }
     int requiredContacts() const { return requiredContactCount; }
 
-    // Hull pairs (Phase 1.3). hullCounterAddress() counts the hull pairs the last record() found
+    // Hull pairs. hullCounterAddress() counts the hull pairs the last record() found
     // (0 when it recorded no hull path); hullCapacity() is the number of per-lane scratch slots.
     // The world raises the step flag when the count exceeds the capacity and calls growHull()
     // from the rerun, like the pair and contact capacities. hullPairs() is the count read back by
@@ -173,7 +173,7 @@ public:
     void growHull(int neededPairs);
     const Buffer &bufSatSep(bool useB) const { return useB ? satSepB : satSepA; }
 
-    // Mesh children (Phase 1.5a). Child keys are appended by csMeshMidphase; childCounterAddress()
+    // Mesh children. Child keys are appended by csMeshMidphase; childCounterAddress()
     // is the raw append count, which can exceed childCapacity(). The sorted child i is manifold slot
     // childBase (= the pair capacity of the record) + i. When the raw count exceeds the capacity the
     // pass is discarded: the world calls growChild(childRaw()) and reruns, like the hull scratch.
@@ -256,7 +256,7 @@ private:
     bool m_hullRecorded = false;
     void ensureHull();
 
-    // Mesh pairs (Phase 1.5a): the pair-slot list csNarrowphase appends mesh-vs-convex pairs to, its
+    // Mesh pairs: the pair-slot list csNarrowphase appends mesh-vs-convex pairs to, its
     // counter and indirect dispatch, the raw child-key append list and its sorted copy, the clamped
     // child count (also the sort's count), and the per-lane scratch the Box3D triangle collision uses.
     Buffer meshList, meshCounter, meshIndirect;

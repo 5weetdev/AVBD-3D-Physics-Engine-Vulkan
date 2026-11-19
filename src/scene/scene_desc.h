@@ -15,7 +15,7 @@
 // device state, in host arrays, with the derived quantities (broadphase cell size, joint
 // torque arm and rest orientation, resolved spring rest length, the sorted collision-ignore
 // list) already computed -- so no backend re-derives them, and none needs to know how a
-// scene was authored. SceneBuilder produces one; GpuSolver and VkWorld consume it.
+// scene was authored. SceneBuilder produces one; VkWorld consumes it.
 //
 // In-process only and unversioned. It is not the ABI (include/avbd3d/ is).
 

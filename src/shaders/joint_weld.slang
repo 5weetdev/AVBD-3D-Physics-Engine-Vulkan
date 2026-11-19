@@ -23,7 +23,7 @@ public quat jointRot(BodySoA b, int body)
     return body >= 0 ? b.rot[body] : quat(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
-// H = outer(r, F) - dot(r, F) * I, column-norm diagonal approximation (gpu_forces.cuh).
+// H = outer(r, F) - dot(r, F) * I, column-norm diagonal approximation.
 public float3x3 geometricStiffnessBallSocketDiag(vec3 r, vec3 F)
 {
     float d = dot3(r, F);
@@ -35,14 +35,14 @@ public float3x3 geometricStiffnessBallSocketDiag(vec3 r, vec3 F)
         sqrt(max(0.0f, rSq * F.z * F.z - 2.0f * r.z * F.z * d + d2)));
 }
 
-// PENALTY_MIN/MAX (collision.h) and JOINT_PENALTY_MAX (gpu_forces.cuh) -- kept local so
+// PENALTY_MIN/MAX (collision.h) and JOINT_PENALTY_MAX -- kept local so
 // forces.slang does not have to import dual.slang/narrowphase.slang just for constants.
 public static const float PENALTY_MIN_J = 1.0f;
 static const float PENALTY_MAX_J = 10000000000.0f;
 public static const float JOINT_PENALTY_MAX = 500000.0f;
 
 // Effective mass along a world-space linear axis: J M^-1 J^T for the two bodies' linear
-// and angular response (gpu_forces.cuh:jointEffMassLin). body A may be a world anchor
+// and angular response. body A may be a world anchor
 // (ia < 0), which contributes nothing.
 public float jointEffMassLin(BodySoA b, int ia, int ib, vec3 rAW, vec3 rBW, vec3 axis, float dt)
 {
@@ -68,7 +68,7 @@ public float jointEffMassLin(BodySoA b, int ia, int ib, vec3 rAW, vec3 rBW, vec3
     return w > 0.0f ? clampf(1.0f / (w * dt * dt), PENALTY_MIN_J, PENALTY_MAX_J) : PENALTY_MIN_J;
 }
 
-// Effective inertia along a world-space rotation axis (gpu_forces.cuh:jointEffMassAng).
+// Effective inertia along a world-space rotation axis.
 public float jointEffMassAng(BodySoA b, int ia, int ib, vec3 axis, float torqueArm, float dt)
 {
     float w = 0.0f;
@@ -92,7 +92,7 @@ public float jointEffMassAng(BodySoA b, int ia, int ib, vec3 axis, float torqueA
 }
 
 // Scales a warm-started lambda down where its matching penalty component has ramped
-// above the effective-mass baseline, gated by relative speed (gpu_forces.cuh:jointDampLambda).
+// above the effective-mass baseline, gated by relative speed.
 // dualDamping <= 0 is a no-op and bit-exact against the pre-existing behaviour.
 public vec3 jointDampLambda(vec3 lambda, vec3 penalty, vec3 kAuto, vec3 vRel, float dualDamping, float dualDampVel)
 {

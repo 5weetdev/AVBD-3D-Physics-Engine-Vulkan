@@ -1,4 +1,4 @@
-// Continuous collision (Phase 5). After the solve, a body that moved more than a fraction of its
+// Continuous collision. After the solve, a body that moved more than a fraction of its
 // smallest half extent is swept against the geometry it may have tunnelled through, and its pose
 // is clamped to the earliest time of impact. Same scheme as Box3D's b3SolveContinuous and the 2D
 // solver's ccd2d.slang:

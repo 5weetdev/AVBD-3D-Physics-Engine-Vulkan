@@ -1,4 +1,4 @@
-// Phase 1.5a: static triangle mesh pairs. csNarrowphase (narrowphase.slang) does not collide a pair with
+// static triangle mesh pairs. csNarrowphase (narrowphase.slang) does not collide a pair with
 // a mesh shape: a mesh against a dynamic convex shape appends its pair slot to meshList. Then:
 //   csMeshArgs        indirect dispatch for the midphase, from the list length
 //   csMeshMidphase    one lane per listed pair walks the Box3D mesh BVH (b3MeshData in the geometry

@@ -70,7 +70,7 @@ uint digitU64(uint64_t key, uint pass) { return uint((key >> (uint64_t)(pass * 8
 // Low `n` bits set (n in [0,64]), split across a uint2 the way WaveActiveBallot's
 // returned uint4's .xy holds up to 64 lanes -- z/w are never touched since this port
 // only has to support 32- and 64-wide subgroups.
-// Device-count sorts (M4): the host sizes the grid by capacity and passes the live element
+// Device-count sorts: the host sizes the grid by capacity and passes the live element
 // count as a device pointer, so the sort can be recorded before the count is known. Blocks
 // past the count see no elements -- hist writes zeros, scatter writes nothing -- so the
 // scanned offsets and the output are identical to a sort sized exactly.

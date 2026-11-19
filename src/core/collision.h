@@ -97,7 +97,7 @@ struct Contact
 // collidable yet: the narrowphase emits no contacts for a pair with a hull in it, and the
 // renderer skips it (a later phase adds the hull SAT and a mesh draw).
 #define AVBD_SHAPE_HULL 4
-// A static triangle mesh (Phase 1.5a): a Box3D b3MeshData blob (BVH + vertices + triangles) in the
+// A static triangle mesh: a Box3D b3MeshData blob (BVH + vertices + triangles) in the
 // device geometry heap at the shape's geomOffset. halfExtents is the mesh's local AABB half size.
 // Meshes are static (density 0) and collide only with convex shapes (box, sphere, capsule, hull).
 // The narrowphase divert sends those pairs to narrowphase_mesh.slang, which runs a

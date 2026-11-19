@@ -1,5 +1,5 @@
 // The wake stage -- the implicit, velocity-gated wake path (one
-// contact ring per step) plus GpuSolver::wakeAll(). The explicit, ungated mutation
+// contact ring per step) plus wakeAll(). The explicit, ungated mutation
 // flood lives in mutate.slang (mirroring the mutation path's split). Kernel-for-kernel:
 // k_wake_request -> csWakeRequest, k_touch_clear -> csTouchClear,
 // k_touch_accum -> csTouchAccum, k_wake_lost_support -> csWakeLostSupport,
@@ -331,7 +331,7 @@ void csWakeIslandSeed(uint3 tid: SV_DispatchThreadID)
 }
 
 // ---------------------------------------------------------------------------
-// csWakeAll -- k_wake_all (GpuSolver::wakeAll())
+// csWakeAll -- k_wake_all
 // ---------------------------------------------------------------------------
 struct WakeAllArgs
 {

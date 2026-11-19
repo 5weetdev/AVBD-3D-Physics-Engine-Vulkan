@@ -69,7 +69,7 @@ static const float kMaxStepRotation = 0.5f * 3.14159265f;
 vec3 spinStep(quat d, uint exact)
 {
     if (exact == 0u)
-        return scale(vec3(d.x, d.y, d.z), 2.0f); // legacy: kept only for the frozen CUDA goldens
+        return scale(vec3(d.x, d.y, d.z), 2.0f); // legacy form, kept so the golden gates replay
     const float dw = d.w < 0.0f ? -max(-d.w, 1e-6f) : max(d.w, 1e-6f);
     vec3 dv = scale(vec3(d.x, d.y, d.z), 2.0f / dw);
     const float a = sqrt(dv.x * dv.x + dv.y * dv.y + dv.z * dv.z);
@@ -263,7 +263,7 @@ void csExplosionGuard(uint3 tid: SV_DispatchThreadID)
 }
 
 // ---------------------------------------------------------------------------
-// Per-body settings (Phase 2). csIntegrateProps / csVelocityProps replace csIntegrate /
+// Per-body settings. csIntegrateProps / csVelocityProps replace csIntegrate /
 // csVelocity only in a world where some body has a non-default BodyProps; the host
 // dispatches the originals otherwise, so a default scene runs the code above bit for bit.
 // They carry the props pointer as a separate args field (BodySoA above is byte-pinned).

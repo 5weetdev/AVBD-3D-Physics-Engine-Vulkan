@@ -22,7 +22,7 @@
 namespace
 {
 
-// Same packing as makePairKey in gpu_types.cuh, which the scene layer cannot include:
+// Pair key packing:
 // low index in the high 32 bits, so a sort gives a canonical duplicate-free order.
 unsigned long long pairKey(int a, int b)
 {

@@ -23,12 +23,12 @@ namespace avbdvk
 {
 
 // ===========================================================================
-// mutate.slang (Phase 5B) -- the mutation path: the batched external
+// mutate.slang -- the mutation path: the batched external
 // mutation apply and the explicit, UNGATED wake flood every mutation seeds.
 // Reuses FullBodySoAGpu/FullManifoldSoAGpu/FullJointSoAGpu/FullSpringSoAGpu.
 // ===========================================================================
 
-// Mirrors GpuSolver::BodyTransform / BodyPointVector (engine/host/gpu_solver.h) byte
+// Mirrors BodyTransform / BodyPointVector byte
 // for byte -- see mutate.slang's own header comment: both are all-4-byte-aligned
 // (vec3/quat, no 8-byte pointers), so no padding either side.
 struct BodyTransformGpu
@@ -36,14 +36,14 @@ struct BodyTransformGpu
     float px, py, pz;
     float qx, qy, qz, qw;
 };
-static_assert(sizeof(BodyTransformGpu) == 28, "must match GpuSolver::BodyTransform");
+static_assert(sizeof(BodyTransformGpu) == 28, "must match BodyTransform");
 
 struct BodyPointVectorGpu
 {
     float vx, vy, vz;
     float wx, wy, wz;
 };
-static_assert(sizeof(BodyPointVectorGpu) == 24, "must match GpuSolver::BodyPointVector");
+static_assert(sizeof(BodyPointVectorGpu) == 24, "must match BodyPointVector");
 
 struct MutateApplyArgsGpu
 {
@@ -126,7 +126,7 @@ struct WakeSeedMergeArgsGpu
     int32_t _pad0 = 0;
     VkDeviceAddress seed = 0;
     VkDeviceAddress request = 0;
-    VkDeviceAddress gate = 0; // M4: skip the merge while *gate != 0; 0 = ungated
+    VkDeviceAddress gate = 0; // skip the merge while *gate != 0; 0 = ungated
 };
 static_assert(sizeof(WakeSeedMergeArgsGpu) % 8 == 0, "layout");
 

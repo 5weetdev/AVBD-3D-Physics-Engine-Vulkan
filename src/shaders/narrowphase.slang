@@ -154,7 +154,7 @@ struct NarrowphaseArgs
     int contactCapacity;
     SolverParamsNp p;
     uint _pad2;
-    // M4: when set, pairCount is a capacity and *livePairs the broadphase's emit counter
+    // when set, pairCount is a capacity and *livePairs the broadphase's emit counter
     // (it may exceed the capacity; a thread below pairCount is then live). Dead slots get
     // contactCount 0 so every consumer sized by capacity skips them.
     uint *livePairs;
@@ -166,7 +166,7 @@ struct NarrowphaseArgs
     // when the scene has no hull shape; a hull pair is then dropped as before.
     int *hullList;       // may be null. Pair slots of hull pairs; capacity = pairCount
     int *hullCounter;    // may be null. Counts appends (zeroed by the host before the kernel)
-    // Mesh pairs (Phase 1.5a): a static triangle mesh against a convex shape is not collided here.
+    // Mesh pairs: a static triangle mesh against a convex shape is not collided here.
     // Its pair slot is appended to meshList for csMeshMidphase (narrowphase_mesh.slang). Both may
     // be null when the scene has no mesh; a mesh pair is then dropped, as before.
     int *meshList;       // may be null. Pair slots of mesh-vs-convex pairs; capacity = pairCount
@@ -280,7 +280,7 @@ void csNarrowphase(uint3 tid: SV_DispatchThreadID)
     args->cur.shapeB[t] = sb;
     args->cur.contactCount[t] = 0;
 
-    // Collision filter (Phase 2). Each shape's category must be in the other's mask; a shared
+    // Collision filter. Each shape's category must be in the other's mask; a shared
     // nonzero group overrides that (positive always collides, negative never). Null arrays
     // (no filter, e.g. a bare narrowphase test) and the defaults (category 1, mask all,
     // group 0) collide as before. Two bodies of mass 0 (a kinematic and a static) never do.

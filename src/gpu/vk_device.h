@@ -167,7 +167,7 @@ public:
     PFN_vkCmdEndDebugUtilsLabelEXT cmdEndDebugLabel = nullptr;
     PFN_vkSetDebugUtilsObjectNameEXT setDebugObjectName = nullptr;
 
-    // --- Phase 6 interop hooks -----------------------
+    // --- Win32 interop hooks -----------------------
     // Both must be called before init(); both are no-ops by default,
     // so nothing above this comment changes behavior.
 

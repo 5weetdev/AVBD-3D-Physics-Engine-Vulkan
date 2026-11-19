@@ -23,7 +23,7 @@ namespace avbdvk
 {
 
 // ===========================================================================
-// pick.slang / drag.slang (Phase 5C) -- the pick path and the drag path.
+// pick.slang / drag.slang -- the pick path and the drag path.
 // Reuses FullBodySoAGpu and FullJointSoAGpu (both defined above).
 // ===========================================================================
 

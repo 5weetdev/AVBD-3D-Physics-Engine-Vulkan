@@ -1,4 +1,4 @@
-// The drag path (Phase 5C): the mouse grab expressed as a
+// The drag path: the mouse grab expressed as a
 // temporary joint, k_drag_update and k_drag_release. Field-for-field identical to the
 // the reference source; the grabGroup/grabSurvivors host-side graph walks and the
 // dragBody/dragBodies/releaseDrag orchestration stay on the CPU (they touch no device

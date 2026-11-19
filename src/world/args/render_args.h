@@ -23,7 +23,7 @@ namespace avbdvk
 {
 
 // ===========================================================================
-// render.slang (Phase 5C) -- reuses FullBodySoAGpu (defined above) for the body
+// render.slang -- reuses FullBodySoAGpu (defined above) for the body
 // fields both csWriteInstances and csPackPose read. Field order transcribed from
 // render.slang at the time this was written.
 // ===========================================================================

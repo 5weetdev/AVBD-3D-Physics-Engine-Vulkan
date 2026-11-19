@@ -23,7 +23,7 @@ namespace avbdvk
 {
 
 // ===========================================================================
-// sleep.slang (Phase 5B) -- the sleep stage. Reuses FullBodySoAGpu,
+// sleep.slang -- the sleep stage. Reuses FullBodySoAGpu,
 // FullJointSoAGpu, FullManifoldSoAGpu, FullSpringSoAGpu, ConstraintGraphGpu (all
 // defined above). Field order transcribed from sleep.slang at the time this was
 // written; every explicit _padN below matches a gap sleep.slang's Slang compiler
@@ -82,7 +82,7 @@ struct SleepCommitArgsGpu
     VkDeviceAddress touchHash = 0;
     VkDeviceAddress snapCount = 0;
     VkDeviceAddress snapHash = 0;
-    VkDeviceAddress activeCountPtr = 0; // M4 live count (0: activeCount is exact)
+    VkDeviceAddress activeCountPtr = 0; // live count (0: activeCount is exact)
 };
 static_assert(sizeof(SleepCommitArgsGpu) % 8 == 0, "layout");
 

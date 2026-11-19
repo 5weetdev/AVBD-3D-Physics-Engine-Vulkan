@@ -1,4 +1,4 @@
-// vk_ccd.h -- host side of ccd.slang: the post-solve continuous collision clamp (Phase 5).
+// vk_ccd.h -- host side of ccd.slang: the post-solve continuous collision clamp.
 // Owned by VkWorld, which fills the CcdArgsGpu body/shape pointers; this class owns the pipelines
 // and the buffers only the CCD uses (flagged list, counter, per-body fraction, TOI lane scratch).
 #pragma once

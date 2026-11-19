@@ -73,7 +73,7 @@ struct ResetColorsArgs
     int *dyn;
     uint dynCount;
     uint _pad0;
-    uint *dynCountPtr; // M4: when set, dynCount is a bound and the live count is min(*ptr, dynCount)
+    uint *dynCountPtr; // when set, dynCount is a bound and the live count is min(*ptr, dynCount)
 };
 
 [shader("compute")]
@@ -210,7 +210,7 @@ struct RowsArgs
     uint _pad0;
     int *start;
     int *end;
-    // M4: when set, `n` is the capacity and the live entry count is min(*count, n).
+    // when set, `n` is the capacity and the live entry count is min(*count, n).
     uint *count;
 };
 
@@ -256,7 +256,7 @@ struct JpRoundArgs
     uint _pad0;
     int *color;
     uint *remaining;
-    uint *dynCountPtr; // M4: live-count pointer, see ResetColorsArgs
+    uint *dynCountPtr; // live-count pointer, see ResetColorsArgs
 };
 
 int graphOtherS(JpRoundArgs *args, uint64_t key, int isA)

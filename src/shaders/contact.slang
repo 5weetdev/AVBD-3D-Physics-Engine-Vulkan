@@ -1,4 +1,4 @@
-// Ported from engine/core/gpu_contact.cuh:evalContact. The shared prologue of
+// evalContact: the shared prologue of
 // Manifold::updatePrimal / updateDual on the CPU -- see that file's header comment.
 // Same term order throughout so the two read side by side.
 

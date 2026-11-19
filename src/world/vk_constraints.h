@@ -16,8 +16,8 @@
 // manifolds + joints + springs, the (body<<32)|(type<<29)|index key sort, and the
 // batched Jones-Plassmann coloring loop.
 //
-// Like VkBroadphase/VkNarrowphase, this owns its own CommandList/HostRingBuffer. Since
-// M4 a build() is ONE submission: emit, sort and rows run on a device entry count, and
+// Like VkBroadphase/VkNarrowphase, this owns its own CommandList/HostRingBuffer. A
+// build() is ONE submission: emit, sort and rows run on a device entry count, and
 // the Jones-Plassmann rounds are recorded blind to a bound (last build's convergence
 // round + 2, at least 8) instead of the reference host loop's "dispatch until the remaining
 // counter reads zero". A round past convergence is a no-op, so the colours are the
@@ -39,7 +39,7 @@
 namespace avbdvk
 {
 
-// Same ceiling as engine/collide/gpu_constraints.cuh's AVBD_MAX_COLORS -- colors are
+// The ceiling on colours -- colors are
 // held in a 128-bit mask (two uint64) in csJpRound, so this is a hard limit, not a
 // tunable. Kept as a plain duplicated constant rather than an #include: src/world may
 // not reach into engine/collide (see tools/check_layering.py).
@@ -85,7 +85,7 @@ struct VkConstraintsSpringRefs
     int count = 0;
 };
 
-// Device addresses of the built graph, mirroring gpu_constraints.cuh's ConstraintGraph.
+// Device addresses of the built graph.
 struct VkConstraintGraph
 {
     VkDeviceAddress key = 0;
@@ -113,11 +113,11 @@ public:
                const VkConstraintsJointRefs &joints, const VkConstraintsSpringRefs &springs, const Buffer &dynamicIdx,
                int dynamicCount, VkDeviceAddress dynamicCountAddr = 0);
 
-    // dynamicCountAddr (M4, here and below): 0 means `dynamicCount` is exact. Non-zero is
+    // dynamicCountAddr: 0 means `dynamicCount` is exact. Non-zero is
     // the device address of an int32 live count and `dynamicCount` is only its upper bound:
     // grids are sized by the bound, every kernel reads min(*addr, bound) and early-outs.
 
-    // build() in pieces (M4). record() zeroes the outputs, resets colours, emits the
+    // build() in pieces. record() zeroes the outputs, resets colours, emits the
     // entries and records the sort and the row ranges into `cmd`, with the entry count
     // kept on device. The caller must have grown `radix` for maxEntries (8-byte keys,
     // 4-byte values) BEFORE recording anything into `cmd` that uses it. finish() runs

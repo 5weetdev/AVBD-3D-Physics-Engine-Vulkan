@@ -249,7 +249,7 @@ struct SleepCommitArgs
     int *touchHash;
     int *snapCount;
     int *snapHash;
-    // M4: when set, activeCount is a bound and the live count is min(*ptr, activeCount).
+    // when set, activeCount is a bound and the live count is min(*ptr, activeCount).
     int *activeCountPtr;
 };
 

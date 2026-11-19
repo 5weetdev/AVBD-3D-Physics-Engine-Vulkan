@@ -11,8 +11,7 @@
 
 #pragma once
 
-// SceneBuilder: the authoring API for scenes. Same method names and semantics GpuSolver
-// used to carry for this, but with no solver behind it -- a scene is described here and
+// SceneBuilder: the authoring API for scenes. No solver sits behind it -- a scene is described here and
 // handed to a backend as a SceneDesc via finalize().
 
 #include "scene_desc.h"
@@ -60,7 +59,7 @@ public:
     // match what the compound should weigh.
     int addShape(int body, int type, vec3 localPos, quat localRot, vec3 size, float friction);
 
-    // Convex hull shapes (Phase 1.2). The hull is a Box3D b3HullData blob (b3CreateHull,
+    // Convex hull shapes. The hull is a Box3D b3HullData blob (b3CreateHull,
     // b3MakeBoxHull().base, ...); its bytes are copied into the scene, deduplicated by hash,
     // and uploaded to the device geometry heap. A hull has no collider yet: the narrowphase
     // emits no contacts for it and the renderer does not draw it.
@@ -73,7 +72,7 @@ public:
                     vec3 angularVelocity = vec3{0, 0, 0}, quat rotation = quat{0, 0, 0, 1});
     int addHullShape(int body, const b3HullData *hull, vec3 localPos, quat localRot, float friction);
 
-    // Static triangle mesh shapes (Phase 1.5a). The triangles are cooked by Box3D's b3CreateMesh
+    // Static triangle mesh shapes. The triangles are cooked by Box3D's b3CreateMesh
     // (identifyEdges on), the resulting b3MeshData blob is copied into the scene, deduplicated by
     // hash and uploaded to the geometry heap like a hull. The narrowphase collides a mesh with
     // convex shapes only; mesh against mesh is not collided.
@@ -88,7 +87,7 @@ public:
     int addMeshShape(int body, const vec3 *vertices, int vertexCount, const int *indices, int triangleCount,
                      vec3 localPos, quat localRot, float friction);
 
-    // Mass from shapes (Phase 1.4): replaces the body's mass and moment with the sum over ALL
+    // Mass from shapes: replaces the body's mass and moment with the sum over ALL
     // its shapes at `density`, using Box3D's b3Compute*Mass, then moves the body into its
     // principal frame. The solver pose becomes the centre of mass in the principal frame
     // (pos, rot, linear velocity are converted), every shape's local transform is re-expressed

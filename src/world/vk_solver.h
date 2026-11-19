@@ -64,7 +64,7 @@ struct SolverPipelines
 void launchPrimalColor(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, const PrimalArgsGpu &args,
                        bool warp4, bool withForces);
 
-// M4: the same sweep with the colour's range and group count on device. Record
+// the same sweep with the colour's range and group count on device. Record
 // launchPrimalDispatchArgs once per step (after the colouring, fenced with
 // barrierIndirect), then one launchPrimalColorIndirect per colour: args.colorStart/
 // colorEnd/color select the range, and `indirect` holds a VkDispatchIndirectCommand per

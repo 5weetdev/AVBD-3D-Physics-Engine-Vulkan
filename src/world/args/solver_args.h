@@ -23,7 +23,7 @@ namespace avbdvk
 {
 
 // ===========================================================================
-// primal.slang / dual.slang (Phase 4b) -- full BodySoA/ManifoldSoA/JointSoA/SpringSoA
+// primal.slang / dual.slang -- full BodySoA/ManifoldSoA/JointSoA/SpringSoA
 // device-address mirrors (types.slang's structs, byte-for-byte), the local
 // ConstraintGraph mirror (primal.slang/dual.slang declare their own copy the same way
 // integrate.slang keeps a private BodySoA -- see those files' header comments), and
@@ -137,7 +137,7 @@ struct PrimalArgsGpu
     int32_t listStart = 0;
     int32_t listCount = 0;
     SolverParamsGpu p;
-    VkDeviceAddress colorStart = 0, colorEnd = 0; // M4 device colour range, see primal.slang
+    VkDeviceAddress colorStart = 0, colorEnd = 0; // device colour range, see primal.slang
     int32_t color = 0, heavyDegree = 0;           // heavyDegree > 0: high-degree bodies go to csPrimalWide*
     VkDeviceAddress shapeRolling = 0;             // per shape rolling resistance; may be null (no shape has any)
 };

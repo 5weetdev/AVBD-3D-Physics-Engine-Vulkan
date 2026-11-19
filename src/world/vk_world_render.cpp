@@ -25,7 +25,7 @@ namespace avbdvk
 
 void VkWorld::computeRenderGroups(const SceneDesc &scene)
 {
-    // solver_impl's recomputeShapeRegions(): groups 0..2 are the shape classes and
+    // Render groups: groups 0..2 are the shape classes and
     // always exist; a body's authored group (>= 0) overrides its shape. Every group's
     // region is sized for every shape that could land in it, so the kernel's atomic can
     // never run past its region and culling only ever compacts within one. Instances are
@@ -250,7 +250,7 @@ void VkWorld::writeDebugInstances(const DebugDrawViewGpu &view, int maxMarkers)
     if (!any || slots <= 0 || maxMarkers <= 0)
         return;
 
-    // GpuSolver::debugInstanceBudget(): what the enabled markers could want -- a point
+    // Debug instance budget: what the enabled markers could want -- a point
     // and a normal per contact, a link per manifold -- capped by maxMarkers. Sizing to the
     // cap alone would grow the buffer to 120k instances for a five-block tower.
     long long want = 0;

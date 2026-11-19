@@ -224,7 +224,7 @@ void VkNarrowphase::reserve(int maxPairs_, int maxContacts_)
     maxPairs = maxPairs_;
     maxContacts = maxContacts_;
 
-    // Per-slot arrays hold the pair slots and the child slots (Phase 1.5a): child slot i is
+    // Per-slot arrays hold the pair slots and the child slots: child slot i is
     // manifold slot childBase + i, so the array must reach past maxPairs by childCap.
     const VkDeviceSize slotN = (VkDeviceSize)slotCapacity();
     keyA.resize(slotN * sizeof(uint64_t));

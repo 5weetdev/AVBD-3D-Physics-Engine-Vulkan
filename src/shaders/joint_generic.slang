@@ -7,12 +7,12 @@ import types;
 import joint_weld;
 
 // ---------------------------------------------------------------------------
-// Generic 6-DOF joint (gpu_forces.cuh's rotationVector .. jointDual6). A joint with
+// Generic 6-DOF joint. A joint with
 // generic[i] == 0 is the weld above and never reaches this code. For a generic joint the
 // dual state (C0/penalty/lambda) lives in joint-frame A's coordinates, not world.
 // ---------------------------------------------------------------------------
 
-// JointAxisMode (gpu_forces.cuh). FREE is 0 so a zeroed mode array is six free axes.
+// JointAxisMode. FREE is 0 so a zeroed mode array is six free axes.
 static const int JOINT_AXIS_FREE = 0;
 static const int JOINT_AXIS_LOCKED = 1;
 static const int JOINT_AXIS_LIMITED = 2;
@@ -531,8 +531,8 @@ public void jointDual6(JointSoA j, int i, BodySoA b, float alpha, float betaLin,
 
 bool jointIsGeneric(JointSoA j, int i) { return j.generic != nullptr && j.generic[i] != 0; }
 
-// The entry points the kernels call. They dispatch as gpu_forces.cuh's jointInitialize,
-// stampJoint and jointDual do: a generic joint takes the 6-DOF path, a weld takes the
+// The entry points the kernels call. They dispatch jointInitialize,
+// stampJoint and jointDual: a generic joint takes the 6-DOF path, a weld takes the
 // weld path, which is untouched.
 public void jointInitialize(JointSoA j, int i, BodySoA b, float alpha, float gamma, float dt,
                             float dualDamping, float dualDampVel)

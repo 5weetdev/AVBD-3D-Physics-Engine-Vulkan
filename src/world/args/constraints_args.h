@@ -30,7 +30,7 @@ struct CsResetColorsArgsGpu
     VkDeviceAddress color = 0;
     VkDeviceAddress dyn = 0;
     uint32_t dynCount = 0, _pad0 = 0;
-    VkDeviceAddress dynCountPtr = 0; // M4 live count (0: dynCount is exact)
+    VkDeviceAddress dynCountPtr = 0; // live count (0: dynCount is exact)
 };
 static_assert(sizeof(CsResetColorsArgsGpu) % 8 == 0, "layout");
 
@@ -61,7 +61,7 @@ struct CsRowsArgsGpu
     VkDeviceAddress keys = 0;
     uint32_t n = 0, _pad0 = 0;
     VkDeviceAddress start = 0, end = 0;
-    VkDeviceAddress count = 0; // M4 live count; `n` is then the capacity
+    VkDeviceAddress count = 0; // live count; `n` is then the capacity
 };
 static_assert(sizeof(CsRowsArgsGpu) % 8 == 0, "layout");
 
@@ -75,7 +75,7 @@ struct CsJpRoundArgsGpu
     VkDeviceAddress dyn = 0;
     uint32_t dynCount = 0, _pad0 = 0;
     VkDeviceAddress color = 0, remaining = 0;
-    VkDeviceAddress dynCountPtr = 0; // M4 live count (0: dynCount is exact)
+    VkDeviceAddress dynCountPtr = 0; // live count (0: dynCount is exact)
 };
 static_assert(sizeof(CsJpRoundArgsGpu) % 8 == 0, "layout");
 
@@ -84,7 +84,7 @@ struct CsColorKeysArgsGpu
     VkDeviceAddress color = 0, dyn = 0;
     uint32_t dynCount = 0, _pad0 = 0;
     VkDeviceAddress keys = 0, vals = 0;
-    VkDeviceAddress dynCountPtr = 0; // M4 live count (0: dynCount is exact)
+    VkDeviceAddress dynCountPtr = 0; // live count (0: dynCount is exact)
     VkDeviceAddress midTag = 0;      // distance LOD, may be 0
 };
 static_assert(sizeof(CsColorKeysArgsGpu) % 8 == 0, "layout");
@@ -94,7 +94,7 @@ struct CsColorRowsArgsGpu
     VkDeviceAddress keys = 0;
     uint32_t n = 0, _pad0 = 0;
     VkDeviceAddress start = 0, end = 0;
-    VkDeviceAddress dynCountPtr = 0; // M4 live count (0: n is exact)
+    VkDeviceAddress dynCountPtr = 0; // live count (0: n is exact)
     VkDeviceAddress nearEnd = 0;     // distance LOD, may be 0
 };
 static_assert(sizeof(CsColorRowsArgsGpu) % 8 == 0, "layout");

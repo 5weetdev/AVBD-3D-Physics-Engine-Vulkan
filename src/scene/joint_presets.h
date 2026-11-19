@@ -1,5 +1,5 @@
 #pragma once
-// Box3D-style joint presets over SceneBuilder (docs/SOLVER_3D_ROADMAP.md, Phase 3). Host only,
+// Box3D-style joint presets over SceneBuilder. Host only,
 // header only, no dependency on Box3D: the parameter structs repeat Box3D's field names and
 // meanings so a caller holding a b3*JointDef can fill them one to one, and each preset lowers
 // to addJoint6 rows (plus, where Box3D layers several behaviours on one axis, a companion

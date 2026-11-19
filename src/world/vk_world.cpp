@@ -572,8 +572,8 @@ void VkWorld::reserve(int bodyCap, int jointCap, int springCap, int pairCap, int
 
 void VkWorld::grow(int neededPairs, int neededContacts)
 {
-    // Same headroom constants as GpuSolver::stepLaunch()'s two overflow-retry sites
-    // (broadphase pairs: +1024, narrowphase contacts: +4096) per VkWorld's capacity code.
+    // Headroom constants of the two overflow-retry sites
+    // (broadphase pairs: +1024, narrowphase contacts: +4096).
     int newPairCap = std::max(m_pairCap, cappedGrow(neededPairs, 1024, m_dbg.hardPairCap > 0 ? m_dbg.hardPairCap : kDefaultCapacityCeiling));
     int newContactCap = std::max(m_contactCap, cappedGrow(neededContacts, 4096, m_dbg.hardContactCap > 0 ? m_dbg.hardContactCap : kDefaultCapacityCeiling));
     bool pairGrew = newPairCap > m_pairCap;

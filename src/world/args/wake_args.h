@@ -23,8 +23,8 @@ namespace avbdvk
 {
 
 // ===========================================================================
-// wake.slang (Phase 5B) -- the wake stage, the implicit velocity-gated wake
-// path plus GpuSolver::wakeAll(). Reuses FullBodySoAGpu/FullManifoldSoAGpu/
+// wake.slang -- the wake stage, the implicit velocity-gated wake
+// path plus wakeAll(). Reuses FullBodySoAGpu/FullManifoldSoAGpu/
 // FullJointSoAGpu/FullSpringSoAGpu (all defined above).
 // ===========================================================================
 

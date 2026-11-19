@@ -304,11 +304,9 @@ void launchBodyGather(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &p
     cmd.dispatch(pl.bodyGather, groups, a);
 }
 
-// launchWakeFlood: owns its own CommandList/HostRingBuffer/submit loop, exactly
-// mirroring solver_kernels.cuh's launchWakeFlood (kFloodMaxRounds=64,
-// kFloodSyncEvery=4, batch growth is irrelevant here since -- unlike VkConstraints's
-// JP coloring -- this loop's unit of work is fixed at "one round" per readback check,
-// matching the reference source exactly rather than growing a batch).
+// launchWakeFlood: owns its own CommandList/HostRingBuffer/submit loop (kFloodMaxRounds=64,
+// kFloodSyncEvery=4). Unlike VkConstraints's JP coloring, its unit of work is fixed at "one round"
+// per readback check, so it does not grow a batch.
 void launchWakeFlood(Device &dev, MutatePipelines &mutPl, WakePipelines &wakePl,
                      const WakeFloodContactsArgsGpu &contactsArgs, const WakeFloodJointsArgsGpu &jointsArgs,
                      const WakeSeedMergeArgsGpu &mergeArgs, int slots, int edgeCount, int dynCount,

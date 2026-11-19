@@ -202,7 +202,7 @@ size_t radixSortTempBytes(uint32_t n);
 // the sorts' own growth checks are no-ops.
 void reserveRadix(RadixScratch &scratch, uint32_t n, uint32_t keyBytes, uint32_t valBytes);
 
-// Device-count sorts (M4): with countAddr != 0, n is a capacity -- the grid, the scratch and
+// Device-count sorts: with countAddr != 0, n is a capacity -- the grid, the scratch and
 // the pass schedule are sized by it -- and the live count is read on device as
 // min(*countAddr, n). Recording no longer needs the count on the host; the result is
 // identical to a sort sized exactly. countAddr == 0 sorts exactly n elements.

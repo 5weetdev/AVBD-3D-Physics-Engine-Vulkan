@@ -63,7 +63,7 @@ public:
     // dispatchIndirect() is never gated.
     void setGate(DispatchGate *g) { m_gate = g; }
 
-    // M4: a dispatch whose group count is read from `argsBuf` at `offset` (a
+    // a dispatch whose group count is read from `argsBuf` at `offset` (a
     // VkDispatchIndirectCommand; the buffer needs VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT).
     // The kernel that wrote the command must be fenced with barrierIndirect(), since
     // the indirect read is not a compute-shader read.
@@ -72,7 +72,7 @@ public:
 
     // Recorded transfers, each fenced by a full barrier on both sides so it can sit
     // between any two dispatches: the in-step replacements for the synchronous
-    // Buffer::zero()/upload()/readback() round trips (M4). `bytes` is rounded up to a
+    // Buffer::zero()/upload()/readback() round trips. `bytes` is rounded up to a
     // multiple of 4 and clamped to the buffer, as Buffer::zero() does; 0 is a no-op.
     void fill(Buffer &buf, uint32_t word, VkDeviceSize bytes = ~0ull, VkDeviceSize offset = 0);
     void copy(const Buffer &src, Buffer &dst, VkDeviceSize bytes, VkDeviceSize srcOffset = 0,

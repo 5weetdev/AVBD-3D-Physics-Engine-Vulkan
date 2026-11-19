@@ -1,6 +1,4 @@
-// Device-side mirrors of device-side pointer-bundle structs (engine/core/gpu_types.cuh,
-// engine/core/gpu_forces.cuh) and the solver's per-step params (engine/host/gpu_solver.h:
-// SolverParams), for Slang kernels.
+// Device-side mirrors of device-side pointer-bundle structs and the solver's per-step params (SolverParams), for Slang kernels.
 //
 // Phase 1 found that Slang's scalar layout (-fvk-use-scalar-layout) does NOT tail-pad a
 // nested struct the way the C++/device ABI does: a C++ struct that ends in a 4-byte field
@@ -12,7 +10,7 @@
 // to bring the struct up to a multiple of 8 (the alignment its 8-byte pointers demand).
 //
 // tools/test_vk_layout.cpp is the mechanical check, and it is an end-to-end GPU one: it
-// fills the REAL the reference structs (gpu_types.cuh, gpu_forces.cuh, gpu_solver.h via
+// fills the host structs (via
 // engine/vk/solver_params_pack.h) with a distinct sentinel per field, uploads
 // the raw bytes unchanged, and dispatches engine/shaders/layout_probe.slang, which
 // imports THIS file and reads the instance back through the actual struct declarations
@@ -22,7 +20,7 @@
 // that version could not see the Slang compiler's own layout and has been replaced.)
 //
 // IMPORTANT -- SolverParams is NOT mirrored as a raw byte-for-byte struct here. The real
-// C++ SolverParams (engine/host/gpu_solver.h) interleaves `bool` fields (1 byte in the
+// C++ SolverParams interleaves `bool` fields (1 byte in the
 // Itanium/MSVC C++ ABI) with `float`/`int` fields (4-byte aligned), so the compiler
 // inserts 3 bytes of UNINITIALIZED padding after each bool. HLSL/Slang have no 1-byte
 // bool -- `bool` there is a 4-byte type -- so there is no scalar-layout Slang struct that
@@ -36,7 +34,7 @@
 import maths;
 
 // ---------------------------------------------------------------------------
-// BodySoA -- mirrors engine/core/gpu_types.cuh:BodySoA (152 bytes in the C++ ABI:
+// BodySoA -- mirrors the host BodySoA (152 bytes in the C++ ABI:
 // 18 pointers + int count, padded to a multiple of 8).
 // ---------------------------------------------------------------------------
 // Per-body settings, 56 bytes (mirrors engine/core/scene_types.h BodyProps). All-zero except
@@ -121,7 +119,7 @@ public struct ShapeSoA
 };
 
 // ---------------------------------------------------------------------------
-// ManifoldSoA -- mirrors engine/core/gpu_types.cuh:ManifoldSoA (128 bytes; ends on an
+// ManifoldSoA -- mirrors the host ManifoldSoA (128 bytes; ends on an
 // 8-byte boundary already, so no trailing pad is needed).
 // ---------------------------------------------------------------------------
 public struct ManifoldSoA
@@ -149,7 +147,7 @@ public struct ManifoldSoA
 };
 
 // ---------------------------------------------------------------------------
-// JointSoA -- mirrors engine/core/gpu_forces.cuh:JointSoA (184 bytes: 22 pointers +
+// JointSoA -- mirrors the host JointSoA (184 bytes: 22 pointers +
 // int count, padded to a multiple of 8).
 // ---------------------------------------------------------------------------
 public struct JointSoA
@@ -198,7 +196,7 @@ public struct SpringSoA
 };
 
 // ---------------------------------------------------------------------------
-// SolverParamsGpu -- an explicit, hand-packed subset of engine/host/gpu_solver.h's
+// SolverParamsGpu -- an explicit, hand-packed subset of the host
 // SolverParams. See the file-header note: this is deliberately NOT a byte-mirror of the
 // C++ struct. Every bool becomes a uint (0/1) the host writes explicitly; there is no
 // reliance on C++ struct padding being zero or meaningful. Field set here covers what

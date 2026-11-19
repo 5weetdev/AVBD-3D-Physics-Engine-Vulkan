@@ -1,4 +1,4 @@
-// Phase 1.3: narrowphase for hull pairs. csNarrowphase (narrowphase.slang) does not collide a pair
+// narrowphase for hull pairs. csNarrowphase (narrowphase.slang) does not collide a pair
 // with a hull shape: it appends the pair's slot to a compacted list (a counted append, capacity =
 // pair capacity, so it cannot overflow). csNarrowphaseHullArgs turns the list length into an
 // indirect dispatch and csNarrowphaseHull runs one lane per listed pair through the generated Box3D

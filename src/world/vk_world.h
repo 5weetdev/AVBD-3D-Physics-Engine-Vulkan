@@ -32,7 +32,7 @@
 //    synchronously. The implicit velocity-gated wake path (launchWakeDetect/
 //    launchWakeIslandSeed/launchWakeApply) is wired every step, and the joint-island
 //    wake flood (launchWakeIslandSeed -> launchWakeFloodJoints rounds ->
-//    launchWakeSeedMerge) reaches VkWorld::step()'s fixed point exactly. Since M4 both floods
+//    launchWakeSeedMerge) reaches VkWorld::step()'s fixed point exactly. both floods
 //    are recorded to a bound in the step's one phase-4 submission, with the merge gated
 //    on the last round having changed nothing; see step() for why that is exact.
 //  - Growth: reserve()/grow() mirror the capacity code's cappedGrow() policy exactly (same
@@ -116,8 +116,7 @@ public:
 
     void destroy();
 
-    // Advances the world by params.dt, mirroring GpuSolver::stepLaunch()'s phase
-    // order: integrate -> broadphase (+overflow retry) -> narrowphase (+overflow
+    // Advances the world by params.dt. Phase order: integrate -> broadphase (+overflow retry) -> narrowphase (+overflow
     // retry) -> sleep/wake first half (if params.sleepEnabled) -> constraints build
     // -> the iteration loop (one command buffer) -> velocity -> explosion guard ->
     // kill-fallen -> sleep commit second half.
@@ -280,7 +279,7 @@ public:
     // --- Render output (docs/VK_DEMO_INTERFACE.md point 2) ---------------------------
     //
     // Bundles the k_write_instances arguments the reference side spreads across
-    // writeInstances()'s parameter list (engine/host/gpu_solver.h) plus setOverlay()'s
+    // writeInstances()'s parameter list plus setOverlay()'s
     // state, since VkWorld has no persistent "current overlay" of its own to fold them
     // into implicitly.
     struct RenderInstancesParams
@@ -290,7 +289,7 @@ public:
         bool segmentByShape = false;    // true: one region per render group (0..2 = shapes)
     };
 
-    // The host half of the OverlayView GpuSolver::writeInstances builds from its
+    // The host half of the OverlayView built from the
     // setOverlay() state (the instance writer): ranges from `o`, the grid cell
     // size of the uploaded scene, sleepFrames from `params`. The device addresses are
     // left 0; writeInstances() fills the ones the selected mode reads.
@@ -315,7 +314,7 @@ public:
     // result in this VkWorld's own instanceBuffer(). Grows/reallocates that buffer
     // (VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | STORAGE_BUFFER_BIT) to bodyCount() capacity
     // on demand. Segmentation with segmentByShape writes one contiguous region per render
-    // group, exactly as GpuSolver::writeInstances' groupCountsOut/groupBasesOut: groups
+    // group (groupCountsOut/groupBasesOut): groups
     // 0..2 are the shape classes and always exist, SceneDesc::renderGroup >= 3 gives a
     // body set its own region (see groupSegmentBase/groupSegmentCount).
     //
@@ -341,9 +340,9 @@ public:
     // Debug draw instances (contact points/normals/manifold links), same buffer-ownership
     // and completion contract as writeInstances(). Capped at `maxMarkers` (a 100k pile
     // carries ~230k contacts): the buffer is sized to min(what the enabled markers could
-    // want, maxMarkers), as GpuSolver::debugInstanceBudget(), and the count is clamped
-    // to it. debugInstanceRequested() is what the markers wanted before the cap --
-    // GpuSolver::lastDebugRequested(), for the UI's "view incomplete" line.
+    // want, maxMarkers), and the count is clamped
+    // to it. debugInstanceRequested() is what the markers wanted before the cap,
+    // for the UI's "view incomplete" line.
     void writeDebugInstances(const DebugDrawViewGpu &view, int maxMarkers);
     VkBuffer debugInstanceBuffer() const { return debugInstances.handle(); }
     int debugInstanceCount() const { return m_debugInstanceCount; }
@@ -358,7 +357,7 @@ public:
 
     void wakeAll();
 
-    // The mutation API, GpuSolver's (the mutation path) one for one. Writes are
+    // The mutation API. Writes are
     // queued and land at the top of the next step(), in submission order, and every one
     // except Awake(false) seeds the explicit wake flood -- ungated, so a 0.2 m/s nudge
     // wakes a sleeping pile. Payload strides: Transform 28 bytes, Impulse/Force 24,
@@ -599,7 +598,7 @@ private:
     DispatchGate m_gate;    // skips phases 6-8 on device when stepState flag is set
     DispatchGate m_gateCap; // skips phases 4-5 on device when the capacity flag (stepState[1]) is set
     Buffer stepState;       // device step flags; word 0 = overflow/skip flag (gate)
-    Buffer primalIndirect;  // M4: a VkDispatchIndirectCommand per colour for the primal sweep
+    Buffer primalIndirect;  // a VkDispatchIndirectCommand per colour for the primal sweep
     Buffer floodChanged;    // per-round changed flags of the explicit flood (slot 0: wakeRegion's)
     Buffer islandSeed;      // the joint-island flood's own seeds, so it cannot clobber wakeSeed
     // Phase 4's one recorded readback: [0] the active count, then kFloodMaxRounds
@@ -662,7 +661,7 @@ private:
     bool m_brokenMirror = false;
     int m_lastColors = 0; // colour count of the last build, for the next recorded colour bound
 
-    // --- Mutation queue (solver_impl's mutBatches) ---------------------------------
+    // --- Mutation queue ---------------------------------
     struct MutBatch
     {
         int type;          // BodyWrite
@@ -689,7 +688,7 @@ private:
     RadixScratch radix;
     SelectScratch m_select; // the sleep path's active-list compaction
 
-    // --- Step context (M4) -----------------------------------------------------------
+    // --- Step context -----------------------------------------------------------
     // One command buffer and one argument ring, owned for the world's lifetime instead
     // of created per phase per step. Every step-level submission reuses them: begin()
     // resets the buffer and the ring rewinds, which is safe because each submission is
@@ -715,7 +714,7 @@ private:
         VkNpBodyRefs npb{};
         VkNpHullRefs nph{};     // the geometry heap, for the hull pair kernel
         bool hasHulls = false;  // any hull shape: record the hull path (else it costs nothing)
-        VkNpMeshRefs nmh{};     // the geometry heap and radix sort, for the mesh path (Phase 1.5a)
+        VkNpMeshRefs nmh{};     // the geometry heap and radix sort, for the mesh path
         bool hasMeshes = false; // any mesh shape: record the mesh path (else it costs nothing)
         VkNarrowphaseParams npp{};
         int edgeCount = 0;
@@ -816,8 +815,8 @@ private:
     int m_jointCount = 0, m_springCount = 0;
     std::vector<float> m_jointForceLimit, m_jointTorqueLimit; // setJointThresholds; <= 0 = off
     // Joint slots actually dispatched over: m_jointCount authored + kMaxDragJoints (1)
-    // reserved for dragBegin/dragUpdate/dragEnd, mirroring solver_impl's
-    // jointsTotal. jointCount() below stays the authored count -- the drag slot is not
+    // reserved for dragBegin/dragUpdate/dragEnd.
+    // jointCount() below stays the authored count -- the drag slot is not
     // a joint any caller of this API authored.
     int m_jointSlots = 0;
     int m_activeCount = 0;

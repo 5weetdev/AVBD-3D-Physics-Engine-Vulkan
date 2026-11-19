@@ -7,14 +7,14 @@
 // the mutation lands, so a gate would silently drop the first frames of every
 // interaction.
 //
-// `type` mirrors GpuSolver::BodyWrite / BodyRead as a plain int (Transform=0,
+// `type` is BodyWrite / BodyRead as a plain int (Transform=0,
 // LinearVelocity=1, AngularVelocity=2, Impulse=3, Force=4, Torque=5, Awake=6 for writes;
 // Pose=0, LinearVelocity=1, AngularVelocity=2, Awake=3 for reads) -- the host picks the
 // same numeric values the real C++ enums have, so this file need not know their names.
 //
 // The `data`/`out` byte buffers are read/written through a typed pointer cast plus
 // ordinary array indexing (`((BodyTransform *)args->data)[t]`), exactly mirroring the
-// the reference source's `((const GpuSolver::BodyTransform *)data)[t]` -- Slang raw pointers
+// the reference source's `(data)[t]` -- Slang raw pointers
 // compute the same byte stride from the cast-to type, so no explicit sizeof/byte-offset
 // arithmetic is needed here.
 
@@ -29,7 +29,7 @@ struct PushConstants
 [[vk::push_constant]]
 ConstantBuffer<PushConstants> pc;
 
-// Mirrors GpuSolver::BodyTransform / BodyPointVector (engine/host/gpu_solver.h) byte for
+// Mirrors BodyTransform / BodyPointVector byte for
 // byte: vec3 (12B) + quat (16B) = 28B, vec3 + vec3 = 24B, both 4-byte aligned throughout
 // (no 8-byte pointers inside), so no padding is needed on either side.
 struct BodyTransform
@@ -344,7 +344,7 @@ struct WakeSeedMergeArgs
     int _pad0;
     uint8_t *seed;
     uint8_t *request;
-    // M4: when set, the merge is skipped while *gate is nonzero -- the flood's last
+    // when set, the merge is skipped while *gate is nonzero -- the flood's last
     // recorded round still changed something, so the seeds are not a fixed point yet
     // and must survive for the host to record more rounds. Null = merge unconditionally.
     int *gate;

@@ -169,7 +169,7 @@ enum class BodyWrite
     Force,           // BodyPointVector: force at a world point, applied over one dt
     Torque,          // vec3
     Awake,           // unsigned char: 1 wakes, 0 forces to sleep
-    Props,           // BodyProps: replaces the body's settings (Phase 2)
+    Props,           // BodyProps: replaces the body's settings
     Target,          // BodyTarget: kinematic target pose, converted to a velocity
 };
 
@@ -187,7 +187,7 @@ struct BodyTransform
     quat rot;
 };
 
-// Per-body settings (Phase 2). The device mirror is BodyProps in types.slang, 56 bytes;
+// Per-body settings. The device mirror is BodyProps in types.slang, 56 bytes;
 // the all-default value is "no special behaviour" and a world whose bodies are all
 // default never reads or dispatches anything for it.
 enum BodyPropFlags : unsigned
@@ -282,7 +282,7 @@ enum class BodyTier : unsigned char
     Bulk = 1,        // never downloaded; exists only as device rows + instance data
 };
 
-// One spawned body of a group, in world space, as GpuSolver::spawnGroup() takes it.
+// One spawned body of a group, in world space.
 struct SpawnBody
 {
     vec3 size;

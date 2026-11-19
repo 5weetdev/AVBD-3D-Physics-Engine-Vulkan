@@ -46,7 +46,7 @@ struct PrimalArgs
     int listStart;
     int listCount;
     SolverParamsGpu p;
-    // M4: when colorStart is set, the list is colour `color`'s device range,
+    // when colorStart is set, the list is colour `color`'s device range,
     // [colorStart[color], colorEnd[color]), and listStart/listCount are ignored.
     int *colorStart;
     int *colorEnd;
@@ -652,7 +652,7 @@ void csPrimalWideForces(uint3 gtid: SV_GroupThreadID, uint3 gid: SV_GroupID)
 }
 
 // ---------------------------------------------------------------------------
-// csPrimalDispatchArgs (M4): one thread per colour turns the device colour ranges into
+// csPrimalDispatchArgs: one thread per colour turns the device colour ranges into
 // VkDispatchIndirectCommand {groups, 1, 1}, so the per-colour primal sweep needs no
 // host copy of the ranges. An empty colour gets zero groups, which is a legal no-op.
 // ---------------------------------------------------------------------------

@@ -114,7 +114,7 @@ public float3x3 orthonormalF(vec3 normal)
 }
 
 // ---------------------------------------------------------------------------
-// Extensions for engine/shaders/{primal,dual,contact,forces}.slang (Phase 4b): the
+// Extensions for engine/shaders/{primal,dual,contact,forces}.slang: the
 // float3x3 algebra and LDL^T solve engine/core/maths.h uses in the primal/dual step.
 // Same operation order as the reference source throughout.
 // ---------------------------------------------------------------------------

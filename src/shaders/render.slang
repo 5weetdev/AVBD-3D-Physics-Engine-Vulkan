@@ -2,13 +2,12 @@
 //
 // csWriteInstances now covers the reference k_write_instances in full: frustum culling
 // (bounding-sphere test against 6 planes, compacted via an atomic `visible` counter),
-// every OverlayMode (engine/host/gpu_solver.h's OverlayMode / render_types's
-// overlayColorFor, ported below as overlayColorFor), and per-shape/group segmentation
+// every OverlayMode (overlayColorFor below), and per-shape/group segmentation
 // (shapeBase/shapeVisible, one atomic-compacted region per group).
 //
 // The overlay structural aggregates (the overlay reductions' k_overlay_stats_clear/
 // _contacts/_forces and k_overlay_load_clear/_accum) are ported as their own kernels
-// below, matching the reference host orchestration in GpuSolver::writeInstances(): the host
+// below: the host
 // clears+accumulates into OverlayStats/an unsigned int load buffer, then passes the
 // results into WriteInstancesArgs.ov exactly as the reference passes them into k_write_instances'
 // OverlayView parameter.
@@ -73,7 +72,7 @@ struct OverlayView
     int *penetration;
 };
 
-// OverlayMode (engine/host/gpu_solver.h), transcribed verbatim.
+// OverlayMode, transcribed verbatim.
 static const int OVERLAY_NONE = 0;
 static const int OVERLAY_SLEEP = 1;
 static const int OVERLAY_GRID = 2;

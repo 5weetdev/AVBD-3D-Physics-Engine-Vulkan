@@ -17,7 +17,7 @@
 // (launchActiveFlags, launchSleepCommit, launchWakeDetect, launchWakeIslandSeed,
 // launchWakeApply, launchMutateApply, launchWakeFloodJoints, launchWakeSeedMerge,
 // launchWakeFlood) one for one, plus launchWakeAll and launchBodyGather for the two
-// GpuSolver methods (wakeAll(), getBodyData()) that call kernels directly rather than
+// Methods (wakeAll(), getBodyData()) that call kernels directly rather than
 // through the launch seam. See the sleep stage, the wake stage,
 // the mutation path for the reference behavior, and
 // tools/test_vk_sleep_wake.cpp for the reference-vs-Vulkan parity gate.
@@ -147,7 +147,7 @@ void launchWakeFloodJoints(CommandList &cmd, HostRingBuffer &ring, MutatePipelin
 void launchWakeSeedMerge(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl, const WakeSeedMergeArgsGpu &args,
                          int dynCount);
 
-// M4: `count` wake-flood rounds recorded back to back, no readback between them.
+// `count` wake-flood rounds recorded back to back, no readback between them.
 // Round r dispatches the contact flood (if slots > 0) and the joint flood (if
 // edgeCount > 0), both flagging into their own int at changedSlots + 4*(firstRound+r),
 // then a barrier. The flood is monotone, so a round after the fixed point changes
