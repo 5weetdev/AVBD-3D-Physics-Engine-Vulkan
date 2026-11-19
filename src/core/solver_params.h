@@ -115,7 +115,7 @@ struct SolverParams
 
     // Angular inertia in the world frame: the primal uses R diag(moment) R^T (R = the body
     // rotation at the start of the step) and the explicit gyroscopic torque -w x (I w), so a
-    // torque-free spinning body conserves its angular momentum. On by default since 2026-10-14:
+    // torque-free spinning body conserves its angular momentum. On by default:
     // diag(moment) on the world-frame step drifts a tilted spinning thin box's angular momentum
     // by 138% over 120 steps (2.6% with this on), and the perturbed 100k pile measured no cost
     // (alternated, 3 rounds, within noise).
@@ -124,7 +124,7 @@ struct SolverParams
     // Angular velocity from the step's rotation (integrate.slang spinStep): the exact inverse of
     // the rotation update, capped at a quarter turn per step. Off is the legacy 2 vec(dq) / dt,
     // which loses (w dt)^2 / 8 of the spin every step (a free sphere at 8 rad/s lost 11% in 1 s,
-    // and a rolling one slowed with no rolling resistance). On by default since 2026-10-15; off
+    // and a rolling one slowed with no rolling resistance). On by default:; off
     // exists only so the golden gates can replay the frozen goldens, which used the legacy form.
     bool exactSpinVelocity;
 
