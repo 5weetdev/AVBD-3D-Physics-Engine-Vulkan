@@ -42,6 +42,17 @@ inline int effectiveContactCap(int cap)
     return cap > 0 ? std::max(cap, 4) : 0;
 }
 
+inline constexpr int kMaxCapAttempts = 5;  // the pass after this many capacity reruns commits clamped
+inline constexpr int kCapSlotsBase = 2048; // phase 4 <= ~670 dispatches, phase 5 ~100 + JP rounds
+// First zero slot + 1 (the convergence round), or 0 if every slot changed.
+inline int convergedAt(const int32_t *flags, int n)
+{
+    for (int r = 0; r < n; r++)
+        if (flags[r] == 0)
+            return r + 1;
+    return 0;
+}
+
 using Clock = std::chrono::steady_clock;
 inline float msSince(Clock::time_point t0, Clock::time_point t1)
 {
