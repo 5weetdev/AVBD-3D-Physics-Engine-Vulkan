@@ -750,6 +750,13 @@ private:
         int pass = 0;
         // What the pass just submitted recorded, for finishPass().
         bool front = false, recordedP1 = false, phase4ThisPass = false;
+        // Locals of the record* phases that a later phase reads.
+        Clock::time_point tPass{}, tRec{};
+        int coarseIters = 0, gateSlots = 0;
+        bool lodNearOnly = false, restitutionOn = false, withForces = false, warp4 = false, fusedIter = false;
+        ConstraintGraphGpu g{};
+        VkDeviceAddress cStart = 0, cEnd = 0, cNearEnd = 0;
+        CoarseArgsGpu ca{};
     };
     StepCtx m_step;
     bool m_stepInFlight = false;
@@ -763,6 +770,20 @@ private:
     void recordDragUpdate(CommandList &cmd, HostRingBuffer &ring);
     void setupFront();
     void recordAndSubmitPass();
+    // The pieces of recordAndSubmitPass, in recording order; each appends to m_stepCmd.
+    void recordFront();            // prologue, reservations and the front (phases 1-3)
+    void recordSleepFirstHalf();   // implicit/explicit wake flood, island flood, active list
+    void recordConstraintsBuild(); // CSR build + Jones-Plassmann colouring
+    void recordIterations();       // primal/dual iteration loop (or the fused small-world kernel)
+    void recordIterationLoop();    // the loop body: fused kernel or per-colour primal/dual
+    void recordTail();             // velocity, guard, kill-fallen, restitution, report, LOD
+    void recordSleepCommit();      // sleep commit and cloth tear
+    void submitPass();             // timestamps, status copy, snapshot copy, submit
+    void growAfterCapacityOverflow();
+    void reportFrontTruncation();
+    void readPhase4Convergence();
+    void recordPassTimings();
+    void countRerunCauses(bool jpShort, bool colorShort);
     bool finishPass(); // waits; true = committed, false = rerun (call recordAndSubmitPass)
     void assertIdle(const char *who) const;
 

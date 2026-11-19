@@ -388,53 +388,29 @@ void VkWorld::setupFront()
 }
 
 
-void VkWorld::recordAndSubmitPass()
+void VkWorld::recordFront()
 {
     StepCtx &S = m_step;
     const SolverParams &params = m_params;
     CommandList &cmd = m_stepCmd;
     HostRingBuffer &ring = m_stepRing;
-    auto &b = S.b;
-    auto &j = S.j;
-    auto &sp = S.sp;
-    auto &p = S.p;
-    auto &sleepOn = S.sleepOn;
     auto &npb = S.npb;
     auto &npp = S.npp;
-    auto &edgeCount = S.edgeCount;
     auto &tsStart = S.tsStart;
-    auto &tsEnd = S.tsEnd;
-    auto &wd = S.wd;
     auto &slots = S.slots;
-    auto &m = S.m;
-    auto &floodDone = S.floodDone;
-    auto &floodRec = S.floodRec;
-    auto &islandRec = S.islandRec;
-    auto &floodBound = S.floodBound;
-    auto &islandBound = S.islandBound;
-    auto &cbr = S.cbr;
-    auto &cmr = S.cmr;
-    auto &cjr = S.cjr;
-    auto &csr = S.csr;
-    auto &phase4Done = S.phase4Done;
-    auto &p4Fresh = S.p4Fresh;
     auto &jpRounds = S.jpRounds;
     auto &colorBound = S.colorBound;
-    auto &recordBuildMs = S.recordBuildMs;
-    auto &hostSubmitMs = S.hostSubmitMs;
-    auto &hostRecordMs = S.hostRecordMs;
     auto &tSolve = S.tSolve;
     auto &frontPending = S.frontPending;
     auto &phase1Done = S.phase1Done;
     auto &capAttempt = S.capAttempt;
-    auto &fc = S.fc;
-    auto &fj = S.fj;
-    auto &fi = S.fi;
-    auto &merge = S.merge;
-    auto &mergeIsland = S.mergeIsland;
-    auto &isArgs = S.isArgs;
     auto &pass = S.pass;
-    const Clock::time_point tPass = Clock::now();
+    auto &tPass = S.tPass;
+    auto &coarseIters = S.coarseIters;
+    auto &gateSlots = S.gateSlots;
+    auto &front = S.front;
+    auto &recordedP1 = S.recordedP1;
+    tPass = Clock::now();
     if (pass > 64)
     {
         fprintf(stderr, "[avbd_vk] step: %d reruns without converging\n", pass);
@@ -443,8 +419,8 @@ void VkWorld::recordAndSubmitPass()
     tSolve = Clock::now();
     // Everything that can reallocate is grown before the first recorded command.
     // +25: the tail's fixed dispatches.
-    const int coarseIters = std::min(std::max(params.coarseIterations, 0), params.iterations);
-    const int gateSlots =
+    coarseIters = std::min(std::max(params.coarseIterations, 0), params.iterations);
+    gateSlots =
         params.iterations * (colorBound + 2) + 25 + 24 * coarseIters + 2; // coarse: reset, assign, 8 parities x 3
     // Reserved for the worst-case colour / JP-round bounds, not this pass's: a bound
     // that grows between steps must not allocate.
@@ -455,9 +431,9 @@ void VkWorld::recordAndSubmitPass()
     cmd.writeTimestamp(tsStart);
     cmd.fill(stepState, 0u);
 
-    const bool front = frontPending;
+    front = frontPending;
     S.front = front;
-    bool recordedP1 = false;
+    recordedP1 = false;
     if (front)
     {
         if (!phase1Done)
@@ -520,7 +496,33 @@ void VkWorld::recordAndSubmitPass()
         cmd.setGate(&m_gateCap);
     }
 
-    const bool phase4ThisPass = !phase4Done;
+}
+
+void VkWorld::recordSleepFirstHalf()
+{
+    StepCtx &S = m_step;
+    CommandList &cmd = m_stepCmd;
+    HostRingBuffer &ring = m_stepRing;
+    auto &b = S.b;
+    auto &edgeCount = S.edgeCount;
+    auto &wd = S.wd;
+    auto &slots = S.slots;
+    auto &floodDone = S.floodDone;
+    auto &floodRec = S.floodRec;
+    auto &islandRec = S.islandRec;
+    auto &floodBound = S.floodBound;
+    auto &islandBound = S.islandBound;
+    auto &phase4Done = S.phase4Done;
+    auto &p4Fresh = S.p4Fresh;
+    auto &fc = S.fc;
+    auto &fj = S.fj;
+    auto &fi = S.fi;
+    auto &merge = S.merge;
+    auto &mergeIsland = S.mergeIsland;
+    auto &isArgs = S.isArgs;
+    auto &pass = S.pass;
+    auto &phase4ThisPass = S.phase4ThisPass;
+    phase4ThisPass = !phase4Done;
     S.phase4ThisPass = phase4ThisPass;
     if (phase4ThisPass)
     {
@@ -617,9 +619,28 @@ void VkWorld::recordAndSubmitPass()
                            (VkDeviceSize)(1 + kFloodMaxRounds) * sizeof(int32_t));
     }
 
+}
+
+void VkWorld::recordConstraintsBuild()
+{
+    StepCtx &S = m_step;
+    CommandList &cmd = m_stepCmd;
+    HostRingBuffer &ring = m_stepRing;
+    auto &slots = S.slots;
+    auto &cbr = S.cbr;
+    auto &cmr = S.cmr;
+    auto &cjr = S.cjr;
+    auto &csr = S.csr;
+    auto &jpRounds = S.jpRounds;
+    auto &colorBound = S.colorBound;
+    auto &recordBuildMs = S.recordBuildMs;
+    auto &tRec = S.tRec;
+    auto &g = S.g;
+    auto &restitutionOn = S.restitutionOn;
+    auto &front = S.front;
     // --- Phase 5: constraint graph build, recorded into this submission ----------
     // m_dynCount is only the bound; the live count is read from activeCounter on device.
-    const Clock::time_point tRec = Clock::now();
+    tRec = Clock::now();
     const int recordedJp = constraints.recordBuild(cmd, ring, csPl, primPl, radix, cbr, cmr, cjr, csr, activeIdx,
                                                    m_dynCount, activeCounter.address(), jpRounds);
     if (m_dynCount > 0 && recordedJp > 0 && recordedJp < VkConstraints::kMaxJpRounds)
@@ -633,13 +654,13 @@ void VkWorld::recordAndSubmitPass()
         cmd.setGate(nullptr);
 
     VkConstraintGraph gRaw = constraints.graph();
-    ConstraintGraphGpu g{};
+    g = {};
     g.key = gRaw.key;
     g.isA = gRaw.isA;
     g.start = gRaw.start;
     g.end = gRaw.end;
 
-    const bool restitutionOn = (m_anyRestitution || m_anyShapeRestitution) && slots > 0;
+    restitutionOn = (m_anyRestitution || m_anyShapeRestitution) && slots > 0;
     if (restitutionOn)
     {
         // The approach speed of every manifold, before the iterations move anything: the
@@ -652,21 +673,61 @@ void VkWorld::recordAndSubmitPass()
         cmd.barrier();
     }
 
+}
+
+void VkWorld::recordIterations()
+{
+    StepCtx &S = m_step;
+    const SolverParams &params = m_params;
+    CommandList &cmd = m_stepCmd;
+    auto &edgeCount = S.edgeCount;
+    auto &slots = S.slots;
+    auto &pass = S.pass;
+    auto &coarseIters = S.coarseIters;
+    auto &withForces = S.withForces;
+    auto &warp4 = S.warp4;
+    auto &fusedIter = S.fusedIter;
     // --- Phase 6: iteration loop --------------------------------------------------
     // GPU timestamps around each iteration's primal sweep and dual pass: slot 0 at
     // the start, 2it+1 after the primal colours, 2it+2 after the duals. Primal and
     // dual are summed over the iterations; iterMs is the whole loop.
     cmd.writeTimestamp(3);
-    const bool withForces = edgeCount > 0;
-    const bool warp4 = params.primalLanes > 1;
+    withForces = edgeCount > 0;
+    warp4 = params.primalLanes > 1;
     // Small-world fusion (vk_small_world.h): the whole loop as one single-workgroup dispatch.
     // Decided on the host from counts known at record time. Anything the fused kernel does not
     // run (the coarse correction, thread-per-body primal) keeps the
     // multi-dispatch path below, as does a world past the workgroup's reach.
-    const bool fusedIter = smallWorldEnabled() && warp4 && params.iterations > 0 && coarseIters == 0 &&
-                           m_dynCount > 0 && m_dynCount <= kFusedIterMaxBodies && slots <= kFusedIterMaxManifoldSlots &&
-                           m_jointSlots <= kFusedIterMaxJointSlots;
+    fusedIter = smallWorldEnabled() && warp4 && params.iterations > 0 && coarseIters == 0 && m_dynCount > 0 &&
+                m_dynCount <= kFusedIterMaxBodies && slots <= kFusedIterMaxManifoldSlots &&
+                m_jointSlots <= kFusedIterMaxJointSlots;
     m_lastFusedIter = fusedIter;
+    recordIterationLoop();
+}
+
+void VkWorld::recordIterationLoop()
+{
+    StepCtx &S = m_step;
+    const SolverParams &params = m_params;
+    CommandList &cmd = m_stepCmd;
+    HostRingBuffer &ring = m_stepRing;
+    auto &b = S.b;
+    auto &j = S.j;
+    auto &sp = S.sp;
+    auto &p = S.p;
+    auto &slots = S.slots;
+    auto &m = S.m;
+    auto &colorBound = S.colorBound;
+    auto &pass = S.pass;
+    auto &coarseIters = S.coarseIters;
+    auto &gateSlots = S.gateSlots;
+    auto &g = S.g;
+    auto &withForces = S.withForces;
+    auto &warp4 = S.warp4;
+    auto &fusedIter = S.fusedIter;
+    auto &cStart = S.cStart;
+    auto &cEnd = S.cEnd;
+    auto &ca = S.ca;
     if (fusedIter)
         m_fusedIterPasses++;
     if (!fusedIter)
@@ -677,14 +738,14 @@ void VkWorld::recordAndSubmitPass()
     // The colour ranges stay on device: the primal sweep reads its range and its
     // group count from them, so the only host input left is how many colours to
     // record. An empty colour dispatches zero groups.
-    const VkDeviceAddress cStart = constraints.colorStartAddr();
-    const VkDeviceAddress cEnd = constraints.colorEndAddr();
+    cStart = constraints.colorStartAddr();
+    cEnd = constraints.colorEndAddr();
     if (!fusedIter)
         launchPrimalDispatchArgs(cmd, ring, solverPl, cStart, cEnd, primalIndirect, colorBound, warp4);
     if (!fusedIter)
         cmd.barrierIndirect();
 
-    CoarseArgsGpu ca{};
+    ca = {};
     if (coarseIters > 0)
     {
         ca.pa.b = b;
@@ -793,6 +854,22 @@ void VkWorld::recordAndSubmitPass()
             cmd.writeTimestamp((uint32_t)(3 + 2 * it + 2));
         }
 
+}
+
+void VkWorld::recordTail()
+{
+    StepCtx &S = m_step;
+    const SolverParams &params = m_params;
+    CommandList &cmd = m_stepCmd;
+    HostRingBuffer &ring = m_stepRing;
+    auto &b = S.b;
+    auto &p = S.p;
+    auto &slots = S.slots;
+    auto &m = S.m;
+    auto &pass = S.pass;
+    auto &g = S.g;
+    auto &restitutionOn = S.restitutionOn;
+    auto &ca = S.ca;
     // --- Phase 7: velocity, explosion guard, kill-fallen -------------------------
     IntegrateBodySoAGpu ib{};
     ib.pos = pos.address();
@@ -939,6 +1016,20 @@ void VkWorld::recordAndSubmitPass()
         }
     }
 
+}
+
+void VkWorld::recordSleepCommit()
+{
+    StepCtx &S = m_step;
+    const SolverParams &params = m_params;
+    CommandList &cmd = m_stepCmd;
+    HostRingBuffer &ring = m_stepRing;
+    auto &b = S.b;
+    auto &j = S.j;
+    auto &sp = S.sp;
+    auto &sleepOn = S.sleepOn;
+    auto &m = S.m;
+    auto &g = S.g;
     // --- Phase 8: sleep commit --------------------------------------------------
     if (sleepOn)
     {
@@ -989,7 +1080,18 @@ void VkWorld::recordAndSubmitPass()
         launchSleepCommit(cmd, ring, sleepPl, sc);
         cmd.barrier();
     }
+}
 
+void VkWorld::submitPass()
+{
+    StepCtx &S = m_step;
+    CommandList &cmd = m_stepCmd;
+    HostRingBuffer &ring = m_stepRing;
+    auto &tsEnd = S.tsEnd;
+    auto &hostSubmitMs = S.hostSubmitMs;
+    auto &hostRecordMs = S.hostRecordMs;
+    auto &tPass = S.tPass;
+    auto &recordedP1 = S.recordedP1;
     cmd.setGate(nullptr);
     cmd.writeTimestamp(tsEnd);
     cmd.copyToHost(stepState, stepFlagReadout, 2 * sizeof(int32_t));
@@ -1040,6 +1142,192 @@ void VkWorld::recordAndSubmitPass()
 }
 
 
+void VkWorld::recordAndSubmitPass()
+{
+    recordFront();
+    recordSleepFirstHalf();
+    recordConstraintsBuild();
+    recordIterations();
+    recordTail();
+    recordSleepCommit();
+    submitPass();
+}
+
+
+// A capacity overflow made phases 4-8 a no-op on device: grow what was too small so the pass can
+// be discarded and recorded again.
+void VkWorld::growAfterCapacityOverflow()
+{
+    StepCtx &S = m_step;
+    StepResult &result = S.result;
+    auto &capAttempt = S.capAttempt;
+    // Capacity overflow: phases 4-8 had no effect on device. Grow, discard the
+    // pass, and record phases 2-8 again with phase 4 restarted from the
+    // device state this step began with (the seeds were never merged).
+    const int pairCap0 = m_pairCap, contactCap0 = m_contactCap, hullCap0 = narrow.hullCapacity();
+    const int childCap0 = narrow.childCapacity();
+    if (broad.overflowed())
+        grow(broad.producedPairs(), m_contactCap);
+    else
+    {
+        narrow.finish(broad.pairCount(), false);
+        grow(broad.pairCount(), narrow.requiredContacts());
+        if (narrow.hullPairs() > narrow.hullCapacity())
+            narrow.growHull(narrow.hullPairs());
+        if (narrow.meshRecorded() && narrow.childOverflowed())
+        {
+            narrow.growChild(narrow.childRaw());
+            syncManifoldCap();
+        }
+    }
+    constraints.finishRecorded();
+    capAttempt++;
+    result.capacityReruns++;
+    // At a ceiling nothing grew: another identical pass would overflow again,
+    // so the next one is the clamped commit.
+    if (m_pairCap == pairCap0 && m_contactCap == contactCap0 && narrow.hullCapacity() == hullCap0 &&
+        narrow.childCapacity() == childCap0)
+        capAttempt = std::max(capAttempt, kMaxCapAttempts);
+    if (capAttempt > 64)
+    {
+        fprintf(stderr, "[avbd_vk] step: capacity reruns without converging\n");
+        abort();
+    }
+}
+
+// The front overflowed a hard ceiling and the step commits clamped results: say which resource.
+void VkWorld::reportFrontTruncation()
+{
+    StepResult &result = m_step.result;
+    if (broad.overflowed())
+    {
+        result.ok = false;
+        result.truncated = true;
+        result.failPhase = "broadphase";
+        result.failResource = "pairs";
+        result.required = broad.producedPairs();
+        result.capacity = m_pairCap;
+    }
+    else if (narrow.overflowed())
+    {
+        result.ok = false;
+        result.truncated = true;
+        result.failPhase = "narrowphase";
+        result.failResource = "contacts";
+        result.required = narrow.requiredContacts();
+        result.capacity = m_contactCap;
+    }
+    else if (narrow.hullRecorded() && narrow.hullPairs() > narrow.hullCapacity())
+    {
+        result.ok = false;
+        result.truncated = true;
+        result.failPhase = "narrowphase";
+        result.failResource = "hullPairs";
+        result.required = narrow.hullPairs();
+        result.capacity = narrow.hullCapacity();
+    }
+    else if (narrow.meshRecorded() && narrow.childOverflowed())
+    {
+        result.ok = false;
+        result.truncated = true;
+        result.failPhase = "narrowphase";
+        result.failResource = "meshChildren";
+        result.required = narrow.childRaw();
+        result.capacity = narrow.childCapacity();
+    }
+}
+
+// Reads back the sleep first half's convergence flags: whether the wake flood and the island flood
+// finished within their recorded rounds.
+void VkWorld::readPhase4Convergence()
+{
+    StepCtx &S = m_step;
+    const int32_t *readout = wakeReadout.mappedAs<int32_t>();
+    auto &edgeCount = S.edgeCount;
+    auto &floodDone = S.floodDone;
+    auto &floodRec = S.floodRec;
+    auto &islandRec = S.islandRec;
+    auto &phase4Done = S.phase4Done;
+    auto &floodCause = S.floodCause;
+    auto &islandCause = S.islandCause;
+    m_activeCount = readout[0];
+
+    bool converged = true;
+    floodCause = islandCause = false;
+    if (!floodDone)
+    {
+        const int at = convergedAt(readout + 1, floodRec);
+        floodDone = at > 0 || floodRec >= kFloodMaxRounds;
+        m_lastFloodRounds = at > 0 ? at : floodRec;
+        converged = floodDone;
+        floodCause = !floodDone;
+    }
+    if (edgeCount > 0)
+    {
+        const int at = convergedAt(readout + 1 + kFloodMaxRounds, islandRec);
+        m_lastIslandRounds = at > 0 ? at : islandRec;
+        islandCause = !(at > 0 || islandRec >= kIslandMaxRounds);
+        converged = converged && !islandCause;
+    }
+    phase4Done = converged;
+}
+
+// The GPU-timestamp split of a committed pass.
+void VkWorld::recordPassTimings()
+{
+    StepCtx &S = m_step;
+    CommandList &cmd = m_stepCmd;
+    auto &iters = S.iters;
+    auto &tsStart = S.tsStart;
+    auto &tsEnd = S.tsEnd;
+    auto &frontMs = S.frontMs;
+    auto &front = S.front;
+    m_timing.iterMs = m_timing.primalMs = m_timing.dualMs = -1.0f;
+    m_timing.tailMs = m_timing.gpuMs = m_timing.frontMs = -1.0f;
+    m_timing.gpuMs = (float)(cmd.timestampDeltaNs(tsStart, tsEnd) * 1e-6);
+    m_timing.tailMs = (float)(cmd.timestampDeltaNs((uint32_t)(3 + 2 * iters), tsEnd) * 1e-6);
+    m_timing.frontMs = frontMs;
+    // Phases 4-5: end of narrowphase (or, on a rerun pass, the top of the buffer) to the
+    // iteration loop, readouts included.
+    m_timing.gpuBuildMs = (float)(cmd.timestampDeltaNs(front ? 2u : tsStart, 3) * 1e-6);
+    if (iters > 0 && cmd.timestampDeltaNs(3, (uint32_t)(3 + 2 * iters)) >= 0.0)
+    {
+        double primal = 0.0, dual = 0.0;
+        for (int it = 0; it < iters; it++)
+        {
+            primal += cmd.timestampDeltaNs((uint32_t)(3 + 2 * it), (uint32_t)(3 + 2 * it + 1));
+            dual += cmd.timestampDeltaNs((uint32_t)(3 + 2 * it + 1), (uint32_t)(3 + 2 * it + 2));
+        }
+        m_timing.iterMs = (float)(cmd.timestampDeltaNs(3, (uint32_t)(3 + 2 * iters)) * 1e-6);
+        m_timing.primalMs = (float)(primal * 1e-6);
+        m_timing.dualMs = (float)(dual * 1e-6);
+    }
+}
+
+// Books a flagged pass against its causes and widens the bound that was too small.
+void VkWorld::countRerunCauses(bool jpShort, bool colorShort)
+{
+    StepCtx &S = m_step;
+    StepResult &result = S.result;
+    auto &jpRounds = S.jpRounds;
+    auto &colorBound = S.colorBound;
+    auto &floodCause = S.floodCause;
+    auto &islandCause = S.islandCause;
+    if (floodCause)
+        result.floodReruns++;
+    if (islandCause)
+        result.islandReruns++;
+    if (jpShort)
+        result.jpReruns++;
+    if (colorShort)
+        result.colorReruns++;
+    floodCause = islandCause = false;
+    if (jpShort)
+        jpRounds = std::min(2 * jpRounds, (int)VkConstraints::kMaxJpRounds);
+    if (colorShort)
+        colorBound = std::min(constraints.colorCount() + 2, (int)AVBD_MAX_COLORS_VK);
+}
+
 bool VkWorld::finishPass()
 {
     StepCtx &S = m_step;
@@ -1082,129 +1370,23 @@ bool VkWorld::finishPass()
         broad.finish();
         if (stepFlag[1])
         {
-            // Capacity overflow: phases 4-8 had no effect on device. Grow, discard the
-            // pass, and record phases 2-8 again with phase 4 restarted from the
-            // device state this step began with (the seeds were never merged).
-            const int pairCap0 = m_pairCap, contactCap0 = m_contactCap, hullCap0 = narrow.hullCapacity();
-            const int childCap0 = narrow.childCapacity();
-            if (broad.overflowed())
-                grow(broad.producedPairs(), m_contactCap);
-            else
-            {
-                narrow.finish(broad.pairCount(), false);
-                grow(broad.pairCount(), narrow.requiredContacts());
-                if (narrow.hullPairs() > narrow.hullCapacity())
-                    narrow.growHull(narrow.hullPairs());
-                if (narrow.meshRecorded() && narrow.childOverflowed())
-                {
-                    narrow.growChild(narrow.childRaw());
-                    syncManifoldCap();
-                }
-            }
-            constraints.finishRecorded();
-            capAttempt++;
-            result.capacityReruns++;
-            // At a ceiling nothing grew: another identical pass would overflow again,
-            // so the next one is the clamped commit.
-            if (m_pairCap == pairCap0 && m_contactCap == contactCap0 && narrow.hullCapacity() == hullCap0 &&
-                narrow.childCapacity() == childCap0)
-                capAttempt = std::max(capAttempt, kMaxCapAttempts);
-            if (capAttempt > 64)
-            {
-                fprintf(stderr, "[avbd_vk] step: capacity reruns without converging\n");
-                abort();
-            }
+            growAfterCapacityOverflow();
             S.pass++;
             return false;
         }
         narrow.finish(broad.pairCount());
         frontPending = false;
-        if (broad.overflowed())
-        {
-            result.ok = false;
-            result.truncated = true;
-            result.failPhase = "broadphase";
-            result.failResource = "pairs";
-            result.required = broad.producedPairs();
-            result.capacity = m_pairCap;
-        }
-        else if (narrow.overflowed())
-        {
-            result.ok = false;
-            result.truncated = true;
-            result.failPhase = "narrowphase";
-            result.failResource = "contacts";
-            result.required = narrow.requiredContacts();
-            result.capacity = m_contactCap;
-        }
-        else if (narrow.hullRecorded() && narrow.hullPairs() > narrow.hullCapacity())
-        {
-            result.ok = false;
-            result.truncated = true;
-            result.failPhase = "narrowphase";
-            result.failResource = "hullPairs";
-            result.required = narrow.hullPairs();
-            result.capacity = narrow.hullCapacity();
-        }
-        else if (narrow.meshRecorded() && narrow.childOverflowed())
-        {
-            result.ok = false;
-            result.truncated = true;
-            result.failPhase = "narrowphase";
-            result.failResource = "meshChildren";
-            result.required = narrow.childRaw();
-            result.capacity = narrow.childCapacity();
-        }
+        reportFrontTruncation();
     }
 
     if (phase4ThisPass)
-    {
-        m_activeCount = readout[0];
-
-        bool converged = true;
-        floodCause = islandCause = false;
-        if (!floodDone)
-        {
-            const int at = convergedAt(readout + 1, floodRec);
-            floodDone = at > 0 || floodRec >= kFloodMaxRounds;
-            m_lastFloodRounds = at > 0 ? at : floodRec;
-            converged = floodDone;
-            floodCause = !floodDone;
-        }
-        if (edgeCount > 0)
-        {
-            const int at = convergedAt(readout + 1 + kFloodMaxRounds, islandRec);
-            m_lastIslandRounds = at > 0 ? at : islandRec;
-            islandCause = !(at > 0 || islandRec >= kIslandMaxRounds);
-            converged = converged && !islandCause;
-        }
-        phase4Done = converged;
-    }
+        readPhase4Convergence();
     constraints.finishRecorded();
     m_lastColors = constraints.colorCount();
 
     if (!stepFlag[0])
     {
-        m_timing.iterMs = m_timing.primalMs = m_timing.dualMs = -1.0f;
-        m_timing.tailMs = m_timing.gpuMs = m_timing.frontMs = -1.0f;
-        m_timing.gpuMs = (float)(cmd.timestampDeltaNs(tsStart, tsEnd) * 1e-6);
-        m_timing.tailMs = (float)(cmd.timestampDeltaNs((uint32_t)(3 + 2 * iters), tsEnd) * 1e-6);
-        m_timing.frontMs = frontMs;
-        // Phases 4-5: end of narrowphase (or, on a rerun pass, the top of the buffer) to the
-        // iteration loop, readouts included.
-        m_timing.gpuBuildMs = (float)(cmd.timestampDeltaNs(front ? 2u : tsStart, 3) * 1e-6);
-        if (iters > 0 && cmd.timestampDeltaNs(3, (uint32_t)(3 + 2 * iters)) >= 0.0)
-        {
-            double primal = 0.0, dual = 0.0;
-            for (int it = 0; it < iters; it++)
-            {
-                primal += cmd.timestampDeltaNs((uint32_t)(3 + 2 * it), (uint32_t)(3 + 2 * it + 1));
-                dual += cmd.timestampDeltaNs((uint32_t)(3 + 2 * it + 1), (uint32_t)(3 + 2 * it + 2));
-            }
-            m_timing.iterMs = (float)(cmd.timestampDeltaNs(3, (uint32_t)(3 + 2 * iters)) * 1e-6);
-            m_timing.primalMs = (float)(primal * 1e-6);
-            m_timing.dualMs = (float)(dual * 1e-6);
-        }
+        recordPassTimings();
         return true;
     }
 
@@ -1216,19 +1398,7 @@ bool VkWorld::finishPass()
         fprintf(stderr, "[avbd_vk] step: flag set but phase 4, JP and colours are all within bounds\n");
         abort();
     }
-    if (floodCause)
-        result.floodReruns++;
-    if (islandCause)
-        result.islandReruns++;
-    if (jpShort)
-        result.jpReruns++;
-    if (colorShort)
-        result.colorReruns++;
-    floodCause = islandCause = false;
-    if (jpShort)
-        jpRounds = std::min(2 * jpRounds, (int)VkConstraints::kMaxJpRounds);
-    if (colorShort)
-        colorBound = std::min(constraints.colorCount() + 2, (int)AVBD_MAX_COLORS_VK);
+    countRerunCauses(jpShort, colorShort);
     S.pass++;
     return false;
 }
