@@ -11,45 +11,39 @@
 
 #include "vk_broadphase.h"
 #include "vk_args.h"
+#include "vk_capacity.h"
 
 namespace avbdvk
 {
 
+// Every entry point of this module, named once; init and destroy walk the same table.
+static std::array<PipelineEntry, 8> entries(BroadphasePipelines &p)
+{
+    return {{
+        {&p.aabbAndBin, "csAabbAndBin"},
+        {&p.aabbStatic, "csAabbStatic"},
+        {&p.aabbBinStatic, "csAabbBinStatic"},
+        {&p.resetRanges, "csResetRanges"},
+        {&p.cellRanges, "csCellRanges"},
+        {&p.emitPairs, "csEmitPairs"},
+        {&p.emitCrossPairs, "csEmitCrossPairs"},
+        {&p.emitOversizePairs, "csEmitOversizePairs"},
+    }};
+}
+
 void BroadphasePipelines::init(Device &dev, PipelineLayout &layout, const uint32_t *spirv, size_t spirvWords)
 {
-    aabbAndBin.init(dev, layout, spirv, spirvWords, "csAabbAndBin", "csAabbAndBin");
-    aabbStatic.init(dev, layout, spirv, spirvWords, "csAabbStatic", "csAabbStatic");
-    aabbBinStatic.init(dev, layout, spirv, spirvWords, "csAabbBinStatic", "csAabbBinStatic");
-    resetRanges.init(dev, layout, spirv, spirvWords, "csResetRanges", "csResetRanges");
-    cellRanges.init(dev, layout, spirv, spirvWords, "csCellRanges", "csCellRanges");
-    emitPairs.init(dev, layout, spirv, spirvWords, "csEmitPairs", "csEmitPairs");
-    emitCrossPairs.init(dev, layout, spirv, spirvWords, "csEmitCrossPairs", "csEmitCrossPairs");
-    emitOversizePairs.init(dev, layout, spirv, spirvWords, "csEmitOversizePairs", "csEmitOversizePairs");
+    initPipelines(dev, layout, spirv, spirvWords, entries(*this));
 }
 
 void BroadphasePipelines::destroy()
 {
-    aabbAndBin.destroy();
-    aabbStatic.destroy();
-    aabbBinStatic.destroy();
-    resetRanges.destroy();
-    cellRanges.destroy();
-    emitPairs.destroy();
-    emitCrossPairs.destroy();
-    emitOversizePairs.destroy();
+    destroyPipelines(entries(*this));
 }
 
 // Device-side argument layouts now live in vk_args.h, shared with the layout-gate probe
 // (tools/test_vk_layout.cpp + src/shaders/layout_probe.slang) so the struct the
 // probe verifies is the exact same one dispatched here.
-
-static int nextPow2i(int v)
-{
-    int p = 1;
-    while (p < v)
-        p <<= 1;
-    return p;
-}
 
 void VkBroadphase::init(Device &dev)
 {

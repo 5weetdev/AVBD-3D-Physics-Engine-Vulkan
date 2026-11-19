@@ -10,18 +10,12 @@
  */
 
 #include "vk_solver.h"
+#include "vk_util.h"
 
 #include <algorithm>
 
 namespace avbdvk
 {
-
-static uint32_t ceilDiv(int n, int d)
-{
-    if (n <= 0)
-        return 0;
-    return (uint32_t)((n + d - 1) / d);
-}
 
 void SolverPipelines::init(Device &dev, PipelineLayout &layout, const uint32_t *primalSpirv, size_t primalWords,
                            const uint32_t *dualSpirv, size_t dualWords)

@@ -4,6 +4,8 @@
 // avbd3d_api.cpp and the layout gate), so the casts below are the same bytes.
 #include "avbd3d_internal.h"
 
+#include "avbd3d_convert.h"
+
 #include "box3d/base.h"
 #include "box3d/collision.h"
 #include "box3d/math_functions.h"
@@ -15,19 +17,7 @@ static_assert(sizeof(avbd3d_Vec3) == sizeof(b3Vec3), "avbd3d_Vec3 layout");
 static_assert(sizeof(avbd3d_MeshDef) == sizeof(b3MeshDef), "avbd3d_MeshDef layout");
 static_assert(sizeof(avbd3d_HeightFieldDef) == sizeof(b3HeightFieldDef), "avbd3d_HeightFieldDef layout");
 
-namespace
-{
-
-// Same bytes, two type names: avbd3d and Box3D structs are layout-identical (see the static_asserts above).
-template <class To, class From> To avbd3d_bit(const From &from)
-{
-    static_assert(sizeof(To) == sizeof(From), "avbd3d and Box3D layouts differ");
-    To to;
-    std::memcpy(&to, &from, sizeof(To));
-    return to;
-}
-
-} // namespace
+using avbd3d_impl::avbd3d_bit;
 
 avbd3d_HullData *avbd3d_CreateHull(const avbd3d_Vec3 *points, int pointCount, int maxVertexCount)
 {

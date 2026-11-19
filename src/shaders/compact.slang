@@ -3,7 +3,7 @@
 // for the exact reference semantics this mirrors). Built on scan.slang's exclusive scan:
 // convert the 0/1 flags to uint32, scan them (host recurses via
 // engine/vk/vk_primitives.cpp), then scatter each flagged item to its scanned
-// position. See docs/VULKAN_MIGRATION_PLAN.md Phase 2.
+// position.
 
 #define COMPACT_BLOCK 256
 

@@ -10,35 +10,32 @@
  */
 
 #include "vk_integrate.h"
+#include "vk_util.h"
 
 namespace avbdvk
 {
 
-static uint32_t ceilDiv(int n, int d)
+// Every entry point of this module, named once; init and destroy walk the same table.
+static std::array<PipelineEntry, 6> entries(IntegratePipelines &p)
 {
-    if (n <= 0)
-        return 0;
-    return (uint32_t)((n + d - 1) / d);
+    return {{
+        {&p.integrate, "csIntegrate"},
+        {&p.velocity, "csVelocity"},
+        {&p.killFallen, "csKillFallen"},
+        {&p.explosionGuard, "csExplosionGuard"},
+        {&p.integrateProps, "csIntegrateProps"},
+        {&p.velocityProps, "csVelocityProps"},
+    }};
 }
 
 void IntegratePipelines::init(Device &dev, PipelineLayout &layout, const uint32_t *spirv, size_t words)
 {
-    integrate.init(dev, layout, spirv, words, "csIntegrate", "csIntegrate");
-    velocity.init(dev, layout, spirv, words, "csVelocity", "csVelocity");
-    killFallen.init(dev, layout, spirv, words, "csKillFallen", "csKillFallen");
-    explosionGuard.init(dev, layout, spirv, words, "csExplosionGuard", "csExplosionGuard");
-    integrateProps.init(dev, layout, spirv, words, "csIntegrateProps", "csIntegrateProps");
-    velocityProps.init(dev, layout, spirv, words, "csVelocityProps", "csVelocityProps");
+    initPipelines(dev, layout, spirv, words, entries(*this));
 }
 
 void IntegratePipelines::destroy()
 {
-    integrate.destroy();
-    velocity.destroy();
-    killFallen.destroy();
-    explosionGuard.destroy();
-    integrateProps.destroy();
-    velocityProps.destroy();
+    destroyPipelines(entries(*this));
 }
 
 void launchIntegrate(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl, const IntegrateArgsGpu &args,

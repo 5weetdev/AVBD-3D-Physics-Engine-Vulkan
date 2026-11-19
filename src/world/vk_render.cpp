@@ -14,26 +14,28 @@
 namespace avbdvk
 {
 
+// Every entry point of this module, named once; init and destroy walk the same table.
+static std::array<PipelineEntry, 7> entries(RenderPipelines &p)
+{
+    return {{
+        {&p.writeInstances, "csWriteInstances"},
+        {&p.overlayStatsClear, "csOverlayStatsClear"},
+        {&p.overlayStatsContacts, "csOverlayStatsContacts"},
+        {&p.overlayStatsForces, "csOverlayStatsForces"},
+        {&p.overlayLoadClear, "csOverlayLoadClear"},
+        {&p.overlayLoadAccum, "csOverlayLoadAccum"},
+        {&p.writeDebugInstances, "csWriteDebugInstances"},
+    }};
+}
+
 void RenderPipelines::init(Device &dev, PipelineLayout &layout, const uint32_t *spirv, size_t spirvWords)
 {
-    writeInstances.init(dev, layout, spirv, spirvWords, "csWriteInstances", "csWriteInstances");
-    overlayStatsClear.init(dev, layout, spirv, spirvWords, "csOverlayStatsClear", "csOverlayStatsClear");
-    overlayStatsContacts.init(dev, layout, spirv, spirvWords, "csOverlayStatsContacts", "csOverlayStatsContacts");
-    overlayStatsForces.init(dev, layout, spirv, spirvWords, "csOverlayStatsForces", "csOverlayStatsForces");
-    overlayLoadClear.init(dev, layout, spirv, spirvWords, "csOverlayLoadClear", "csOverlayLoadClear");
-    overlayLoadAccum.init(dev, layout, spirv, spirvWords, "csOverlayLoadAccum", "csOverlayLoadAccum");
-    writeDebugInstances.init(dev, layout, spirv, spirvWords, "csWriteDebugInstances", "csWriteDebugInstances");
+    initPipelines(dev, layout, spirv, spirvWords, entries(*this));
 }
 
 void RenderPipelines::destroy()
 {
-    writeInstances.destroy();
-    overlayStatsClear.destroy();
-    overlayStatsContacts.destroy();
-    overlayStatsForces.destroy();
-    overlayLoadClear.destroy();
-    overlayLoadAccum.destroy();
-    writeDebugInstances.destroy();
+    destroyPipelines(entries(*this));
 }
 
 void launchWriteInstances(CommandList &cmd, HostRingBuffer &ring, RenderPipelines &pl,

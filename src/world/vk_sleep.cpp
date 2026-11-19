@@ -10,85 +10,85 @@
  */
 
 #include "vk_sleep.h"
+#include "vk_util.h"
 
 namespace avbdvk
 {
-
-static uint32_t ceilDiv(int n, int d)
-{
-    if (n <= 0)
-        return 0;
-    return (uint32_t)((n + d - 1) / d);
-}
 
 // ---------------------------------------------------------------------------
 // Pipelines
 // ---------------------------------------------------------------------------
 
+// Every entry point of this module, named once; init and destroy walk the same table.
+static std::array<PipelineEntry, 5> entries(SleepPipelines &p)
+{
+    return {{
+        {&p.sleepBlockFracture, "csSleepBlockFracture"},
+        {&p.sleepBlockDrag, "csSleepBlockDrag"},
+        {&p.sleepMark, "csSleepMark"},
+        {&p.sleepCommit, "csSleepCommit"},
+        {&p.activeFlags, "csActiveFlags"},
+    }};
+}
+
 void SleepPipelines::init(Device &dev, PipelineLayout &layout, const uint32_t *spirv, size_t spirvWords)
 {
-    sleepBlockFracture.init(dev, layout, spirv, spirvWords, "csSleepBlockFracture", "csSleepBlockFracture");
-    sleepBlockDrag.init(dev, layout, spirv, spirvWords, "csSleepBlockDrag", "csSleepBlockDrag");
-    sleepMark.init(dev, layout, spirv, spirvWords, "csSleepMark", "csSleepMark");
-    sleepCommit.init(dev, layout, spirv, spirvWords, "csSleepCommit", "csSleepCommit");
-    activeFlags.init(dev, layout, spirv, spirvWords, "csActiveFlags", "csActiveFlags");
+    initPipelines(dev, layout, spirv, spirvWords, entries(*this));
 }
 
 void SleepPipelines::destroy()
 {
-    sleepBlockFracture.destroy();
-    sleepBlockDrag.destroy();
-    sleepMark.destroy();
-    sleepCommit.destroy();
-    activeFlags.destroy();
+    destroyPipelines(entries(*this));
+}
+
+// Every entry point of this module, named once; init and destroy walk the same table.
+static std::array<PipelineEntry, 9> entries(WakePipelines &p)
+{
+    return {{
+        {&p.wakeRequest, "csWakeRequest"},
+        {&p.touchClear, "csTouchClear"},
+        {&p.touchAccum, "csTouchAccum"},
+        {&p.wakeLostSupport, "csWakeLostSupport"},
+        {&p.wakeApply, "csWakeApply"},
+        {&p.touchAccumJoints, "csTouchAccumJoints"},
+        {&p.wakeRequestJoints, "csWakeRequestJoints"},
+        {&p.wakeIslandSeed, "csWakeIslandSeed"},
+        {&p.wakeAll, "csWakeAll"},
+    }};
 }
 
 void WakePipelines::init(Device &dev, PipelineLayout &layout, const uint32_t *spirv, size_t spirvWords)
 {
-    wakeRequest.init(dev, layout, spirv, spirvWords, "csWakeRequest", "csWakeRequest");
-    touchClear.init(dev, layout, spirv, spirvWords, "csTouchClear", "csTouchClear");
-    touchAccum.init(dev, layout, spirv, spirvWords, "csTouchAccum", "csTouchAccum");
-    wakeLostSupport.init(dev, layout, spirv, spirvWords, "csWakeLostSupport", "csWakeLostSupport");
-    wakeApply.init(dev, layout, spirv, spirvWords, "csWakeApply", "csWakeApply");
-    touchAccumJoints.init(dev, layout, spirv, spirvWords, "csTouchAccumJoints", "csTouchAccumJoints");
-    wakeRequestJoints.init(dev, layout, spirv, spirvWords, "csWakeRequestJoints", "csWakeRequestJoints");
-    wakeIslandSeed.init(dev, layout, spirv, spirvWords, "csWakeIslandSeed", "csWakeIslandSeed");
-    wakeAll.init(dev, layout, spirv, spirvWords, "csWakeAll", "csWakeAll");
+    initPipelines(dev, layout, spirv, spirvWords, entries(*this));
 }
 
 void WakePipelines::destroy()
 {
-    wakeRequest.destroy();
-    touchClear.destroy();
-    touchAccum.destroy();
-    wakeLostSupport.destroy();
-    wakeApply.destroy();
-    touchAccumJoints.destroy();
-    wakeRequestJoints.destroy();
-    wakeIslandSeed.destroy();
-    wakeAll.destroy();
+    destroyPipelines(entries(*this));
+}
+
+// Every entry point of this module, named once; init and destroy walk the same table.
+static std::array<PipelineEntry, 7> entries(MutatePipelines &p)
+{
+    return {{
+        {&p.mutateApply, "csMutateApply"},
+        {&p.wakeSeedRegion, "csWakeSeedRegion"},
+        {&p.wakeFloodContacts, "csWakeFloodContacts"},
+        {&p.wakeFloodJoints, "csWakeFloodJoints"},
+        {&p.wakeSeedMerge, "csWakeSeedMerge"},
+        {&p.bodyGather, "csBodyGather"},
+        {&p.jointWrite, "csJointWrite"},
+    }};
 }
 
 void MutatePipelines::init(Device &dev, PipelineLayout &layout, const uint32_t *spirv, size_t spirvWords)
 {
-    mutateApply.init(dev, layout, spirv, spirvWords, "csMutateApply", "csMutateApply");
-    wakeSeedRegion.init(dev, layout, spirv, spirvWords, "csWakeSeedRegion", "csWakeSeedRegion");
-    wakeFloodContacts.init(dev, layout, spirv, spirvWords, "csWakeFloodContacts", "csWakeFloodContacts");
-    wakeFloodJoints.init(dev, layout, spirv, spirvWords, "csWakeFloodJoints", "csWakeFloodJoints");
-    wakeSeedMerge.init(dev, layout, spirv, spirvWords, "csWakeSeedMerge", "csWakeSeedMerge");
-    bodyGather.init(dev, layout, spirv, spirvWords, "csBodyGather", "csBodyGather");
-    jointWrite.init(dev, layout, spirv, spirvWords, "csJointWrite", "csJointWrite");
+    initPipelines(dev, layout, spirv, spirvWords, entries(*this));
 }
 
 void MutatePipelines::destroy()
 {
-    mutateApply.destroy();
-    wakeSeedRegion.destroy();
-    wakeFloodContacts.destroy();
-    wakeFloodJoints.destroy();
-    wakeSeedMerge.destroy();
-    bodyGather.destroy();
-    jointWrite.destroy();
+    destroyPipelines(entries(*this));
 }
 
 // ---------------------------------------------------------------------------

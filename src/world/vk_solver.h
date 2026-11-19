@@ -16,7 +16,7 @@
 // launchPrimalThreads/launchPrimalLanes (collapsed here into one launchPrimalColor call,
 // selecting thread-per-body vs the 4-lane cooperative variant and With/NoForces via
 // booleans instead of four separate the reference template instantiations), launchJointInit,
-// launchJointDual, launchDual . See docs/VULKAN_MIGRATION_PLAN.md
+// launchJointDual, launchDual.
 // Phase 4b and tools/test_vk_solve_iter.cpp for the reference-vs-Vulkan parity test that
 // exercises these.
 //

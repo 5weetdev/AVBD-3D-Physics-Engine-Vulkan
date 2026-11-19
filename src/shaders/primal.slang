@@ -3,10 +3,8 @@
 // csPrimalWarp4 (a LANES=4 cooperative-lane variant, generic over WaveGetLaneCount() so
 // lane groups never straddle a subgroup). Each is split into a *_Forces and *_NoForces
 // entry point rather than a Slang generic over a bool, matching integrate.slang's
-// precedent of concrete entry points per instantiation (one pipeline per instance, per
-// docs/VULKAN_MIGRATION_PLAN.md Phase 4). Phase 4b scope: legacy weld joints and plain
-// springs only (see forces.slang's header note) -- WITH_FORCES here means "joints/
-// springs present", same meaning as the reference WITH_FORCES.
+// precedent of concrete entry points per instantiation (one pipeline per instance).
+// WITH_FORCES here means "joints/springs present".
 //
 // LANES beyond 4 (2/8/16/32, the reference launchPrimalLanes switch) are not instantiated here;
 // only the plain thread-per-body and 4-lane cooperative variants are, matching what

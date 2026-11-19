@@ -375,11 +375,6 @@ public:
     void applyForce(int body, vec3 force, vec3 worldPoint);
     void applyTorque(int body, vec3 torque);
     void setAwake(int body, bool awake);
-    // Per-body settings (BodyProps: damping, gravity scale, speed cap, sleep, motion locks,
-    // conveyor / rolling / friction mixing, kinematic flag). Queued like every other write. The
-    // KINEMATIC flag is authoring-only (SceneBuilder::setKinematic); a runtime write keeps the
-    // body's current kinematic bit.
-    void setBodyProps(int body, const BodyProps &props);
     // Kinematic body: sets its velocity so that it reaches (pos, rot) in dt seconds. The
     // velocity persists until it is set again (setLinearVelocity / another target).
     void setTargetTransform(int body, vec3 pos, quat rot, float dt);

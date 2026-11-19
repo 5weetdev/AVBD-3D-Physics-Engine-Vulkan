@@ -1,23 +1,27 @@
 // vk_contact_report.cpp -- host side of contact_report.slang.
 
 #include "vk_contact_report.h"
+#include "vk_util.h"
 
 namespace avbdvk
 {
 
-static uint32_t ceilDiv(int n, int d)
+// Every entry point of this module, named once; init and destroy walk the same table.
+static std::array<PipelineEntry, 1> entries(ContactReportPipelines &p)
 {
-    return (uint32_t)((n + d - 1) / d);
+    return {{
+        {&p.report, "csContactReport"},
+    }};
 }
 
 void ContactReportPipelines::init(Device &dev, PipelineLayout &layout, const uint32_t *spirv, size_t spirvWords)
 {
-    report.init(dev, layout, spirv, spirvWords, "csContactReport", "csContactReport");
+    initPipelines(dev, layout, spirv, spirvWords, entries(*this));
 }
 
 void ContactReportPipelines::destroy()
 {
-    report.destroy();
+    destroyPipelines(entries(*this));
 }
 
 void launchContactReport(CommandList &cmd, HostRingBuffer &ring, ContactReportPipelines &pl,
@@ -29,18 +33,24 @@ void launchContactReport(CommandList &cmd, HostRingBuffer &ring, ContactReportPi
     cmd.dispatch(pl.report, groups, ring.write(&args, sizeof(args)));
 }
 
+// Every entry point of this module, named once; init and destroy walk the same table.
+static std::array<PipelineEntry, 3> entries(RestitutionPipelines &p)
+{
+    return {{
+        {&p.pre, "csRestitutionPre"},
+        {&p.impulse, "csRestitutionImpulse"},
+        {&p.apply, "csRestitutionApply"},
+    }};
+}
+
 void RestitutionPipelines::init(Device &dev, PipelineLayout &layout, const uint32_t *spirv, size_t spirvWords)
 {
-    pre.init(dev, layout, spirv, spirvWords, "csRestitutionPre", "csRestitutionPre");
-    impulse.init(dev, layout, spirv, spirvWords, "csRestitutionImpulse", "csRestitutionImpulse");
-    apply.init(dev, layout, spirv, spirvWords, "csRestitutionApply", "csRestitutionApply");
+    initPipelines(dev, layout, spirv, spirvWords, entries(*this));
 }
 
 void RestitutionPipelines::destroy()
 {
-    pre.destroy();
-    impulse.destroy();
-    apply.destroy();
+    destroyPipelines(entries(*this));
 }
 
 void launchRestitutionPre(CommandList &cmd, HostRingBuffer &ring, RestitutionPipelines &pl,

@@ -118,12 +118,10 @@ vec3 jointDampLambda(vec3 lambda, vec3 penalty, vec3 kAuto, vec3 vRel, float dua
 }
 
 // Transliterated from Joint::initialize (weld path only). Now ports the effective-mass
-// auto-clamp exactly (gpu_forces.cuh's non-generic jointInitialize): a scalar
-// maxKLin/maxKAng taken from the max of the three world-axis baselines, since the weld
-// path's penalty is diagonal in world space rather than a joint frame. This closes the
-// divergence flagged in AGENTS.md/VULKAN_MIGRATION_PLAN.md Phase 5A item 4 -- without it
-// a warm-started weld penalty could ratchet past what the body masses involved can
-// support, which the reference never allows.
+// auto-clamp: a scalar maxKLin/maxKAng taken from the max of the three world-axis
+// baselines, since the weld path's penalty is diagonal in world space rather than a joint
+// frame. Without it a warm-started weld penalty could ratchet past what the body masses
+// involved can support.
 public void jointInitializeWeld(JointSoA j, int i, BodySoA b, float alpha, float gamma, float dt,
                                 float dualDamping, float dualDampVel)
 {

@@ -77,8 +77,8 @@ private:
     bool m_concurrent = false;
 };
 
-// Host-visible, persistently mapped buffer -- the "argument ring" the push-constant
-// design in docs/VULKAN_MIGRATION_PLAN.md needs: the host writes a small struct per
+// Host-visible, persistently mapped buffer -- the "argument ring" of the push-constant
+// design: the host writes a small struct per
 // dispatch into this ring and passes its device address in an 8-byte push constant.
 class HostRingBuffer
 {

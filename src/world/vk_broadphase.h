@@ -14,7 +14,7 @@
 // Vulkan host orchestration for src/shaders/broadphase.slang, mirroring
 // engine/collide/gpu_broadphase.cuh's Broadphase class phase for phase: AABB+bin,
 // bucket sort (radixSortPairsU32), cell ranges, pair emission, final key sort
-// (radixSortKeysU64). See docs/VULKAN_MIGRATION_PLAN.md Phase 3b.
+// (radixSortKeysU64).
 //
 // record() appends the whole build to a caller's command buffer and never submits: the
 // final key sort is sized by capacity and reads the live pair count from counter() on

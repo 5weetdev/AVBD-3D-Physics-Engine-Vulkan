@@ -13,7 +13,7 @@
 
 // Instance + physical/logical device setup for the Vulkan backend. Gives the engine
 // a context bound to a chosen GPU and one queue --
-// see docs/VULKAN_MIGRATION_PLAN.md Phase 1.
+//
 //
 // Deliberately minimal: one compute queue, validation layers gated by build config
 // or an env var, and the feature set the migration plan's spike GPU (RTX 4070
@@ -167,7 +167,7 @@ public:
     PFN_vkCmdEndDebugUtilsLabelEXT cmdEndDebugLabel = nullptr;
     PFN_vkSetDebugUtilsObjectNameEXT setDebugObjectName = nullptr;
 
-    // --- Phase 6 interop hooks (docs/VULKAN_MIGRATION_PLAN.md) -----------------------
+    // --- Phase 6 interop hooks -----------------------
     // Both must be called before init(); both are no-ops by default,
     // so nothing above this comment changes behavior.
 

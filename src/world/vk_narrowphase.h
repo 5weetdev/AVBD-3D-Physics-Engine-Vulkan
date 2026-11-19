@@ -17,7 +17,7 @@
 // start always reads last step's dual state), reserve()/grow() with the same
 // reserve-vs-reserveKeep growth split, reset(), and the same overflow contract
 // (requiredContacts() larger than contactTotal() on overflow, prevSlots only advances
-// on a non-overflowed build). See docs/VULKAN_MIGRATION_PLAN.md Phase 3b.
+// on a non-overflowed build).
 
 #include "vk_buffer.h"
 #include "vk_cmd.h"

@@ -284,11 +284,9 @@ void VkNarrowphase::reserve(int maxPairs_, int maxContacts_)
 // NOTE: Buffer::resize() does not preserve contents (see vk_buffer.h) -- unlike the
 // the reference class's reserveKeep, a grow() here loses the warm-start cache for one step, the
 // same way a fresh reserve() would. That is a known simplification versus the reference
-// path documented in the narrowphase's grow() comment; acceptable for this
-// correctness-gate phase, which only exercises small, non-growing scenes (see
-// docs/VULKAN_MIGRATION_PLAN.md Phase 3b test-scope note). A content-preserving
-// resize would be a straightforward follow-up (readback+upload or a copy command)
-// if a growth-under-load parity test is added later.
+// path documented in the narrowphase's grow() comment; acceptable because the gates only
+// exercise small, non-growing scenes. TODO: a content-preserving resize (readback+upload or a
+// copy command) once a growth-under-load parity test exists.
 void VkNarrowphase::grow(int maxPairs_, int maxContacts_)
 {
     // Contact-cache-preserving grow, mirroring the capacity code's

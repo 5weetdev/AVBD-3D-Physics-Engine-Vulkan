@@ -29,6 +29,17 @@
 namespace avbdvk
 {
 
+// Workgroup counts: ceil(n / d). The signed form returns 0 for n <= 0 (an empty phase dispatches
+// nothing); the unsigned form is the plain ceiling.
+constexpr uint32_t ceilDiv(uint32_t n, uint32_t d)
+{
+    return (n + d - 1) / d;
+}
+constexpr uint32_t ceilDiv(int n, int d)
+{
+    return n <= 0 ? 0u : (uint32_t)((n + d - 1) / d);
+}
+
 // A failed Vulkan call (or an unusable device / exhausted budget, see below).
 class VkError : public std::runtime_error
 {

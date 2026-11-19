@@ -1,7 +1,7 @@
 // Phase-2 primitive: stable LSD radix sort replacing cub::DeviceRadixSort::SortPairs /
 // SortKeys (see the call sites in the broadphase -- uint32 key/int32
 // value -- and the constraint builder -- uint64 key/uint32 value, and uint64
-// key only, used for graph coloring). See docs/VULKAN_MIGRATION_PLAN.md Phase 2.
+// key only, used for graph coloring).
 //
 // Structural design (rewritten after profiling showed the first cut was superlinear in
 // n -- see the profiling notes in vk_primitives.h/.cpp):

@@ -13,11 +13,12 @@
 
 // Compute pipeline loading from embedded SPIR-V byte arrays, sharing ONE pipeline
 // layout across every kernel: a single 8-byte push-constant range (the argument
-// struct's device address -- see docs/VULKAN_MIGRATION_PLAN.md). No descriptor sets
+// struct's device address). No descriptor sets
 // at all, since every buffer is addressed through buffer device address pointers.
 
 #include "vk_device.h"
 
+#include <array>
 #include <cstdint>
 #include <string>
 
@@ -59,5 +60,31 @@ private:
     VkShaderModule m_module = VK_NULL_HANDLE;
     VkPipelineLayout m_layout = VK_NULL_HANDLE;
 };
+
+// One kernel of a module: the pipeline to build and its entry point (also its profiler label).
+struct PipelineEntry
+{
+    Pipeline *pipeline;
+    const char *entry;
+};
+
+// Builds / destroys every pipeline of a table (a phase owner's `*Pipelines` struct).
+inline void initPipelines(Device &dev, PipelineLayout &layout, const uint32_t *spirv, size_t spirvWords,
+                          const PipelineEntry *entries, size_t count)
+{
+    for (size_t i = 0; i < count; i++)
+        entries[i].pipeline->init(dev, layout, spirv, spirvWords, entries[i].entry, entries[i].entry);
+}
+template <size_t N>
+void initPipelines(Device &dev, PipelineLayout &layout, const uint32_t *spirv, size_t spirvWords,
+                   const std::array<PipelineEntry, N> &entries)
+{
+    initPipelines(dev, layout, spirv, spirvWords, entries.data(), N);
+}
+template <size_t N> void destroyPipelines(const std::array<PipelineEntry, N> &entries)
+{
+    for (const PipelineEntry &e : entries)
+        e.pipeline->destroy();
+}
 
 } // namespace avbdvk

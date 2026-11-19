@@ -11,6 +11,7 @@
 
 #include "vk_world.h"
 
+#include "vk_capacity.h"
 #include "vk_small_world.h"
 
 #include "collision.h" // MAX_MANIFOLD_CONTACTS
@@ -70,18 +71,6 @@ static const int kMaxOversizeBodies = 64;
 static int effectiveContactCap(int cap)
 {
     return cap > 0 ? std::max(cap, 4) : 0;
-}
-
-static int cappedGrow(int have, int need, int slack, int ceiling = 0)
-{
-    (void)have;
-    const int kMaxCapacity = ceiling > 0 ? ceiling : 20 * 1000 * 1000;
-    if (need < 0)
-        return kMaxCapacity;
-    long long grown = (long long)need + need / 4 + slack;
-    if (grown > kMaxCapacity)
-        grown = kMaxCapacity;
-    return (int)grown;
 }
 
 void VkWorld::init()
@@ -614,8 +603,8 @@ void VkWorld::grow(int neededPairs, int neededContacts)
 {
     // Same headroom constants as GpuSolver::stepLaunch()'s two overflow-retry sites
     // (broadphase pairs: +1024, narrowphase contacts: +4096) per VkWorld's capacity code.
-    int newPairCap = std::max(m_pairCap, cappedGrow(m_pairCap, neededPairs, 1024, m_dbg.hardPairCap));
-    int newContactCap = std::max(m_contactCap, cappedGrow(m_contactCap, neededContacts, 4096, m_dbg.hardContactCap));
+    int newPairCap = std::max(m_pairCap, cappedGrow(neededPairs, 1024, m_dbg.hardPairCap > 0 ? m_dbg.hardPairCap : kDefaultCapacityCeiling));
+    int newContactCap = std::max(m_contactCap, cappedGrow(neededContacts, 4096, m_dbg.hardContactCap > 0 ? m_dbg.hardContactCap : kDefaultCapacityCeiling));
     bool pairGrew = newPairCap > m_pairCap;
     bool contactGrew = newContactCap > m_contactCap;
     if (pairGrew)
@@ -3172,8 +3161,6 @@ void VkWorld::downloadAwake(std::vector<unsigned char> &out) const
         awake.readback(out.data(), m_bodyCount * sizeof(unsigned char));
 }
 
-void VkWorld::zeroDerivedState() {}
-
 void VkWorld::computeRenderGroups(const SceneDesc &scene)
 {
     // solver_impl's recomputeShapeRegions(): groups 0..2 are the shape classes and
@@ -3871,11 +3858,6 @@ void VkWorld::setAwake(int body, bool on)
 {
     unsigned char v = on ? 1 : 0;
     setBodyData(&body, &v, BodyWrite::Awake, 1);
-}
-
-void VkWorld::setBodyProps(int body, const BodyProps &p)
-{
-    setBodyData(&body, &p, BodyWrite::Props, 1);
 }
 
 void VkWorld::setTargetTransform(int body, vec3 p, quat r, float dt)

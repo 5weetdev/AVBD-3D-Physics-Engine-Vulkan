@@ -15,28 +15,29 @@
 namespace avbdvk
 {
 
+// Every entry point of this module, named once; init and destroy walk the same table.
+static std::array<PipelineEntry, 8> entries(ConstraintsPipelines &p)
+{
+    return {{
+        {&p.resetColors, "csResetColors"},
+        {&p.emitManifold, "csEmitManifoldEntries"},
+        {&p.emitForce, "csEmitForceEntries"},
+        {&p.rows, "csConstraintsRows"},
+        {&p.jpRound, "csJpRound"},
+        {&p.colorKeys, "csColorKeys"},
+        {&p.colorRows, "csConstraintsColorRows"},
+        {&p.buildSmall, "csBuildSmall"},
+    }};
+}
+
 void ConstraintsPipelines::init(Device &dev, PipelineLayout &layout, const uint32_t *spirv, size_t spirvWords)
 {
-    resetColors.init(dev, layout, spirv, spirvWords, "csResetColors", "csResetColors");
-    emitManifold.init(dev, layout, spirv, spirvWords, "csEmitManifoldEntries", "csEmitManifoldEntries");
-    emitForce.init(dev, layout, spirv, spirvWords, "csEmitForceEntries", "csEmitForceEntries");
-    rows.init(dev, layout, spirv, spirvWords, "csConstraintsRows", "csConstraintsRows");
-    jpRound.init(dev, layout, spirv, spirvWords, "csJpRound", "csJpRound");
-    colorKeys.init(dev, layout, spirv, spirvWords, "csColorKeys", "csColorKeys");
-    colorRows.init(dev, layout, spirv, spirvWords, "csConstraintsColorRows", "csConstraintsColorRows");
-    buildSmall.init(dev, layout, spirv, spirvWords, "csBuildSmall", "csBuildSmall");
+    initPipelines(dev, layout, spirv, spirvWords, entries(*this));
 }
 
 void ConstraintsPipelines::destroy()
 {
-    resetColors.destroy();
-    emitManifold.destroy();
-    emitForce.destroy();
-    rows.destroy();
-    jpRound.destroy();
-    colorKeys.destroy();
-    colorRows.destroy();
-    buildSmall.destroy();
+    destroyPipelines(entries(*this));
 }
 
 // Device-side argument layout lives in vk_args.h (Cs*ArgsGpu), shared with the

@@ -10,6 +10,7 @@
  */
 
 #include "vk_primitives.h"
+#include "vk_util.h"
 #include "vk_args.h"
 
 #include "scan_spirv.h"
@@ -39,11 +40,6 @@ SmallSortStats &smallSortStats()
 {
     static SmallSortStats s;
     return s;
-}
-
-static uint32_t divUp(uint32_t a, uint32_t b)
-{
-    return (a + b - 1) / b;
 }
 
 // ---------------------------------------------------------------------------
@@ -146,7 +142,7 @@ void reserveScan(ScanScratch &scratch, uint32_t n)
     uint32_t cur = n;
     for (size_t level = 0; cur > 1; level++)
     {
-        uint32_t numBlocks = divUp(cur, kScanBlock);
+        uint32_t numBlocks = ceilDiv(cur, kScanBlock);
         ensureLevel(scratch.levelB, level, *scratch.m_dev, (VkDeviceSize)numBlocks * sizeof(uint32_t));
         if (numBlocks > 1)
             ensureLevel(scratch.levelR, level, *scratch.m_dev, (VkDeviceSize)numBlocks * sizeof(uint32_t));
@@ -160,7 +156,7 @@ size_t scanTempBytes(uint32_t n)
     uint32_t cur = n;
     while (cur > 1)
     {
-        uint32_t numBlocks = divUp(cur, kScanBlock);
+        uint32_t numBlocks = ceilDiv(cur, kScanBlock);
         total += (size_t)numBlocks * sizeof(uint32_t) * 2; // blockSums + scanned-blockSums
         cur = numBlocks;
     }
@@ -172,7 +168,7 @@ static void recordScanLevel(CommandList &cmd, HostRingBuffer &ring, PrimitivesPi
 {
     if (n == 0)
         return;
-    uint32_t numBlocks = divUp(n, kScanBlock);
+    uint32_t numBlocks = ceilDiv(n, kScanBlock);
     Buffer &blockSums = ensureLevel(scratch.levelB, level, *scratch.m_dev, (VkDeviceSize)numBlocks * sizeof(uint32_t));
 
     ScanBlockArgs a{in.address(), out.address(), blockSums.address(), n, 0};
@@ -230,7 +226,7 @@ void selectFlagged(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &
     if (scratch.flagsU32.size() < (VkDeviceSize)n * sizeof(uint32_t))
         scratch.flagsU32.resize((VkDeviceSize)n * sizeof(uint32_t));
 
-    uint32_t blocks = divUp(n, kScanBlock);
+    uint32_t blocks = ceilDiv(n, kScanBlock);
 
     FlagsToU32Args fa{flags.address(), scratch.flagsU32.address(), n, 0};
     VkDeviceAddress addr = ring.write(&fa, sizeof(fa));
@@ -269,7 +265,7 @@ void RadixScratch::destroy()
 
 size_t radixSortTempBytes(uint32_t n)
 {
-    uint32_t numBlocks = divUp(std::max(n, 1u), kTileSize);
+    uint32_t numBlocks = ceilDiv(std::max(n, 1u), kTileSize);
     size_t bytes = 0;
     bytes += (size_t)kRadixBuckets * numBlocks * sizeof(uint32_t) * 2; // digitCount + scanned
     bytes += (size_t)n * 8 * 4;                                        // ping/pong keys+vals (worst case 8B keys)
@@ -289,7 +285,7 @@ void reserveRadix(RadixScratch &scratch, uint32_t n, uint32_t keyBytes, uint32_t
     if (n == 0)
         return;
     Device &dev = *scratch.m_dev;
-    uint32_t numBlocks = divUp(n, kTileSize);
+    uint32_t numBlocks = ceilDiv(n, kTileSize);
     ensureBytes(scratch.digitCount, dev, (VkDeviceSize)kRadixBuckets * numBlocks * sizeof(uint32_t));
     ensureBytes(scratch.digitCountScanned, dev, (VkDeviceSize)kRadixBuckets * numBlocks * sizeof(uint32_t));
     ensureBytes(scratch.keysPing, dev, (VkDeviceSize)n * keyBytes);
@@ -334,7 +330,7 @@ static void recordSkipMask(CommandList &cmd, HostRingBuffer &ring, PrimitivesPip
 
     if (n > 0)
     {
-        uint32_t blocks = divUp(n, kTileThreads);
+        uint32_t blocks = ceilDiv(n, kTileThreads);
         if (isU64)
         {
             ReduceOrAndArgsU64 a{keysIn.address(), scratch.reduceOr.address(), scratch.reduceAnd.address(), n, 0,
@@ -386,7 +382,7 @@ void radixSortPairsU32(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelin
     }
     smallSortStats().radixSorts++;
     Device &dev = *scratch.m_dev;
-    uint32_t numBlocks = divUp(n, kTileSize);
+    uint32_t numBlocks = ceilDiv(n, kTileSize);
 
     ensureBytes(scratch.digitCount, dev, (VkDeviceSize)kRadixBuckets * numBlocks * sizeof(uint32_t));
     ensureBytes(scratch.digitCountScanned, dev, (VkDeviceSize)kRadixBuckets * numBlocks * sizeof(uint32_t));
@@ -463,7 +459,7 @@ void radixSortPairsU64(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelin
     }
     smallSortStats().radixSorts++;
     Device &dev = *scratch.m_dev;
-    uint32_t numBlocks = divUp(n, kTileSize);
+    uint32_t numBlocks = ceilDiv(n, kTileSize);
 
     ensureBytes(scratch.digitCount, dev, (VkDeviceSize)kRadixBuckets * numBlocks * sizeof(uint32_t));
     ensureBytes(scratch.digitCountScanned, dev, (VkDeviceSize)kRadixBuckets * numBlocks * sizeof(uint32_t));
@@ -552,7 +548,7 @@ void radixSortKeysU64(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipeline
     }
     smallSortStats().radixSorts++;
     Device &dev = *scratch.m_dev;
-    uint32_t numBlocks = divUp(n, kTileSize);
+    uint32_t numBlocks = ceilDiv(n, kTileSize);
 
     ensureBytes(scratch.digitCount, dev, (VkDeviceSize)kRadixBuckets * numBlocks * sizeof(uint32_t));
     ensureBytes(scratch.digitCountScanned, dev, (VkDeviceSize)kRadixBuckets * numBlocks * sizeof(uint32_t));

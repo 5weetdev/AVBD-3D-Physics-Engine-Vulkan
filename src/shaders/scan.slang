@@ -2,7 +2,7 @@
 // DeviceScan would provide -- but nothing in the reference engine actually calls DeviceScan
 // directly, it is only needed here as a building block for stream compaction
 // (compact.slang) and the cross-block offset computation inside the radix sort
-// (radix.slang). See docs/VULKAN_MIGRATION_PLAN.md Phase 2.
+// (radix.slang).
 //
 // Multi-level block scan, correctness-first (not decoupled look-back):
 //   csScanBlock: exclusive-scans each contiguous 256-element chunk in shared memory

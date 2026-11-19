@@ -13,7 +13,7 @@
 
 // Phase-2 GPU primitives: exclusive scan, stream compaction (cub::DeviceSelect::Flagged
 // equivalent), and a stable LSD radix sort (cub::DeviceRadixSort::SortPairs/SortKeys
-// equivalent). See docs/VULKAN_MIGRATION_PLAN.md Phase 2 and the reference call sites this
+// equivalent).
 // mirrors: gpu_primitives (selectFlagged), engine/collide/
 // the broadphase and the constraint builder (radixSortPairs/Keys).
 //
