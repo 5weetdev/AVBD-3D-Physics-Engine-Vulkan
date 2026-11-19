@@ -27,14 +27,6 @@ public ConstantBuffer<PushConstants> pc;
 // Mirrors the constraint builder. Not in types.slang (that
 // file is owned by the concurrent constraint-graph port); declared locally here the same
 // way integrate.slang declares its own private BodySoA subset.
-public struct ConstraintGraph
-{
-    uint64_t *key;
-    int *isA;
-    int *start;
-    int *end;
-};
-
 public struct PrimalArgs
 {
     BodySoA b;

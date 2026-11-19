@@ -34,14 +34,6 @@ int graphIndexSL(uint64_t k) { return (int)(uint(k & uint64_t(0xFFFFFFFFu)) & AV
 
 // Mirrors the device structs' ConstraintGraph -- key/isA/start/end, same private
 // copy convention primal.slang/dual.slang use for their own graph mirror.
-struct ConstraintGraph
-{
-    uint64_t *key;
-    int *isA;
-    int *start;
-    int *end;
-};
-
 // graphOther, specialized to the three real SoAs (m/j/sp) rather than the raw bodyA/
 // bodyB arrays constraints.slang's csJpRound uses -- k_sleep_commit calls the real
 // graphOther(g, e, m, j, sp) helper, so this takes the same three SoAs.

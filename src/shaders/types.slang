@@ -226,3 +226,16 @@ public struct SolverParamsGpu
     public float killHeight;
     public float grabStrength;
 };
+
+// Device addresses of the built constraint graph (VkConstraintGraph on the host): the body->constraint
+// adjacency, sorted by key, with each body's row range.
+public struct ConstraintGraph
+{
+    public uint64_t *key;
+    public int *isA;
+    public int *start;
+    public int *end;
+};
+
+// A cloth particle: position only, rotation held at identity (docs/CLOTH.md).
+public static const uint8_t SHAPE_PARTICLE = 3;
