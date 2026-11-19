@@ -44,8 +44,7 @@ void launchIntegrate(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines 
     uint32_t groups = ceilDiv(bodyCount, 256);
     if (groups == 0)
         return;
-    VkDeviceAddress argsAddr = ring.write(&args, sizeof(args));
-    cmd.dispatch(pl.integrate, groups, argsAddr);
+    cmd.dispatchArgs(pl.integrate, groups, ring, args);
 }
 
 void launchVelocity(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl, const VelocityArgsGpu &args,
@@ -54,8 +53,7 @@ void launchVelocity(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &
     uint32_t groups = ceilDiv(bodyCount, 256);
     if (groups == 0)
         return;
-    VkDeviceAddress argsAddr = ring.write(&args, sizeof(args));
-    cmd.dispatch(pl.velocity, groups, argsAddr);
+    cmd.dispatchArgs(pl.velocity, groups, ring, args);
 }
 
 void launchIntegrateProps(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl,
@@ -64,8 +62,7 @@ void launchIntegrateProps(CommandList &cmd, HostRingBuffer &ring, IntegratePipel
     uint32_t groups = ceilDiv(bodyCount, 256);
     if (groups == 0)
         return;
-    VkDeviceAddress argsAddr = ring.write(&args, sizeof(args));
-    cmd.dispatch(pl.integrateProps, groups, argsAddr);
+    cmd.dispatchArgs(pl.integrateProps, groups, ring, args);
 }
 
 void launchVelocityProps(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl,
@@ -74,8 +71,7 @@ void launchVelocityProps(CommandList &cmd, HostRingBuffer &ring, IntegratePipeli
     uint32_t groups = ceilDiv(bodyCount, 256);
     if (groups == 0)
         return;
-    VkDeviceAddress argsAddr = ring.write(&args, sizeof(args));
-    cmd.dispatch(pl.velocityProps, groups, argsAddr);
+    cmd.dispatchArgs(pl.velocityProps, groups, ring, args);
 }
 
 void launchKillFallen(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl, const KillFallenArgsGpu &args,
@@ -84,8 +80,7 @@ void launchKillFallen(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines
     uint32_t groups = ceilDiv(dynCount, 256);
     if (groups == 0)
         return;
-    VkDeviceAddress argsAddr = ring.write(&args, sizeof(args));
-    cmd.dispatch(pl.killFallen, groups, argsAddr);
+    cmd.dispatchArgs(pl.killFallen, groups, ring, args);
 }
 
 void launchExplosionGuard(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl,
@@ -94,8 +89,7 @@ void launchExplosionGuard(CommandList &cmd, HostRingBuffer &ring, IntegratePipel
     uint32_t groups = ceilDiv(dynCount, 256);
     if (groups == 0)
         return;
-    VkDeviceAddress argsAddr = ring.write(&args, sizeof(args));
-    cmd.dispatch(pl.explosionGuard, groups, argsAddr);
+    cmd.dispatchArgs(pl.explosionGuard, groups, ring, args);
 }
 
 } // namespace avbdvk

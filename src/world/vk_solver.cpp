@@ -100,8 +100,7 @@ void launchPrimalDispatchArgs(CommandList &cmd, HostRingBuffer &ring, SolverPipe
     if (colorCount <= 0)
         return;
     PrimalDispatchArgsGpu a{colorStart, colorEnd, indirect.address(), (uint32_t)colorCount, warp4 ? 64u : 256u};
-    VkDeviceAddress argsAddr = ring.write(&a, sizeof(a));
-    cmd.dispatch(pl.primalDispatchArgs, ceilDiv(colorCount, 128), argsAddr);
+    cmd.dispatchArgs(pl.primalDispatchArgs, ceilDiv(colorCount, 128), ring, a);
 }
 
 void launchPrimalColorIndirect(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, const PrimalArgsGpu &args,
@@ -133,23 +132,21 @@ void launchIterateSmall(CommandList &cmd, HostRingBuffer &ring, SolverPipelines 
     a.colorBound = colorBound;
     a.withForces = withForces ? 1 : 0;
     a.jointSlots = jointSlots;
-    cmd.dispatch(pl.iterateSmall, 1, ring.write(&a, sizeof(a)));
+    cmd.dispatchArgs(pl.iterateSmall, 1, ring, a);
 }
 
 void launchStepFlagIfSet(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, VkDeviceAddress src,
                          VkDeviceAddress flag)
 {
     StepFlagIfSetArgsGpu a{src, flag};
-    VkDeviceAddress argsAddr = ring.write(&a, sizeof(a));
-    cmd.dispatch(pl.stepFlagIfSet, 1, argsAddr);
+    cmd.dispatchArgs(pl.stepFlagIfSet, 1, ring, a);
 }
 
 void launchStepFlagIfGreater(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, VkDeviceAddress count,
                              VkDeviceAddress flag, int cap)
 {
     StepFlagIfGreaterArgsGpu a{count, flag, cap, 0};
-    VkDeviceAddress argsAddr = ring.write(&a, sizeof(a));
-    cmd.dispatch(pl.stepFlagIfGreater, 1, argsAddr);
+    cmd.dispatchArgs(pl.stepFlagIfGreater, 1, ring, a);
 }
 
 void launchStepColorBound(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, VkDeviceAddress colorStart,
@@ -158,8 +155,7 @@ void launchStepColorBound(CommandList &cmd, HostRingBuffer &ring, SolverPipeline
     if (bound >= maxColors)
         return;
     StepColorBoundArgsGpu a{colorStart, colorEnd, flag, bound, maxColors};
-    VkDeviceAddress argsAddr = ring.write(&a, sizeof(a));
-    cmd.dispatch(pl.stepColorBound, ceilDiv(maxColors - bound, 128), argsAddr);
+    cmd.dispatchArgs(pl.stepColorBound, ceilDiv(maxColors - bound, 128), ring, a);
 }
 
 void launchJointInit(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, const JointInitArgsGpu &args,
@@ -194,8 +190,7 @@ void launchDual(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, con
 void launchCoarse(CommandList &cmd, HostRingBuffer &ring, Pipeline &pipeline, const CoarseArgsGpu &args, int threads,
                   int groupSize)
 {
-    VkDeviceAddress argsAddr = ring.write(&args, sizeof(args));
-    cmd.dispatch(pipeline, ceilDiv(threads, groupSize), argsAddr);
+    cmd.dispatchArgs(pipeline, ceilDiv(threads, groupSize), ring, args);
 }
 
 } // namespace avbdvk

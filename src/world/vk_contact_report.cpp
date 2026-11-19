@@ -30,7 +30,7 @@ void launchContactReport(CommandList &cmd, HostRingBuffer &ring, ContactReportPi
     uint32_t groups = ceilDiv((int)args.slots, 128);
     if (groups == 0)
         return;
-    cmd.dispatch(pl.report, groups, ring.write(&args, sizeof(args)));
+    cmd.dispatchArgs(pl.report, groups, ring, args);
 }
 
 // Every entry point of this module, named once; init and destroy walk the same table.
@@ -58,7 +58,7 @@ void launchRestitutionPre(CommandList &cmd, HostRingBuffer &ring, RestitutionPip
 {
     uint32_t groups = ceilDiv((int)args.slots, 128);
     if (groups > 0)
-        cmd.dispatch(pl.pre, groups, ring.write(&args, sizeof(args)));
+        cmd.dispatchArgs(pl.pre, groups, ring, args);
 }
 
 void launchRestitutionImpulse(CommandList &cmd, HostRingBuffer &ring, RestitutionPipelines &pl,
@@ -66,7 +66,7 @@ void launchRestitutionImpulse(CommandList &cmd, HostRingBuffer &ring, Restitutio
 {
     uint32_t groups = ceilDiv((int)args.slots, 128);
     if (groups > 0)
-        cmd.dispatch(pl.impulse, groups, ring.write(&args, sizeof(args)));
+        cmd.dispatchArgs(pl.impulse, groups, ring, args);
 }
 
 void launchRestitutionApply(CommandList &cmd, HostRingBuffer &ring, RestitutionPipelines &pl,
@@ -74,7 +74,7 @@ void launchRestitutionApply(CommandList &cmd, HostRingBuffer &ring, RestitutionP
 {
     uint32_t groups = ceilDiv((int)args.dynCount, 128);
     if (groups > 0)
-        cmd.dispatch(pl.apply, groups, ring.write(&args, sizeof(args)));
+        cmd.dispatchArgs(pl.apply, groups, ring, args);
 }
 
 } // namespace avbdvk

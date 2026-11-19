@@ -603,8 +603,7 @@ void VkNarrowphase::record(CommandList &cmd, HostRingBuffer &ring, NarrowphasePi
         d.indirect = hullIndirect.address();
         d.capacity = (uint32_t)maxPairs;
         d.groupSize = 32;
-        const VkDeviceAddress dAddr = ring.write(&d, sizeof(d));
-        cmd.dispatch(pl.hullArgs, 1, dAddr);
+        cmd.dispatchArgs(pl.hullArgs, 1, ring, d);
         cmd.barrierIndirect();
         cmd.dispatchIndirect(pl.hull, hullIndirect, 0, hAddr);
         cmd.barrier();
@@ -620,7 +619,7 @@ void VkNarrowphase::record(CommandList &cmd, HostRingBuffer &ring, NarrowphasePi
         da.indirect = meshIndirect.address();
         da.capacity = (uint32_t)pairCapacity;
         da.groupSize = 32;
-        cmd.dispatch(pl.meshArgs, 1, ring.write(&da, sizeof(da)));
+        cmd.dispatchArgs(pl.meshArgs, 1, ring, da);
         cmd.barrierIndirect();
 
         // 2. Midphase: one lane per listed mesh pair, child keys appended to childKeys.
@@ -643,7 +642,7 @@ void VkNarrowphase::record(CommandList &cmd, HostRingBuffer &ring, NarrowphasePi
         dc.indirect = childCount.address();
         dc.capacity = (uint32_t)childCap;
         dc.groupSize = 1;
-        cmd.dispatch(pl.meshChildCount, 1, ring.write(&dc, sizeof(dc)));
+        cmd.dispatchArgs(pl.meshChildCount, 1, ring, dc);
         cmd.barrier();
 
         // 4. Sort the child keys: sorted child i is then manifold slot childBase + i.

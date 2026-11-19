@@ -54,6 +54,18 @@ public:
     {
         dispatch(pipeline, groupsX, 1, 1, argsAddr);
     }
+    // Writes `args` into the argument ring and dispatches with its address (the usual pair).
+    template <class A> void dispatchArgs(Pipeline &pipeline, uint32_t groupsX, HostRingBuffer &ring, const A &args)
+    {
+        dispatch(pipeline, groupsX, 1, 1, ring.write(&args, sizeof(args)));
+    }
+    // One thread per element: ceil(n / block) groups; an empty range dispatches nothing.
+    template <class A>
+    void dispatch1D(Pipeline &pipeline, int n, uint32_t block, HostRingBuffer &ring, const A &args)
+    {
+        if (n > 0)
+            dispatchArgs(pipeline, ((uint32_t)n + block - 1) / block, ring, args);
+    }
 
     // A full compute-shader-write -> compute-shader-read memory barrier. Call between
     // any two dispatches where the second reads what the first wrote.

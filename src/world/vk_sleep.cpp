@@ -101,8 +101,7 @@ void launchActiveFlags(CommandList &cmd, HostRingBuffer &ring, SleepPipelines &p
     uint32_t groups = ceilDiv(dynCount, 256);
     if (groups == 0)
         return;
-    VkDeviceAddress a = ring.write(&args, sizeof(args));
-    cmd.dispatch(pl.activeFlags, groups, a);
+    cmd.dispatchArgs(pl.activeFlags, groups, ring, args);
 }
 
 void launchSleepCommit(CommandList &cmd, HostRingBuffer &ring, SleepPipelines &pl, SleepCommitCall &call)
@@ -141,8 +140,7 @@ void launchSleepCommit(CommandList &cmd, HostRingBuffer &ring, SleepPipelines &p
     if (call.solveCount > 0)
     {
         cmd.barrier();
-        VkDeviceAddress a = ring.write(&call.commit, sizeof(call.commit));
-        cmd.dispatch(pl.sleepCommit, ceilDiv(call.solveCount, 256), a);
+        cmd.dispatchArgs(pl.sleepCommit, ceilDiv(call.solveCount, 256), ring, call.commit);
     }
 }
 
@@ -183,8 +181,7 @@ void launchWakeDetect(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl,
 
     cmd.barrier();
     {
-        VkDeviceAddress a = ring.write(&call.lostSupport, sizeof(call.lostSupport));
-        cmd.dispatch(pl.wakeLostSupport, ceilDiv(call.dynCount, 256), a);
+        cmd.dispatchArgs(pl.wakeLostSupport, ceilDiv(call.dynCount, 256), ring, call.lostSupport);
     }
 }
 
@@ -194,8 +191,7 @@ void launchWakeIslandSeed(CommandList &cmd, HostRingBuffer &ring, WakePipelines 
     uint32_t groups = ceilDiv(dynCount, 256);
     if (groups == 0)
         return;
-    VkDeviceAddress a = ring.write(&args, sizeof(args));
-    cmd.dispatch(pl.wakeIslandSeed, groups, a);
+    cmd.dispatchArgs(pl.wakeIslandSeed, groups, ring, args);
 }
 
 void launchWakeApply(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl, const WakeApplyArgsGpu &args,
@@ -204,8 +200,7 @@ void launchWakeApply(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl, 
     uint32_t groups = ceilDiv(dynCount, 256);
     if (groups == 0)
         return;
-    VkDeviceAddress a = ring.write(&args, sizeof(args));
-    cmd.dispatch(pl.wakeApply, groups, a);
+    cmd.dispatchArgs(pl.wakeApply, groups, ring, args);
 }
 
 void launchWakeAll(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl, const WakeAllArgsGpu &args, int dynCount)
@@ -213,8 +208,7 @@ void launchWakeAll(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl, co
     uint32_t groups = ceilDiv(dynCount, 256);
     if (groups == 0)
         return;
-    VkDeviceAddress a = ring.write(&args, sizeof(args));
-    cmd.dispatch(pl.wakeAll, groups, a);
+    cmd.dispatchArgs(pl.wakeAll, groups, ring, args);
 }
 
 // ---------------------------------------------------------------------------
@@ -227,8 +221,7 @@ void launchMutateApply(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &
     uint32_t groups = ceilDiv(count, 256);
     if (groups == 0)
         return;
-    VkDeviceAddress a = ring.write(&args, sizeof(args));
-    cmd.dispatch(pl.mutateApply, groups, a);
+    cmd.dispatchArgs(pl.mutateApply, groups, ring, args);
 }
 
 void launchJointWrite(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl, const JointWriteArgsGpu &args,
@@ -237,8 +230,7 @@ void launchJointWrite(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &p
     uint32_t groups = ceilDiv(count, 64);
     if (groups == 0)
         return;
-    VkDeviceAddress a = ring.write(&args, sizeof(args));
-    cmd.dispatch(pl.jointWrite, groups, a);
+    cmd.dispatchArgs(pl.jointWrite, groups, ring, args);
 }
 
 void launchWakeSeedRegion(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl,
@@ -247,8 +239,7 @@ void launchWakeSeedRegion(CommandList &cmd, HostRingBuffer &ring, MutatePipeline
     uint32_t groups = ceilDiv(dynCount, 256);
     if (groups == 0)
         return;
-    VkDeviceAddress a = ring.write(&args, sizeof(args));
-    cmd.dispatch(pl.wakeSeedRegion, groups, a);
+    cmd.dispatchArgs(pl.wakeSeedRegion, groups, ring, args);
 }
 
 void launchWakeFloodJoints(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl,
@@ -257,8 +248,7 @@ void launchWakeFloodJoints(CommandList &cmd, HostRingBuffer &ring, MutatePipelin
     uint32_t groups = ceilDiv(edgeCount, 256);
     if (groups == 0)
         return;
-    VkDeviceAddress a = ring.write(&args, sizeof(args));
-    cmd.dispatch(pl.wakeFloodJoints, groups, a);
+    cmd.dispatchArgs(pl.wakeFloodJoints, groups, ring, args);
 }
 
 void launchWakeSeedMerge(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl, const WakeSeedMergeArgsGpu &args,
@@ -267,8 +257,7 @@ void launchWakeSeedMerge(CommandList &cmd, HostRingBuffer &ring, MutatePipelines
     uint32_t groups = ceilDiv(dynCount, 256);
     if (groups == 0)
         return;
-    VkDeviceAddress a = ring.write(&args, sizeof(args));
-    cmd.dispatch(pl.wakeSeedMerge, groups, a);
+    cmd.dispatchArgs(pl.wakeSeedMerge, groups, ring, args);
 }
 
 void recordWakeFloodRounds(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl,
@@ -287,8 +276,7 @@ void recordWakeFloodRounds(CommandList &cmd, HostRingBuffer &ring, MutatePipelin
         if (edgeCount > 0)
         {
             jointsArgs.changed = changed;
-            VkDeviceAddress a = ring.write(&jointsArgs, sizeof(jointsArgs));
-            cmd.dispatch(pl.wakeFloodJoints, ceilDiv(edgeCount, 256), a);
+            cmd.dispatchArgs(pl.wakeFloodJoints, ceilDiv(edgeCount, 256), ring, jointsArgs);
         }
         cmd.barrier();
     }
@@ -300,8 +288,7 @@ void launchBodyGather(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &p
     uint32_t groups = ceilDiv(count, 256);
     if (groups == 0)
         return;
-    VkDeviceAddress a = ring.write(&args, sizeof(args));
-    cmd.dispatch(pl.bodyGather, groups, a);
+    cmd.dispatchArgs(pl.bodyGather, groups, ring, args);
 }
 
 // launchWakeFlood: owns its own CommandList/HostRingBuffer/submit loop (kFloodMaxRounds=64,
@@ -350,8 +337,7 @@ void launchWakeFlood(Device &dev, MutatePipelines &mutPl, WakePipelines &wakePl,
 
     ring.reset();
     cmd.begin();
-    VkDeviceAddress a = ring.write(&mergeArgs, sizeof(mergeArgs));
-    cmd.dispatch(mutPl.wakeSeedMerge, ceilDiv(dynCount, 256), a);
+    cmd.dispatchArgs(mutPl.wakeSeedMerge, ceilDiv(dynCount, 256), ring, mergeArgs);
     cmd.submit();
     cmd.wait();
 

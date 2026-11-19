@@ -203,8 +203,7 @@ void VkConstraints::record(CommandList &cmd, HostRingBuffer &ring, ConstraintsPi
     // ---- Reset colors, then emit every CSR entry (manifolds, joints, springs) into
     // one shared counter -- same shape as Constraints::build's first block. ----
     CsResetColorsArgsGpu rc{color.address(), dynamicIdx.address(), (uint32_t)dynamicCount, 0u, dynamicCountAddr};
-    VkDeviceAddress rcAddr = ring.write(&rc, sizeof(rc));
-    cmd.dispatch(pl.resetColors, (dynamicCount + block - 1) / block, rcAddr);
+    cmd.dispatchArgs(pl.resetColors, (dynamicCount + block - 1) / block, ring, rc);
 
     if (manifolds.slots > 0 || forceCount > 0)
     {
@@ -221,8 +220,7 @@ void VkConstraints::record(CommandList &cmd, HostRingBuffer &ring, ConstraintsPi
             em.isA = rawIsA.address();
             em.counter = counter.address();
             em.capacity = maxEntries;
-            VkDeviceAddress emAddr = ring.write(&em, sizeof(em));
-            cmd.dispatch(pl.emitManifold, ((uint32_t)manifolds.slots + block - 1) / block, emAddr);
+            cmd.dispatchArgs(pl.emitManifold, ((uint32_t)manifolds.slots + block - 1) / block, ring, em);
         }
         if (joints.count > 0)
         {
@@ -238,8 +236,7 @@ void VkConstraints::record(CommandList &cmd, HostRingBuffer &ring, ConstraintsPi
             ej.counter = counter.address();
             ej.capacity = maxEntries;
             ej.type = 1; // FORCE_JOINT
-            VkDeviceAddress ejAddr = ring.write(&ej, sizeof(ej));
-            cmd.dispatch(pl.emitForce, ((uint32_t)joints.count + block - 1) / block, ejAddr);
+            cmd.dispatchArgs(pl.emitForce, ((uint32_t)joints.count + block - 1) / block, ring, ej);
         }
         if (springs.count > 0)
         {
@@ -255,8 +252,7 @@ void VkConstraints::record(CommandList &cmd, HostRingBuffer &ring, ConstraintsPi
             es.counter = counter.address();
             es.capacity = maxEntries;
             es.type = 2; // FORCE_SPRING
-            VkDeviceAddress esAddr = ring.write(&es, sizeof(es));
-            cmd.dispatch(pl.emitForce, ((uint32_t)springs.count + block - 1) / block, esAddr);
+            cmd.dispatchArgs(pl.emitForce, ((uint32_t)springs.count + block - 1) / block, ring, es);
         }
         cmd.barrier();
 
@@ -269,8 +265,7 @@ void VkConstraints::record(CommandList &cmd, HostRingBuffer &ring, ConstraintsPi
 
         CsRowsArgsGpu ra{sortedKeys.address(), (uint32_t)maxEntries, 0u,
                          rowStart.address(),   rowEnd.address(),     counter.address()};
-        VkDeviceAddress raAddr = ring.write(&ra, sizeof(ra));
-        cmd.dispatch(pl.rows, ((uint32_t)maxEntries + block - 1) / block, raAddr);
+        cmd.dispatchArgs(pl.rows, ((uint32_t)maxEntries + block - 1) / block, ring, ra);
         cmd.barrier();
     }
     m_recorded = true;
@@ -352,16 +347,14 @@ int VkConstraints::recordColoring(CommandList &cmd, HostRingBuffer &ring, Constr
         jp.color = color.address();
         jp.remaining = remaining.address() + (VkDeviceAddress)(firstRound + r) * sizeof(uint32_t);
         jp.dynCountPtr = dynamicCountAddr;
-        VkDeviceAddress jpAddr = ring.write(&jp, sizeof(jp));
-        cmd.dispatch(pl.jpRound, (dynamicCount + block - 1) / block, jpAddr);
+        cmd.dispatchArgs(pl.jpRound, (dynamicCount + block - 1) / block, ring, jp);
         cmd.barrier();
     }
 
     // ---- Group dynamic bodies by color so each color is one contiguous dispatch. ----
     CsColorKeysArgsGpu ck{color.address(),    dynamicIdx.address(),  (uint32_t)dynamicCount, 0u,
                           colorKey.address(), bodyScratch.address(), dynamicCountAddr};
-    VkDeviceAddress ckAddr = ring.write(&ck, sizeof(ck));
-    cmd.dispatch(pl.colorKeys, (dynamicCount + block - 1) / block, ckAddr);
+    cmd.dispatchArgs(pl.colorKeys, (dynamicCount + block - 1) / block, ring, ck);
     cmd.barrier();
 
     radixSortPairsU32(cmd, ring, prim, radix, colorKey, colorKeySorted, bodyScratch, bodyByColor,
@@ -374,8 +367,7 @@ int VkConstraints::recordColoring(CommandList &cmd, HostRingBuffer &ring, Constr
     VkDeviceAddress startAddr = colorRanges.address();
     VkDeviceAddress endAddr = colorRanges.address() + (VkDeviceAddress)(AVBD_MAX_COLORS_VK * sizeof(int32_t));
     CsColorRowsArgsGpu cr{colorKeySorted.address(), (uint32_t)dynamicCount, 0u, startAddr, endAddr, dynamicCountAddr};
-    VkDeviceAddress crAddr = ring.write(&cr, sizeof(cr));
-    cmd.dispatch(pl.colorRows, (dynamicCount + block - 1) / block, crAddr);
+    cmd.dispatchArgs(pl.colorRows, (dynamicCount + block - 1) / block, ring, cr);
     cmd.barrier();
 
     m_recordedRounds = firstRound + count;
@@ -424,7 +416,7 @@ int VkConstraints::recordSmall(CommandList &cmd, HostRingBuffer &ring, Constrain
     a.capacity = maxEntries;
     a.rounds = (uint32_t)rounds;
     cmd.barrier(); // producers of the manifolds, bodies and dyn list (the multi path opens with a fill)
-    cmd.dispatch(pl.buildSmall, 1, ring.write(&a, sizeof(a)));
+    cmd.dispatchArgs(pl.buildSmall, 1, ring, a);
     cmd.barrier();
     m_recorded = true;
     m_recordedRounds = rounds;

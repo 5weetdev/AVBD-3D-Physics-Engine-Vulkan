@@ -43,8 +43,7 @@ void DispatchGate::begin(CommandList &cmd, HostRingBuffer &ring, Pipeline &gateP
     a.dst = args.address();
     a.flag = flag;
     a.count = slots;
-    VkDeviceAddress addr = ring.write(&a, sizeof(a));
-    cmd.dispatch(gatePipeline, (uint32_t)((slots + 127) / 128), addr);
+    cmd.dispatchArgs(gatePipeline, (uint32_t)((slots + 127) / 128), ring, a);
     cmd.barrierIndirect();
 }
 
