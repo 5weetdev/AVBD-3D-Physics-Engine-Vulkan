@@ -34,6 +34,9 @@
 #include "wake_spirv.h"
 #include "mutate_spirv.h"
 #include "render_spirv.h"
+#include "render_pose_spirv.h"
+#include "render_overlay_spirv.h"
+#include "render_debug_spirv.h"
 #include "pick_spirv.h"
 #include "drag_spirv.h"
 
@@ -68,7 +71,8 @@ void VkWorld::init()
     wakePl.init(dev, layout, wake_spirv, wake_spirv_words);
     mutatePl.init(dev, layout, mutate_spirv, mutate_spirv_words);
     primPl.init(dev, layout);
-    renderPl.init(dev, layout, render_spirv, render_spirv_words);
+    renderPl.init(dev, layout, {render_spirv, render_spirv_words, render_overlay_spirv, render_overlay_spirv_words,
+                                render_debug_spirv, render_debug_spirv_words});
     interactPl.init(dev, layout, drag_spirv, drag_spirv_words);
     dev.savePipelineCache(); // keep the compiled kernels even if this process is killed before shutdown
 

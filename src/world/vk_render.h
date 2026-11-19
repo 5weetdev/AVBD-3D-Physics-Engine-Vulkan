@@ -27,6 +27,17 @@
 namespace avbdvk
 {
 
+// The embedded SPIR-V of the three render modules (render, render_overlay, render_debug).
+struct RenderModules
+{
+    const uint32_t *render;
+    size_t renderWords;
+    const uint32_t *overlay;
+    size_t overlayWords;
+    const uint32_t *debug;
+    size_t debugWords;
+};
+
 struct RenderPipelines
 {
     Pipeline writeInstances;
@@ -39,7 +50,7 @@ struct RenderPipelines
     Pipeline overlayLoadAccum;
     Pipeline writeDebugInstances;
 
-    void init(Device &dev, PipelineLayout &layout, const uint32_t *spirv, size_t spirvWords);
+    void init(Device &dev, PipelineLayout &layout, const RenderModules &modules);
     void destroy();
 };
 

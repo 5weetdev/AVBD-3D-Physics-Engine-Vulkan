@@ -13,7 +13,7 @@
 // OverlayView parameter.
 //
 // the debug-draw writer's k_write_debug_instances and k_write_force_instances are
-// ported as csWriteDebugInstances, sharing rodRotation/
+// ported as csWriteDebugInstances / csWriteForceInstances, sharing rodRotation/
 // basisRotation/debugRgba/emitInstance/jointAxialLoad with the same term order as the reference.
 //
 // csPackPose ports k_pack_pose (the instance writer) unchanged from the Phase 5C
@@ -26,18 +26,18 @@
 import maths;
 import types;
 
-struct PushConstants
+public struct PushConstants
 {
     uint64_t argsAddr;
 };
 
 [[vk::push_constant]]
-ConstantBuffer<PushConstants> pc;
+public ConstantBuffer<PushConstants> pc;
 
 // Mirrors engine/vk/vk_args.h::BodyInstanceGpu / the device structs'
 // BodyInstance, byte for byte (44 bytes: 3 float pos + 4 float rot + 3 float half +
 // 1 uint rgba, no padding needed).
-struct BodyInstance
+public struct BodyInstance
 {
     float3 pos;
     float4 rot;
@@ -48,7 +48,7 @@ struct BodyInstance
 // Mirrors render_types's OverlayView, field for field. Every pointer may be null,
 // in which case the overlay that wanted it falls back to the default hue (mirroring the
 // the reference `break` in overlayColorFor's switch, which drops to the no-overlay-colour return).
-struct OverlayView
+public struct OverlayView
 {
     int mode;
     float speedMax;
@@ -174,7 +174,7 @@ float3 hueColor(uint h32)
 }
 
 // Black-body heat ramp: render_types, term for term.
-float3 overlayHeat(float t)
+public float3 overlayHeat(float t)
 {
     t = min(max(t, 0.0f), 1.0f);
     if (t < 0.25f)
@@ -197,7 +197,7 @@ float3 overlayHeat(float t)
 }
 
 // Diverging ramp: render_types, term for term.
-float3 overlayDiverge(float t)
+public float3 overlayDiverge(float t)
 {
     t = min(max(t, -1.0f), 1.0f);
     float3 mid = float3(0.82f, 0.82f, 0.84f);
@@ -217,7 +217,7 @@ float3 overlayIndexColor(uint i, float sat, float val)
 }
 
 // render_types, same derivation and term order.
-float jointAxialLoadR(vec3 lambdaLin, vec3 pA, vec3 pB)
+public float jointAxialLoadR(vec3 lambdaLin, vec3 pA, vec3 pB)
 {
     vec3 d = sub(pA, pB);
     float len = length3(d);
@@ -328,7 +328,7 @@ float3 overlayColorFor(OverlayView ov, BodySoA b, int i, out bool has)
     return float3(0.0f, 0.0f, 0.0f);
 }
 
-struct WriteInstancesArgs
+public struct WriteInstancesArgs
 {
     BodySoA b;
     BodyInstance *out;
@@ -454,447 +454,4 @@ void csWriteInstances(uint3 tid: SV_DispatchThreadID)
 
     if (slot < args->maxInstances)
         args->out[slot] = inst;
-}
-
-// ---------------------------------------------------------------------------
-// Overlay structural aggregates (the overlay reductions)
-// ---------------------------------------------------------------------------
-
-struct OverlayStats
-{
-    int *push;
-    int *pull;
-    int *stress;
-    int *cone;
-    int *penetration;
-    int *jointDegree;
-};
-
-void statMax(int *dst, int i, float v)
-{
-    if (dst != nullptr)
-    {
-        int old;
-        InterlockedMax(dst[i], asint(v), old);
-    }
-}
-
-struct OverlayStatsClearArgs
-{
-    OverlayStats s;
-    int n;
-    int _pad0;
-};
-
-[shader("compute")]
-[numthreads(256, 1, 1)]
-void csOverlayStatsClear(uint3 tid: SV_DispatchThreadID)
-{
-    OverlayStatsClearArgs *args = (OverlayStatsClearArgs *)pc.argsAddr;
-    int i = (int)tid.x;
-    if (i >= args->n)
-        return;
-    const int zero = asint(0.0f);
-    const int none = asint(-1.0f);
-    if (args->s.push != nullptr) args->s.push[i] = zero;
-    if (args->s.pull != nullptr) args->s.pull[i] = zero;
-    if (args->s.penetration != nullptr) args->s.penetration[i] = zero;
-    if (args->s.stress != nullptr) args->s.stress[i] = none;
-    if (args->s.cone != nullptr) args->s.cone[i] = none;
-    if (args->s.jointDegree != nullptr) args->s.jointDegree[i] = 0;
-}
-
-struct OverlayStatsContactsArgs
-{
-    ManifoldSoA m;
-    int slots;
-    int _pad0;
-    OverlayStats s;
-};
-
-[shader("compute")]
-[numthreads(256, 1, 1)]
-void csOverlayStatsContacts(uint3 tid: SV_DispatchThreadID)
-{
-    OverlayStatsContactsArgs *args = (OverlayStatsContactsArgs *)pc.argsAddr;
-    ManifoldSoA m = args->m;
-    int t = (int)tid.x;
-    if (t >= args->slots || m.contactCount[t] <= 0)
-        return;
-
-    int off = m.contactOffset[t];
-    float friction = m.friction[t];
-
-    float peakForce = 0.0f;
-    float peakCone = 0.0f;
-    float peakPen = 0.0f;
-
-    for (int c = 0; c < m.contactCount[t]; c++)
-    {
-        vec3 lam = m.lambda[off + c];
-        float fn = abs(lam.x);
-        peakForce = max(peakForce, fn);
-
-        if (args->s.cone != nullptr)
-        {
-            float bounds = fn * friction;
-            float ft = sqrt(lam.y * lam.y + lam.z * lam.z);
-            if (bounds > 1e-6f)
-                peakCone = max(peakCone, min(ft / bounds, 1.0f));
-        }
-
-        if (args->s.penetration != nullptr)
-            peakPen = max(peakPen, -m.C0[off + c].x);
-    }
-
-    int ia = m.bodyA[t], ib = m.bodyB[t];
-    statMax(args->s.push, ia, peakForce);
-    statMax(args->s.push, ib, peakForce);
-    statMax(args->s.cone, ia, peakCone);
-    statMax(args->s.cone, ib, peakCone);
-    statMax(args->s.penetration, ia, peakPen);
-    statMax(args->s.penetration, ib, peakPen);
-}
-
-struct OverlayStatsForcesArgs
-{
-    BodySoA b;
-    JointSoA j;
-    SpringSoA sp;
-    int jointsAuthored;
-    int _pad0;
-    OverlayStats s;
-};
-
-[shader("compute")]
-[numthreads(256, 1, 1)]
-void csOverlayStatsForces(uint3 tid: SV_DispatchThreadID)
-{
-    OverlayStatsForcesArgs *args = (OverlayStatsForcesArgs *)pc.argsAddr;
-    BodySoA b = args->b;
-    JointSoA j = args->j;
-    SpringSoA sp = args->sp;
-
-    int t = (int)tid.x;
-    int total = args->jointsAuthored + (int)sp.count;
-    if (t >= total)
-        return;
-
-    bool isJoint = t < args->jointsAuthored;
-    int i = isJoint ? t : t - args->jointsAuthored;
-
-    int ia, ib;
-    vec3 rA, rB;
-    if (isJoint)
-    {
-        if (j.broken[i])
-            return;
-        ia = j.bodyA[i];
-        ib = j.bodyB[i];
-        rA = j.rA[i];
-        rB = j.rB[i];
-    }
-    else
-    {
-        ia = sp.bodyA[i];
-        ib = sp.bodyB[i];
-        rA = sp.rA[i];
-        rB = sp.rB[i];
-    }
-    if (ib < 0 || (uint)ib >= b.count)
-        return;
-
-    if (args->s.jointDegree != nullptr)
-    {
-        if (ia >= 0)
-        {
-            int old;
-            InterlockedAdd(args->s.jointDegree[ia], 1, old);
-        }
-        int old2;
-        InterlockedAdd(args->s.jointDegree[ib], 1, old2);
-    }
-
-    vec3 pA = ia >= 0 ? transformQ(b.pos[ia], b.rot[ia], rA) : rA;
-    vec3 pB = transformQ(b.pos[ib], b.rot[ib], rB);
-
-    float axial = 0.0f;
-    if (isJoint)
-        axial = jointAxialLoadR(j.lambdaLin[i], pA, pB);
-    else
-    {
-        float len = length3(sub(pB, pA));
-        axial = sp.stiffness[i] * (len - sp.rest[i]);
-    }
-
-    float tension = max(axial, 0.0f);
-    float compression = max(-axial, 0.0f);
-    if (ia >= 0)
-    {
-        statMax(args->s.pull, ia, tension);
-        statMax(args->s.push, ia, compression);
-    }
-    statMax(args->s.pull, ib, tension);
-    statMax(args->s.push, ib, compression);
-
-    if (args->s.stress != nullptr && isJoint)
-    {
-        float frac = j.fracture[i];
-        if (!isinf(frac) && frac > 0.0f && !isnan(frac))
-        {
-            float f = min(max(length3(j.lambdaAng[i]), length3(j.lambdaLin[i])) / frac, 1.0f);
-            if (ia >= 0)
-                statMax(args->s.stress, ia, f);
-            statMax(args->s.stress, ib, f);
-        }
-    }
-}
-
-struct OverlayLoadClearArgs
-{
-    uint *load;
-    int n;
-    int _pad0;
-};
-
-[shader("compute")]
-[numthreads(256, 1, 1)]
-void csOverlayLoadClear(uint3 tid: SV_DispatchThreadID)
-{
-    OverlayLoadClearArgs *args = (OverlayLoadClearArgs *)pc.argsAddr;
-    int i = (int)tid.x;
-    if (i < args->n)
-        args->load[i] = 0u;
-}
-
-struct OverlayLoadAccumArgs
-{
-    BodySoA b;
-    ManifoldSoA m;
-    int slots;
-    int _pad0;
-    uint *load;
-};
-
-[shader("compute")]
-[numthreads(256, 1, 1)]
-void csOverlayLoadAccum(uint3 tid: SV_DispatchThreadID)
-{
-    OverlayLoadAccumArgs *args = (OverlayLoadAccumArgs *)pc.argsAddr;
-    ManifoldSoA m = args->m;
-    int t = (int)tid.x;
-    if (t >= args->slots || m.contactCount[t] <= 0)
-        return;
-
-    int off = m.contactOffset[t];
-    float peak = 0.0f;
-    for (int c = 0; c < m.contactCount[t]; c++)
-        peak = max(peak, abs(m.lambda[off + c].x));
-
-    uint bits = asuint(peak);
-    uint old;
-    InterlockedMax(args->load[m.bodyA[t]], bits, old);
-    InterlockedMax(args->load[m.bodyB[t]], bits, old);
-}
-
-// ---------------------------------------------------------------------------
-// Debug markers and force rods (the debug-draw writer)
-// ---------------------------------------------------------------------------
-
-// Shortest arc rotating +x onto unit vector d (the debug-draw writer).
-quat rodRotation(vec3 d)
-{
-    float w = 1.0f + d.x;
-    if (w < 1.0e-6f)
-        return quat(0.0f, 0.0f, 1.0f, 0.0f);
-    return normalizeQ(quat(0.0f, -d.z, d.y, w));
-}
-
-// Shepperd's method, pivoting on the largest diagonal term (the debug-draw writer).
-quat basisRotation(float3x3 m)
-{
-    float m00 = m.row0.x, m01 = m.row1.x, m02 = m.row2.x;
-    float m10 = m.row0.y, m11 = m.row1.y, m12 = m.row2.y;
-    float m20 = m.row0.z, m21 = m.row1.z, m22 = m.row2.z;
-
-    float tr = m00 + m11 + m22;
-    quat q;
-    if (tr > 0.0f)
-    {
-        float s = sqrt(tr + 1.0f) * 2.0f;
-        q = quat((m21 - m12) / s, (m02 - m20) / s, (m10 - m01) / s, 0.25f * s);
-    }
-    else if (m00 > m11 && m00 > m22)
-    {
-        float s = sqrt(1.0f + m00 - m11 - m22) * 2.0f;
-        q = quat(0.25f * s, (m01 + m10) / s, (m02 + m20) / s, (m21 - m12) / s);
-    }
-    else if (m11 > m22)
-    {
-        float s = sqrt(1.0f + m11 - m00 - m22) * 2.0f;
-        q = quat((m01 + m10) / s, 0.25f * s, (m12 + m21) / s, (m02 - m20) / s);
-    }
-    else
-    {
-        float s = sqrt(1.0f + m22 - m00 - m11) * 2.0f;
-        q = quat((m02 + m20) / s, (m12 + m21) / s, 0.25f * s, (m10 - m01) / s);
-    }
-    return normalizeQ(q);
-}
-
-uint debugRgba(vec3 c)
-{
-    return 0xFC000000u |
-           ((uint)(min(max(c.z, 0.0f), 1.0f) * 255.0f) << 16) |
-           ((uint)(min(max(c.y, 0.0f), 1.0f) * 255.0f) << 8) |
-           (uint)(min(max(c.x, 0.0f), 1.0f) * 255.0f);
-}
-
-void emitInstance(BodyInstance *out, int maxInstances, int *counter,
-                  vec3 p, quat q, vec3 half, uint rgba)
-{
-    int slot;
-    InterlockedAdd(*counter, 1, slot);
-    if (slot >= maxInstances)
-        return;
-
-    BodyInstance inst;
-    inst.pos = float3(p.x, p.y, p.z);
-    inst.rot = float4(q.x, q.y, q.z, q.w);
-    inst.half = float3(half.x, half.y, half.z);
-    inst.rgba = rgba;
-    out[slot] = inst;
-}
-
-struct DebugDrawView
-{
-    int contactPoints;
-    int contactNormals;
-    int manifoldLinks;
-    int tint;
-    float pointSize;
-    float normalLength;
-    float forceMax;
-};
-
-struct WriteDebugInstancesArgs
-{
-    BodySoA b;
-    ManifoldSoA m;
-    int slots;
-    int _pad0;
-    BodyInstance *out;
-    int maxInstances;
-    int _pad1;
-    int *counter;
-    DebugDrawView d;
-};
-
-[shader("compute")]
-[numthreads(256, 1, 1)]
-void csWriteDebugInstances(uint3 tid: SV_DispatchThreadID)
-{
-    WriteDebugInstancesArgs *args = (WriteDebugInstancesArgs *)pc.argsAddr;
-    BodySoA b = args->b;
-    ManifoldSoA m = args->m;
-    DebugDrawView d = args->d;
-
-    int t = (int)tid.x;
-    if (t >= args->slots || m.contactCount[t] <= 0)
-        return;
-
-    int ia = m.bodyA[t], ib = m.bodyB[t];
-    int off = m.contactOffset[t];
-    int n = m.contactCount[t];
-    float3x3 basis = m.basis[t];
-    float friction = m.friction[t];
-
-    vec3 posA = b.pos[ia], posB = b.pos[ib];
-    quat rotA = b.rot[ia], rotB = b.rot[ib];
-
-    float manifoldForce = 0.0f;
-
-    if (d.contactPoints != 0 || d.contactNormals != 0)
-    {
-        quat plate = basisRotation(basis);
-        for (int c = 0; c < n; c++)
-        {
-            vec3 lam = m.lambda[off + c];
-            float fn = abs(lam.x);
-            manifoldForce += fn;
-
-            vec3 pA = transformQ(posA, rotA, m.rA[off + c]);
-            vec3 pB = transformQ(posB, rotB, m.rB[off + c]);
-            vec3 mid = scale(add(pA, pB), 0.5f);
-
-            vec3 col;
-            if (d.tint == 1)
-            {
-                float bounds = fn * friction;
-                if (bounds <= 1e-6f)
-                    col = vec3(0.45f, 0.46f, 0.50f);
-                else
-                {
-                    float ft = sqrt(lam.y * lam.y + lam.z * lam.z);
-                    float3 hc = overlayHeat(min(ft / bounds, 1.0f));
-                    col = vec3(hc.x, hc.y, hc.z);
-                }
-            }
-            else if (d.tint == 2)
-            {
-                col = (m.stick[off + c] & 1) != 0 ? vec3(0.20f, 0.85f, 0.35f)
-                                             : vec3(1.00f, 0.45f, 0.10f);
-            }
-            else if (d.tint == 3)
-            {
-                col = vec3(1.0f, 0.95f, 0.25f);
-            }
-            else
-            {
-                float3 hc = overlayHeat(sqrt(min(fn / max(d.forceMax, 1e-6f), 1.0f)));
-                col = vec3(hc.x, hc.y, hc.z);
-            }
-            uint rgba = debugRgba(col);
-
-            if (d.contactPoints != 0)
-            {
-                float s = d.pointSize;
-                emitInstance(args->out, args->maxInstances, args->counter, mid, plate,
-                            vec3(s * 0.25f, s, s), rgba);
-            }
-
-            if (d.contactNormals != 0)
-            {
-                float len = d.normalLength * min(fn / max(d.forceMax, 1e-6f), 1.0f);
-                if (len > 1e-4f)
-                {
-                    vec3 nrm = basis.row0;
-                    float r = d.pointSize * 0.35f;
-                    emitInstance(args->out, args->maxInstances, args->counter,
-                                add(mid, scale(nrm, len * 0.5f)), rodRotation(nrm),
-                                vec3(len * 0.5f, r, r), rgba);
-                }
-            }
-        }
-    }
-
-    if (d.manifoldLinks != 0)
-    {
-        if (d.contactPoints == 0 && d.contactNormals == 0)
-            for (int c = 0; c < n; c++)
-                manifoldForce += abs(m.lambda[off + c].x);
-
-        vec3 dir = sub(posB, posA);
-        float len = length3(dir);
-        if (len > 1e-5f)
-        {
-            dir = divs(dir, len);
-            float3 hc = overlayHeat(sqrt(min(manifoldForce / max(d.forceMax, 1e-6f), 1.0f)));
-            vec3 col = vec3(hc.x, hc.y, hc.z);
-            float r = d.pointSize * 0.5f;
-            emitInstance(args->out, args->maxInstances, args->counter,
-                        scale(add(posA, posB), 0.5f), rodRotation(dir),
-                        vec3(len * 0.5f, r, r), debugRgba(col));
-        }
-    }
 }

@@ -28,9 +28,13 @@ static std::array<PipelineEntry, 7> entries(RenderPipelines &p)
     }};
 }
 
-void RenderPipelines::init(Device &dev, PipelineLayout &layout, const uint32_t *spirv, size_t spirvWords)
+void RenderPipelines::init(Device &dev, PipelineLayout &layout, const RenderModules &m)
 {
-    initPipelines(dev, layout, spirv, spirvWords, entries(*this));
+    const std::array<PipelineEntry, 7> all = entries(*this);
+    // entries() lists the kernels grouped by module: writeInstances | overlay x5 | debug x1.
+    initPipelines(dev, layout, m.render, m.renderWords, all.data(), 1);
+    initPipelines(dev, layout, m.overlay, m.overlayWords, all.data() + 1, 5);
+    initPipelines(dev, layout, m.debug, m.debugWords, all.data() + 6, 1);
 }
 
 void RenderPipelines::destroy()
