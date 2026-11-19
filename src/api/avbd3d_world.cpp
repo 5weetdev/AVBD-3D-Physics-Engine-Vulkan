@@ -1,4 +1,5 @@
 #include "avbd3d_world.h"
+#include "vk_guard.h"
 
 #include "collision.h"
 #include "box3d/constants.h"
@@ -2068,36 +2069,16 @@ void World::collectContacts()
 
 avbd3d_Error errorOfCurrentException(std::string &text)
 {
-    try
+    const avbdvk::Classified c = avbdvk::classifyCurrentException();
+    text = c.what;
+    switch (c.kind)
     {
-        throw;
-    }
-    catch (const std::bad_alloc &)
-    {
-        text = "out of host memory";
+    case avbdvk::Failure::HostOutOfMemory:
+    case avbdvk::Failure::DeviceOutOfMemory:
         return avbd3d_errorOutOfMemory;
-    }
-    catch (const avbdvk::DeviceError &e)
-    {
-        text = e.what();
-        return avbd3d_errorDevice;
-    }
-    catch (const avbdvk::VkError &e)
-    {
-        text = e.what();
-        const VkResult r = e.result();
-        if (r == VK_ERROR_OUT_OF_DEVICE_MEMORY || r == VK_ERROR_OUT_OF_HOST_MEMORY)
-            return avbd3d_errorOutOfMemory;
-        return r == VK_ERROR_DEVICE_LOST ? avbd3d_errorDeviceLost : avbd3d_errorDevice;
-    }
-    catch (const std::exception &e)
-    {
-        text = e.what();
-        return avbd3d_errorDevice;
-    }
-    catch (...)
-    {
-        text = "unknown exception";
+    case avbdvk::Failure::DeviceLost:
+        return avbd3d_errorDeviceLost;
+    default:
         return avbd3d_errorDevice;
     }
 }
