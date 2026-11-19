@@ -411,7 +411,7 @@ void VkWorld::recordFront()
     auto &front = S.front;
     auto &recordedP1 = S.recordedP1;
     tPass = Clock::now();
-    if (pass > 64)
+    if (pass > kMaxRerunPasses)
     {
         fprintf(stderr, "[avbd_vk] step: %d reruns without converging\n", pass);
         abort();
@@ -1323,9 +1323,9 @@ void VkWorld::countRerunCauses(bool jpShort, bool colorShort)
         result.colorReruns++;
     floodCause = islandCause = false;
     if (jpShort)
-        jpRounds = std::min(2 * jpRounds, (int)VkConstraints::kMaxJpRounds);
+        jpRounds = widenJpRounds(jpRounds, (int)VkConstraints::kMaxJpRounds);
     if (colorShort)
-        colorBound = std::min(constraints.colorCount() + 2, (int)AVBD_MAX_COLORS_VK);
+        colorBound = widenColorBound(constraints.colorCount(), (int)AVBD_MAX_COLORS_VK);
 }
 
 bool VkWorld::finishPass()
@@ -1391,8 +1391,8 @@ bool VkWorld::finishPass()
     }
 
     // Flagged: grow whichever bound was too small and go again.
-    const bool jpShort = !constraints.jpConverged() && jpRounds < VkConstraints::kMaxJpRounds;
-    const bool colorShort = colorBound < AVBD_MAX_COLORS_VK && constraints.colorCount() > colorBound;
+    const bool jpShort = jpBoundShort(constraints.jpConverged(), jpRounds, VkConstraints::kMaxJpRounds);
+    const bool colorShort = colorBoundShort(colorBound, constraints.colorCount(), AVBD_MAX_COLORS_VK);
     if (phase4Done && !jpShort && !colorShort)
     {
         fprintf(stderr, "[avbd_vk] step: flag set but phase 4, JP and colours are all within bounds\n");

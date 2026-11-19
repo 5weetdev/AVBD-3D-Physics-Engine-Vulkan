@@ -46,6 +46,7 @@
 
 #include "vk_broadphase.h"
 #include "vk_buffer.h"
+#include "vk_rerun.h"
 #include "vk_cmd.h"
 #include "vk_constraints.h"
 #include "vk_ccd.h"
@@ -125,16 +126,12 @@ public:
     // to commit clamped results (truncated): failPhase/failResource name what ran out and
     // required/capacity say by how much. Reruns are counted per cause (a pass that hit
     // several causes counts each). submits is the vkQueueSubmit delta over the step.
-    struct StepResult
+    struct StepResult : RerunCounters
     {
         bool ok = true;
         bool truncated = false;
-        int capacityReruns = 0; // pair/contact capacity overflow: grow + rerun from phase 2
         int floodReruns = 0;    // explicit wake flood bound too small
         int islandReruns = 0;   // joint-island flood bound too small
-        int jpReruns = 0;       // Jones-Plassmann round bound too small
-        int colorReruns = 0;    // recorded colour bound too small
-        int submits = 0;
         const char *failPhase = nullptr;
         const char *failResource = nullptr;
         // failPhase == "device": a Vulkan call failed (or a memory budget was hit). vkError is
