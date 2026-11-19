@@ -24,6 +24,8 @@
 #include "narrowphase_mesh_spirv.h"
 #include "constraints_spirv.h"
 #include "primal_spirv.h"
+#include "step_control_spirv.h"
+#include "coarse_spirv.h"
 #include "dual_spirv.h"
 #include "sleep_spirv.h"
 #include "lod_spirv.h"
@@ -57,7 +59,8 @@ void VkWorld::init()
     npPl.initHull(dev, layout, narrowphase_hull_spirv, narrowphase_hull_spirv_words);
     npPl.initMesh(dev, layout, narrowphase_mesh_spirv, narrowphase_mesh_spirv_words);
     csPl.init(dev, layout, constraints_spirv, constraints_spirv_words);
-    solverPl.init(dev, layout, primal_spirv, primal_spirv_words, dual_spirv, dual_spirv_words);
+    solverPl.init(dev, layout, primal_spirv, primal_spirv_words, dual_spirv, dual_spirv_words, step_control_spirv,
+                  step_control_spirv_words, coarse_spirv, coarse_spirv_words);
     sleepPl.init(dev, layout, sleep_spirv, sleep_spirv_words);
     reportPl.init(dev, layout, contact_report_spirv, contact_report_spirv_words);
     ccd.init(dev, layout);

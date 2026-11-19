@@ -52,7 +52,8 @@ struct SolverPipelines
     // primalSpirv/primalWords: src/shaders/primal.slang's embedded SPIR-V.
     // dualSpirv/dualWords: src/shaders/dual.slang's embedded SPIR-V.
     void init(Device &dev, PipelineLayout &layout, const uint32_t *primalSpirv, size_t primalWords,
-              const uint32_t *dualSpirv, size_t dualWords);
+              const uint32_t *dualSpirv, size_t dualWords, const uint32_t *stepSpirv, size_t stepWords,
+              const uint32_t *coarseSpirv, size_t coarseWords);
     void destroy();
 };
 

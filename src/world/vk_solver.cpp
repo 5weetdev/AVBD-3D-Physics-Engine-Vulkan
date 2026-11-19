@@ -18,7 +18,8 @@ namespace avbdvk
 {
 
 void SolverPipelines::init(Device &dev, PipelineLayout &layout, const uint32_t *primalSpirv, size_t primalWords,
-                           const uint32_t *dualSpirv, size_t dualWords)
+                           const uint32_t *dualSpirv, size_t dualWords, const uint32_t *stepSpirv, size_t stepWords,
+                           const uint32_t *coarseSpirv, size_t coarseWords)
 {
     primalThreadNoForces.init(dev, layout, primalSpirv, primalWords, "csPrimalThreadNoForces",
                               "csPrimalThreadNoForces");
@@ -32,16 +33,16 @@ void SolverPipelines::init(Device &dev, PipelineLayout &layout, const uint32_t *
     jointDual.init(dev, layout, dualSpirv, dualWords, "csJointDual", "csJointDual");
     dual.init(dev, layout, dualSpirv, dualWords, "csDual", "csDual");
     iterateSmall.init(dev, layout, primalSpirv, primalWords, "csIterateSmall", "csIterateSmall");
-    primalDispatchArgs.init(dev, layout, primalSpirv, primalWords, "csPrimalDispatchArgs", "csPrimalDispatchArgs");
-    gateDispatchArgs.init(dev, layout, primalSpirv, primalWords, "csGateDispatchArgs", "csGateDispatchArgs");
-    stepFlagIfGreater.init(dev, layout, primalSpirv, primalWords, "csStepFlagIfGreater", "csStepFlagIfGreater");
-    stepFlagIfSet.init(dev, layout, primalSpirv, primalWords, "csStepFlagIfSet", "csStepFlagIfSet");
-    stepColorBound.init(dev, layout, primalSpirv, primalWords, "csStepColorBound", "csStepColorBound");
-    coarseReset.init(dev, layout, primalSpirv, primalWords, "csCoarseReset", "csCoarseReset");
-    coarseAssign.init(dev, layout, primalSpirv, primalWords, "csCoarseAssign", "csCoarseAssign");
-    coarseAssemble.init(dev, layout, primalSpirv, primalWords, "csCoarseAssemble", "csCoarseAssemble");
-    coarseSolve.init(dev, layout, primalSpirv, primalWords, "csCoarseSolve", "csCoarseSolve");
-    coarseApply.init(dev, layout, primalSpirv, primalWords, "csCoarseApply", "csCoarseApply");
+    primalDispatchArgs.init(dev, layout, stepSpirv, stepWords, "csPrimalDispatchArgs", "csPrimalDispatchArgs");
+    gateDispatchArgs.init(dev, layout, stepSpirv, stepWords, "csGateDispatchArgs", "csGateDispatchArgs");
+    stepFlagIfGreater.init(dev, layout, stepSpirv, stepWords, "csStepFlagIfGreater", "csStepFlagIfGreater");
+    stepFlagIfSet.init(dev, layout, stepSpirv, stepWords, "csStepFlagIfSet", "csStepFlagIfSet");
+    stepColorBound.init(dev, layout, stepSpirv, stepWords, "csStepColorBound", "csStepColorBound");
+    coarseReset.init(dev, layout, coarseSpirv, coarseWords, "csCoarseReset", "csCoarseReset");
+    coarseAssign.init(dev, layout, coarseSpirv, coarseWords, "csCoarseAssign", "csCoarseAssign");
+    coarseAssemble.init(dev, layout, coarseSpirv, coarseWords, "csCoarseAssemble", "csCoarseAssemble");
+    coarseSolve.init(dev, layout, coarseSpirv, coarseWords, "csCoarseSolve", "csCoarseSolve");
+    coarseApply.init(dev, layout, coarseSpirv, coarseWords, "csCoarseApply", "csCoarseApply");
 }
 
 void SolverPipelines::destroy()
