@@ -14,7 +14,7 @@
 // Vulkan host orchestration for src/shaders/constraints.slang, mirroring
 // engine/collide/gpu_constraints.cuh's Constraints class: CSR entry emission over
 // manifolds + joints + springs, the (body<<32)|(type<<29)|index key sort, and the
-// batched Jones-Plassmann coloring loop. See docs/VULKAN_MIGRATION_PLAN.md Phase 4a.
+// batched Jones-Plassmann coloring loop.
 //
 // Like VkBroadphase/VkNarrowphase, this owns its own CommandList/HostRingBuffer. Since
 // M4 a build() is ONE submission: emit, sort and rows run on a device entry count, and
@@ -24,6 +24,7 @@
 // host loop's exactly; only a bound that proves too small costs another submission.
 // Correctness parity against the frozen reference graph: tools/test_vk_constraints.cpp.
 
+#include <cmath>
 #include "vk_buffer.h"
 #include "vk_cmd.h"
 #include "vk_device.h"
