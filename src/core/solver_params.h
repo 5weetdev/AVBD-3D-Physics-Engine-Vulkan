@@ -124,7 +124,7 @@ struct SolverParams
     // Angular velocity from the step's rotation (integrate.slang spinStep): the exact inverse of
     // the rotation update, capped at a quarter turn per step. Off is the legacy 2 vec(dq) / dt,
     // which loses (w dt)^2 / 8 of the spin every step (a free sphere at 8 rad/s lost 11% in 1 s,
-    // and a rolling one slowed with no rolling resistance). On by default:; off
+    // and a rolling one slowed with no rolling resistance). On by default; off
     // exists only so the golden gates can replay the frozen goldens, which used the legacy form.
     bool exactSpinVelocity;
 
