@@ -369,7 +369,7 @@ public:
     // and of the staging buffer happens HERE, between steps, with headroom; neither shrinks.
     // Like every public method it may not be called between stepBegin and stepEnd. No kernel
     // reads the heap yet.
-    static const uint32_t kNoGeometry = 0xFFFFFFFFu;
+    static constexpr uint32_t kNoGeometry = 0xFFFFFFFFu;
     uint32_t addGeometry(const void *blob, uint32_t bytes, uint64_t hash);
 
 private:
