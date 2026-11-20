@@ -23,6 +23,15 @@ namespace
 // Equal to kInternalWorld in avbd3d_api.cpp. Every def struct carries it in internalValue.
 constexpr int kInternalWorld = 1152023;
 
+// Same bytes, two type names. The layouts are checked by the static_asserts in avbd3d_api.cpp.
+template <class To, class From> To avbd3d_bit(const From &from)
+{
+    static_assert(sizeof(To) == sizeof(From), "avbd3d and Box3D layouts differ");
+    To to;
+    std::memcpy(&to, &from, sizeof(To));
+    return to;
+}
+
 // The stored def of a live joint, read as its typed struct. The typed def is the source of truth:
 // a setter writes the field back and the next flush rebuilds the rows from these bytes.
 template <class Def> bool loadDef(avbd3d_JointId id, avbd3d_JointType type, Def &d, World *&w, int &r)

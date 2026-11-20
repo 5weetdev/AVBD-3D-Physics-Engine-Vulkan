@@ -105,10 +105,6 @@ struct FullSpringSoAGpu
     VkDeviceAddress bodyA = 0, bodyB = 0;
     VkDeviceAddress rA = 0, rB = 0;
     VkDeviceAddress rest = 0, stiffness = 0;
-    // Cloth extension (types.slang SpringSoA): all may be 0 in a scene without cloth,
-    // where every spring is a plain one (mode 0).
-    VkDeviceAddress lambda = 0, penalty = 0, C0 = 0;    // may be 0
-    VkDeviceAddress fracture = 0, broken = 0, mode = 0; // may be 0
     uint32_t count = 0, _pad0 = 0;
 };
 static_assert(sizeof(FullSpringSoAGpu) % 8 == 0, "layout");
@@ -137,7 +133,7 @@ struct PrimalArgsGpu
     int32_t listStart = 0;
     int32_t listCount = 0;
     SolverParamsGpu p;
-    VkDeviceAddress colorStart = 0, colorEnd = 0; // device colour range, see primal.slang
+    VkDeviceAddress colorStart = 0, colorEnd = 0; // M4 device colour range, see primal.slang
     int32_t color = 0, heavyDegree = 0;           // heavyDegree > 0: high-degree bodies go to csPrimalWide*
     VkDeviceAddress shapeRolling = 0;             // per shape rolling resistance; may be null (no shape has any)
 };

@@ -92,7 +92,7 @@ struct NarrowphaseArgsGpu
     int32_t contactCapacity = 0;
     SolverParamsNpGpu p;
     uint32_t _pad2 = 0;
-    // when set, pairCount is a capacity and the live count is *livePairs (see
+    // M4: when set, pairCount is a capacity and the live count is *livePairs (see
     // narrowphase.slang). Appended last so the layout probe's prefix stays valid.
     VkDeviceAddress livePairs = 0;
     // Fidelity trade, appended for the same reason.
@@ -101,7 +101,7 @@ struct NarrowphaseArgsGpu
     // Hull pairs (Phase 1.3): csNarrowphase appends their slots here for csNarrowphaseHull.
     VkDeviceAddress hullList = 0;    // may be 0 (no hull shape in the scene)
     VkDeviceAddress hullCounter = 0; // may be 0
-    // Mesh pairs: csNarrowphase appends mesh-vs-convex pair slots here for csMeshMidphase.
+    // Mesh pairs (Phase 1.5a): csNarrowphase appends mesh-vs-convex pair slots here for csMeshMidphase.
     VkDeviceAddress meshList = 0;    // may be 0 (no mesh shape in the scene)
     VkDeviceAddress meshCounter = 0; // may be 0
 };

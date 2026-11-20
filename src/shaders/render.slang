@@ -28,7 +28,7 @@ import types;
 
 public struct PushConstants
 {
-    uint64_t argsAddr;
+    public uint64_t argsAddr;
 };
 
 [[vk::push_constant]]
@@ -39,10 +39,10 @@ public ConstantBuffer<PushConstants> pc;
 // 1 uint rgba, no padding needed).
 public struct BodyInstance
 {
-    float3 pos;
-    float4 rot;
-    float3 half;
-    uint rgba;
+    public float3 pos;
+    public float4 rot;
+    public float3 half;
+    public uint rgba;
 };
 
 // Mirrors render_types's OverlayView, field for field. Every pointer may be null,
@@ -50,26 +50,26 @@ public struct BodyInstance
 // the reference `break` in overlayColorFor's switch, which drops to the no-overlay-colour return).
 public struct OverlayView
 {
-    int mode;
-    float speedMax;
-    float loadMax;
-    float degreeMax;
-    float invCellSize;
-    float sleepFrames;
-    int colorCount;
-    int colorStatics;
-    int *graphColor;
-    uint *load;
-    int *degree;
-    float jointLoadMax;
-    float degreeJointMax;
-    float penetrationMax;
-    int *jointDegree;
-    int *push;
-    int *pull;
-    int *stress;
-    int *cone;
-    int *penetration;
+    public int mode;
+    public float speedMax;
+    public float loadMax;
+    public float degreeMax;
+    public float invCellSize;
+    public float sleepFrames;
+    public int colorCount;
+    public int colorStatics;
+    public int *graphColor;
+    public uint *load;
+    public int *degree;
+    public float jointLoadMax;
+    public float degreeJointMax;
+    public float penetrationMax;
+    public int *jointDegree;
+    public int *push;
+    public int *pull;
+    public int *stress;
+    public int *cone;
+    public int *penetration;
 };
 
 // OverlayMode, transcribed verbatim.
@@ -330,17 +330,17 @@ float3 overlayColorFor(OverlayView ov, BodySoA b, int i, out bool has)
 
 public struct WriteInstancesArgs
 {
-    BodySoA b;
-    BodyInstance *out;
-    int maxInstances;
-    int _pad0;
-    float *frustum;   // 24 floats (6 planes * float4), or null
-    int *visible;     // atomic compaction counter, or null
-    OverlayView ov;
-    int *groupOf;     // per-SHAPE render group, or null (falls back to the shape's type)
-    int *shapeBase;   // per-group base slot, or null (disables segmentation)
-    int *shapeVisible; // per-group atomic counter, or null
-    ShapeSoA s;       // one instance is written per shape
+    public BodySoA b;
+    public BodyInstance *out;
+    public int maxInstances;
+    public int _pad0;
+    public float *frustum;   // 24 floats (6 planes * float4), or null
+    public int *visible;     // atomic compaction counter, or null
+    public OverlayView ov;
+    public int *groupOf;     // per-SHAPE render group, or null (falls back to the shape's type)
+    public int *shapeBase;   // per-group base slot, or null (disables segmentation)
+    public int *shapeVisible; // per-group atomic counter, or null
+    public ShapeSoA s;       // one instance is written per shape
 };
 
 [shader("compute")]

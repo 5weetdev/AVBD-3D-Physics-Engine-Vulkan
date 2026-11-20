@@ -82,7 +82,7 @@ struct SleepCommitArgsGpu
     VkDeviceAddress touchHash = 0;
     VkDeviceAddress snapCount = 0;
     VkDeviceAddress snapHash = 0;
-    VkDeviceAddress activeCountPtr = 0; // live count (0: activeCount is exact)
+    VkDeviceAddress activeCountPtr = 0; // M4 live count (0: activeCount is exact)
 };
 static_assert(sizeof(SleepCommitArgsGpu) % 8 == 0, "layout");
 
@@ -93,44 +93,8 @@ struct ActiveFlagsArgsGpu
     int32_t dynCount = 0;
     int32_t _pad0 = 0;
     VkDeviceAddress flags = 0;
-    // Distance LOD, both may be 0 (LOD off): the active set is then awake && not frozen,
-    // and the result is written back to lodLive for the kernels that read it.
-    VkDeviceAddress lodState = 0;
-    VkDeviceAddress lodLive = 0;
 };
 static_assert(sizeof(ActiveFlagsArgsGpu) % 8 == 0, "layout");
-
-// ---------------------------------------------------------------------------
-// lod.slang (distance LOD). Not in the layout probe: every field is a pointer or a
-// 4-byte scalar in declaration order, and the static_asserts below pin the sizes.
-// ---------------------------------------------------------------------------
-struct LodClassifyArgsGpu
-{
-    VkDeviceAddress pos = 0, velLin = 0, velAng = 0, mass = 0, awake = 0;
-    VkDeviceAddress state = 0, timer = 0, live = 0;
-    VkDeviceAddress stats = 0; // may be 0
-    uint32_t count = 0;
-    float focusX = 0, focusY = 0, focusZ = 0;
-    float nearRadius = 0, farRadius = 0, hysteresis = 0, freezeSpeed = 0;
-    uint32_t freezeFrames = 0, freezeFar = 0;
-};
-static_assert(sizeof(LodClassifyArgsGpu) == 9 * 8 + 10 * 4 + 0, "lod.slang LodClassifyArgs");
-
-struct LodThawRefsGpu
-{
-    VkDeviceAddress velLin = 0, velAng = 0, prevVelLin = 0, mass = 0, state = 0, timer = 0, live = 0;
-    float speed = 0;
-    uint32_t _pad0 = 0;
-};
-static_assert(sizeof(LodThawRefsGpu) == 64, "lod.slang LodThawRefs");
-
-struct LodThawContactsArgsGpu
-{
-    LodThawRefsGpu r;
-    VkDeviceAddress bodyA = 0, bodyB = 0, contactCount = 0;
-    uint32_t slots = 0, _pad0 = 0;
-};
-static_assert(sizeof(LodThawContactsArgsGpu) == 64 + 24 + 8, "lod.slang LodThawContactsArgs");
 
 // contact_report.slang: one point of a reported manifold (32 bytes).
 struct ContactReportPointGpu
@@ -178,11 +142,12 @@ struct RestitutionArgsGpu
     VkDeviceAddress gKey = 0, gIsA = 0, gStart = 0, gEnd = 0; // may be 0 except in csRestitutionApply
     VkDeviceAddress dyn = 0;                                  // may be 0 except in csRestitutionApply
     VkDeviceAddress out = 0;
+    VkDeviceAddress shapeA = 0, shapeB = 0, shpRestitution = 0; // per manifold slot / per shape
     uint32_t slots = 0, dynCount = 0;
     float threshold = 0;
     uint32_t _pad = 0;
 };
-static_assert(sizeof(RestitutionArgsGpu) == 21 * 8 + 16, "restitution.slang RestitutionArgs");
+static_assert(sizeof(RestitutionArgsGpu) == 24 * 8 + 16, "restitution.slang RestitutionArgs");
 
 // ccd.slang CcdArgs: shared by csCcdFlag / csCcdToi / csCcdApply.
 struct CcdArgsGpu
@@ -202,13 +167,5 @@ struct CcdArgsGpu
     uint32_t _pad = 0;
 };
 static_assert(sizeof(CcdArgsGpu) == 28 * 8 + 32, "ccd.slang CcdArgs");
-
-struct LodThawJointsArgsGpu
-{
-    LodThawRefsGpu r;
-    VkDeviceAddress jBodyA = 0, jBodyB = 0, jBroken = 0, sBodyA = 0, sBodyB = 0;
-    uint32_t jointSlots = 0, jointCount = 0, springCount = 0, _pad0 = 0;
-};
-static_assert(sizeof(LodThawJointsArgsGpu) == 64 + 40 + 16, "lod.slang LodThawJointsArgs");
 
 } // namespace avbdvk

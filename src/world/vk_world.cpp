@@ -28,16 +28,13 @@
 #include "coarse_spirv.h"
 #include "dual_spirv.h"
 #include "sleep_spirv.h"
-#include "lod_spirv.h"
 #include "contact_report_spirv.h"
 #include "restitution_spirv.h"
 #include "wake_spirv.h"
 #include "mutate_spirv.h"
 #include "render_spirv.h"
-#include "render_pose_spirv.h"
 #include "render_overlay_spirv.h"
 #include "render_debug_spirv.h"
-#include "pick_spirv.h"
 #include "drag_spirv.h"
 
 #include <algorithm>

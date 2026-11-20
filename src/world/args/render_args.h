@@ -40,14 +40,6 @@ struct BodyInstanceGpu
 };
 static_assert(sizeof(BodyInstanceGpu) == 44, "must match BodyInstance/AvbdInstance");
 
-// Mirrors PosePacked byte for byte (28 bytes).
-struct PosePackedGpu
-{
-    float px, py, pz;
-    float qx, qy, qz, qw;
-};
-static_assert(sizeof(PosePackedGpu) == 28, "must match PosePacked");
-
 // Mirrors render.slang's OverlayView / render_types's OverlayView, field for
 // field. _pad0 sits where the compiler needs 4 bytes to bring the pointer fields that
 // follow (jointDegree onward) back onto 8-byte alignment after the three trailing
@@ -83,17 +75,6 @@ struct WriteInstancesArgsGpu
     ShapeSoAGpu s;                    // one instance per shape; groupOf is per shape
 };
 static_assert(sizeof(WriteInstancesArgsGpu) % 8 == 0, "layout");
-
-struct PackPoseArgsGpu
-{
-    FullBodySoAGpu b;
-    VkDeviceAddress idx = 0;
-    int32_t n = 0;
-    int32_t _pad0 = 0;
-    VkDeviceAddress out = 0; // may be a MappedBuffer's address (see vk_buffer.h) for a
-                             // zero-readback pose path, or an ordinary Buffer's.
-};
-static_assert(sizeof(PackPoseArgsGpu) % 8 == 0, "layout");
 
 // the overlay reductions' OverlayStats: 6 int* reduction targets.
 struct OverlayStatsGpu
@@ -170,19 +151,5 @@ struct WriteDebugInstancesArgsGpu
     DebugDrawViewGpu d;
 };
 static_assert(sizeof(WriteDebugInstancesArgsGpu) % 8 == 0, "layout");
-
-struct WriteForceInstancesArgsGpu
-{
-    FullBodySoAGpu b;
-    FullJointSoAGpu j;
-    FullSpringSoAGpu sp;
-    VkDeviceAddress out = 0;
-    int32_t maxInstances = 0;
-    int32_t _pad0 = 0;
-    VkDeviceAddress counter = 0;
-    int32_t loadTint = 0;
-    float loadMax = 0;
-};
-static_assert(sizeof(WriteForceInstancesArgsGpu) % 8 == 0, "layout");
 
 } // namespace avbdvk

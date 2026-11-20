@@ -13,7 +13,6 @@
 #include "box3d/collision.h"
 #include "box3d/types.h"
 
-#include "avbd3d_convert.h"
 #include "joint_presets.h"
 #include "scene_desc.h"
 #include "shape_mass_b3.h"
@@ -469,6 +468,22 @@ private:
     void releaseContact(int c);
 };
 
+inline vec3 toV(avbd3d_Vec3 v)
+{
+    return vec3{v.x, v.y, v.z};
+}
+inline avbd3d_Vec3 fromV(vec3 v)
+{
+    return avbd3d_Vec3{v.x, v.y, v.z};
+}
+inline quat toQ(avbd3d_Quat q)
+{
+    return quat{q.v.x, q.v.y, q.v.z, q.s};
+}
+inline avbd3d_Quat fromQ(quat q)
+{
+    return avbd3d_Quat{avbd3d_Vec3{q.x, q.y, q.z}, q.w};
+}
 // R diag(moment) R^T: the body-frame inertia about the centre of mass from the principal moments
 // and the principal rotation (principal frame -> body frame).
 inline avbd3d_Matrix3 principalToMatrix(vec3 moment, quat rot)

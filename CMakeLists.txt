@@ -97,8 +97,8 @@ set(AVBD_SHADER_GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/shaders_gen)
 file(MAKE_DIRECTORY ${AVBD_SHADER_GEN_DIR})
 set(AVBD_SPIRV_HEADERS)
 foreach(module
-        integrate collide scan compact radix sort_small layout_probe broadphase narrowphase
-        constraints primal dual render drag sleep wake mutate narrowphase_hull
+        integrate collide_test scan compact radix sort_small layout_probe broadphase narrowphase
+        constraints primal step_control coarse dual render render_overlay render_debug drag sleep wake mutate narrowphase_hull
         narrowphase_mesh contact_report restitution ccd)
     avbd_compile_slang(${AVBD_SRC}/shaders ${AVBD_SHADER_GEN_DIR} ${module} hdr)
     list(APPEND AVBD_SPIRV_HEADERS ${hdr})
@@ -154,6 +154,13 @@ add_library(avbd3d_core_static STATIC
     src/world/vk_contact_report.cpp
     src/world/vk_ccd.cpp
     src/world/vk_world.cpp
+    src/world/vk_world_upload.cpp
+    src/world/vk_world_snapshot.cpp
+    src/world/vk_world_step.cpp
+    src/world/vk_world_finish.cpp
+    src/world/vk_world_render.cpp
+    src/world/vk_world_mutate.cpp
+    src/world/vk_world_readback.cpp
     ${AVBD_SPIRV_HEADERS})
 target_include_directories(avbd3d_core_static PUBLIC
     ${AVBD_SRC}/core ${AVBD_SRC}/scene ${AVBD_SRC}/gpu ${AVBD_SRC}/world ${AVBD_SHADER_GEN_DIR})

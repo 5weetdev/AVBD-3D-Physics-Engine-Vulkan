@@ -27,17 +27,6 @@ namespace avbdvk
 // Reuses FullBodySoAGpu and FullJointSoAGpu (both defined above).
 // ===========================================================================
 
-struct PickArgsGpu
-{
-    FullBodySoAGpu b;
-    float originX = 0, originY = 0, originZ = 0;
-    float dirX = 0, dirY = 0, dirZ = 0;
-    VkDeviceAddress bestHit =
-        0;         // uint64_t*: (tBits << 32) | bodyIndex; csPick min's the high word, csPickResolve the low
-    ShapeSoAGpu s; // the ray tests every shape
-};
-static_assert(sizeof(PickArgsGpu) % 8 == 0, "layout");
-
 struct DragUpdateArgsGpu
 {
     FullBodySoAGpu b;

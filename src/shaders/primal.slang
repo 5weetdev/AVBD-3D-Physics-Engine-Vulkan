@@ -18,7 +18,7 @@ import dual_body;
 
 public struct PushConstants
 {
-    uint64_t argsAddr;
+    public uint64_t argsAddr;
 };
 
 [[vk::push_constant]]
@@ -29,24 +29,24 @@ public ConstantBuffer<PushConstants> pc;
 // way integrate.slang declares its own private BodySoA subset.
 public struct PrimalArgs
 {
-    BodySoA b;
-    ConstraintGraph g;
-    ManifoldSoA m;
-    JointSoA joints;
-    SpringSoA springs;
-    int *colorBodies;
-    int listStart;
-    int listCount;
-    SolverParamsGpu p;
+    public BodySoA b;
+    public ConstraintGraph g;
+    public ManifoldSoA m;
+    public JointSoA joints;
+    public SpringSoA springs;
+    public int *colorBodies;
+    public int listStart;
+    public int listCount;
+    public SolverParamsGpu p;
     // when colorStart is set, the list is colour `color`'s device range,
     // [colorStart[color], colorEnd[color]), and listStart/listCount are ignored.
-    int *colorStart;
-    int *colorEnd;
-    int color;
-    int heavyDegree; // > 0: bodies with more graph edges are left to csPrimalWide*
+    public int *colorStart;
+    public int *colorEnd;
+    public int color;
+    public int heavyDegree; // > 0: bodies with more graph edges are left to csPrimalWide*
     // Per shape rolling resistance (0 for a shape that is not a sphere or capsule). May be null:
     // no shape has any, and the contact path costs one pointer test.
-    float *shapeRolling;
+    public float *shapeRolling;
 };
 
 bool heavyBody(PrimalArgs a, int i)
