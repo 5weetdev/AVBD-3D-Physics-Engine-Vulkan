@@ -25,6 +25,7 @@
 #include <mutex>
 #include <thread>
 
+#include <cstdio>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -295,15 +296,12 @@ void writeBacktrace()
     void *frames[48];
     const int count = backtrace(frames, 48);
     char **names = backtrace_symbols(frames, count);
-    fprintf(g_file, "backtrace (%d frames):
-", count);
+    fprintf(g_file, "backtrace (%d frames):\n", count);
     for (int i = 0; i < count; i++)
-        fprintf(g_file, "  #%-2d %s
-", i, names ? names[i] : "?");
+        fprintf(g_file, "  #%-2d %s\n", i, names ? names[i] : "?");
     free(names);
 #else
-    fprintf(g_file, "backtrace: not available on this platform
-");
+    fprintf(g_file, "backtrace: not available on this platform\n");
 #endif
 }
 #endif

@@ -2,7 +2,7 @@
 
 **What you get:** what to install, then the commands that build the library, the demo and the tests. Nothing is prebuilt.
 
-You need a GPU and driver with Vulkan 1.3. The build is tested on one machine: RTX 4070 SUPER, Windows 10 x64. Linux and macOS (MoltenVK) are supported targets, but they are **untested**.
+You need a GPU and driver with Vulkan 1.3. The build is tested on Windows 10 x64 (RTX 4070 SUPER) and Fedora Linux 45 x86-64 (GCC, AMD Radeon 780M with Mesa RADV). macOS (MoltenVK) is a supported target but **untested**.
 
 ## 1. Install
 
@@ -17,17 +17,17 @@ You need a GPU and driver with Vulkan 1.3. The build is tested on one machine: R
 | Python 3 | Embeds the compiled shaders | `winget install Python.Python.3.12` |
 | Vulkan SDK | Vulkan loader, validation layer, `slangc` | <https://vulkan.lunarg.com/sdk/home#windows>. The installer sets `VULKAN_SDK`. |
 
-### Linux and macOS (untested)
+### Linux and macOS (Linux tested, macOS untested)
 
 | Tool | Install |
 | :--- | :--- |
 | Git, CMake 3.20+, Ninja, Python 3, a C++17 compiler | Your package manager (`apt`, `dnf`, `brew`) |
-| Vulkan SDK | <https://vulkan.lunarg.com/sdk/home>. Source its `setup-env.sh` so `VULKAN_SDK` is set and `slangc` is on `PATH`. |
+| Vulkan SDK | <https://vulkan.lunarg.com/sdk/home>. Source its `setup-env.sh` so `VULKAN_SDK` is set and `slangc` is on `PATH`; distribution packages that put `slangc` on `PATH` work too. |
 | SDL2 build dependencies (demo only) | See SDL's `docs/README-linux.md` (X11 or Wayland headers) |
 
 Fedora package names (use the `-devel` equivalents elsewhere): `gcc-c++ cmake ninja-build python3 vulkan-loader-devel vulkan-headers`, plus the X11/Wayland headers SDL needs (`libX11-devel libXext-devel libXrandr-devel libXcursor-devel libXfixes-devel libXi-devel libXScrnSaver-devel libxkbcommon-devel libXrender-devel`).
 
-The code is written to compile on Linux: Windows-only calls and the `VK_KHR_*_win32` interop extensions are guarded by `_WIN32`, and `enableExternalWin32()` is a no-op elsewhere. A full Linux build and test run has not been done yet.
+The code is written to compile on Linux: Windows-only calls and the `VK_KHR_*_win32` interop extensions are guarded by `_WIN32`, and `enableExternalWin32()` is a no-op elsewhere. The full test suite and the demo smoke run pass on Linux.
 
 Open a new terminal after installing so `PATH` picks everything up.
 

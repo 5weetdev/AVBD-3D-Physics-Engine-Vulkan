@@ -29,15 +29,11 @@ done
 for t in cmake ninja python3; do
     command -v "$t" >/dev/null || { echo "[build] ERROR: $t is not on PATH."; exit 1; }
 done
-if [ -z "${VULKAN_SDK:-}" ]; then
-    echo "[build] ERROR: VULKAN_SDK is not set. Install the Vulkan SDK and source its setup-env.sh."
+if [ ! -x "${VULKAN_SDK:-/nonexistent}/bin/slangc" ] && ! command -v slangc >/dev/null; then
+    echo "[build] ERROR: slangc not found. Install the Vulkan SDK and source its setup-env.sh (or install slangc from your distribution)."
     exit 1
 fi
-if [ ! -x "$VULKAN_SDK/bin/slangc" ] && ! command -v slangc >/dev/null; then
-    echo "[build] ERROR: slangc not found in \$VULKAN_SDK/bin or on PATH."
-    exit 1
-fi
-if [ ! -f external/SDL/CMakeLists.txt ]; then
+if [ ! -f external/SDL/CMakeLists.txt ] || [ ! -f external/imgui/imgui.cpp ]; then
     echo "[build] Fetching submodules..."
     git submodule update --init --recursive
 fi

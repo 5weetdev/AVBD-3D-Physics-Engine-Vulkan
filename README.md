@@ -2,7 +2,7 @@
 
 A rigid-body physics engine that runs the whole simulation step on the GPU through Vulkan compute, with a C API.
 
-**Status: experimental, waiting for human review, v1.0.0, ABI 1.0.** Windows with an NVIDIA GPU is the only configuration that has been tested. Linux and macOS (MoltenVK) are intended targets and have not been built or run. See [limitations](docs/limitations.md).
+**Status: experimental, waiting for human review, v1.0.0, ABI 1.0.** Tested on Windows 10 with an NVIDIA GPU and on Linux (Fedora, GCC, Mesa RADV). macOS (MoltenVK) is an intended target and has not been built or run. See [limitations](docs/limitations.md).
 
 ## What it is
 
@@ -98,7 +98,7 @@ All phases are recorded into one command buffer. Details: [architecture](docs/ar
 | Mesh against mesh | Not tested for collision |
 | Height fields | Static only |
 | Determinism | Not guaranteed |
-| Platforms | Only Windows with an NVIDIA GPU is tested |
+| Platforms | Tested on Windows (NVIDIA) and Linux (AMD, Mesa RADV); macOS is untested |
 | Threads | A world is not thread safe |
 
 The full table with workarounds is [docs/limitations.md](docs/limitations.md).
