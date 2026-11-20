@@ -198,7 +198,7 @@ void Device::adopt(VkInstance instance, VkPhysicalDevice physical, VkDevice devi
 // pipeline cache: csCcdToi alone is ~13 s on an RTX 4070 SUPER, ~22 s for the whole kernel set,
 // which left the demo's window unresponsive for that long. The cache is a file per device
 // (vendor, device id, driver version in the name; the driver also rejects a stale blob by its
-// own header), at AVBD_PIPELINE_CACHE_DIR or %LOCALAPPDATA%/avbd3d. Best effort throughout.
+// own header), at AVBD_PIPELINE_CACHE_DIR, %LOCALAPPDATA%/avbd3d, $XDG_CACHE_HOME/avbd3d or ~/.cache/avbd3d. Best effort throughout.
 static std::string pipelineCachePath(VkPhysicalDevice pd)
 {
     VkPhysicalDeviceProperties props{};
@@ -208,6 +208,10 @@ static std::string pipelineCachePath(VkPhysicalDevice pd)
         dir = e;
     else if (const char *la = getenv("LOCALAPPDATA"))
         dir = std::string(la) + "/avbd3d";
+    else if (const char *xdg = getenv("XDG_CACHE_HOME"))
+        dir = std::string(xdg) + "/avbd3d";
+    else if (const char *home = getenv("HOME"))
+        dir = std::string(home) + "/.cache/avbd3d";
     if (dir.empty() || dir == "off")
         return {};
     char name[96];
