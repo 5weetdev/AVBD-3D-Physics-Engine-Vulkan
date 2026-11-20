@@ -230,8 +230,8 @@ public:
 
 private:
     Device *m_dev = nullptr;
-    HostRingBuffer ring;
-    CommandList cmd;
+    HostRingBuffer m_ring;
+    CommandList m_cmd;
 
     // Double-buffered manifold storage, A/B halves swapped each build via `flip`,
     // exactly like keyA/keyB etc in the reference class.

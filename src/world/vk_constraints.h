@@ -137,7 +137,7 @@ public:
     int recordSmall(CommandList &cmd, HostRingBuffer &ring, ConstraintsPipelines &pl,
                     const VkConstraintsBodyRefs &bodies, const VkConstraintsManifoldRefs &manifolds,
                     const VkConstraintsJointRefs &joints, const VkConstraintsSpringRefs &springs,
-                    const Buffer &dynamicIdx, int dynamicBound, VkDeviceAddress dynamicCountAddr, int rounds);
+                    const Buffer &dynamicIdx, int dynamicBound, VkDeviceAddress dynamicCountAddr, int blindRounds);
 
     // Jones-Plassmann rounds recorded without a readback between them: `count` rounds
     // starting at round `firstRound`, then the colour grouping. Returns rounds recorded.
@@ -221,8 +221,8 @@ public:
 
 private:
     Device *m_dev = nullptr;
-    HostRingBuffer ring;
-    CommandList cmd;
+    HostRingBuffer m_ring;
+    CommandList m_cmd;
 
     Buffer rawKeys, sortedKeys;
     Buffer rawIsA, sortedIsA;

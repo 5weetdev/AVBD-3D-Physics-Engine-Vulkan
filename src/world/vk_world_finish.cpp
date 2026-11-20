@@ -205,26 +205,14 @@ bool VkWorld::finishPass()
 {
     StepCtx &S = m_step;
     CommandList &cmd = m_stepCmd;
-    StepResult &result = S.result;
-    const int32_t *readout = wakeReadout.mappedAs<int32_t>();
     const int32_t *stepFlag = stepFlagReadout.mappedAs<int32_t>();
-    auto &edgeCount = S.edgeCount;
-    auto &iters = S.iters;
     auto &tsStart = S.tsStart;
-    auto &tsEnd = S.tsEnd;
     auto &frontMs = S.frontMs;
-    auto &slots = S.slots;
-    auto &floodDone = S.floodDone;
-    auto &floodRec = S.floodRec;
-    auto &islandRec = S.islandRec;
     auto &phase4Done = S.phase4Done;
     auto &jpRounds = S.jpRounds;
     auto &colorBound = S.colorBound;
-    auto &floodCause = S.floodCause;
-    auto &islandCause = S.islandCause;
     auto &hostWaitMs = S.hostWaitMs;
     auto &frontPending = S.frontPending;
-    auto &capAttempt = S.capAttempt;
     auto &front = S.front;
     auto &recordedP1 = S.recordedP1;
     auto &phase4ThisPass = S.phase4ThisPass;

@@ -90,8 +90,8 @@ static NpManifoldSoAGpu toGpu(const VkManifoldSet &s)
 void VkNarrowphase::init(Device &dev)
 {
     m_dev = &dev;
-    ring.init(dev, 1 << 22);
-    cmd.init(dev, 2);
+    m_ring.init(dev, 1 << 22);
+    m_cmd.init(dev, 2);
 
     keyA.init(dev);
     keyB.init(dev);
@@ -151,8 +151,8 @@ void VkNarrowphase::destroy()
 {
     release();
     m_readout.destroy();
-    cmd.destroy();
-    ring.destroy();
+    m_cmd.destroy();
+    m_ring.destroy();
 }
 
 void VkNarrowphase::release()
@@ -281,12 +281,6 @@ void VkNarrowphase::reserve(int maxPairs_, int maxContacts_)
     reset();
 }
 
-// NOTE: Buffer::resize() does not preserve contents (see vk_buffer.h) -- unlike the
-// the reference class's reserveKeep, a grow() here loses the warm-start cache for one step, the
-// same way a fresh reserve() would. That is a known simplification versus the reference
-// path documented in the narrowphase's grow() comment; acceptable because the gates only
-// exercise small, non-growing scenes. TODO: a content-preserving resize (readback+upload or a
-// copy command) once a growth-under-load parity test exists.
 void VkNarrowphase::grow(int maxPairs_, int maxContacts_)
 {
     // Contact-cache-preserving grow, mirroring the capacity code's
@@ -475,11 +469,11 @@ void VkNarrowphase::sets(VkManifoldSet &curSet, VkManifoldSet &prevSet) const
 void VkNarrowphase::build(NarrowphasePipelines &pl, const VkNpBodyRefs &bodies, const Buffer &pairs, int pairCount,
                           const VkNarrowphaseParams &params)
 {
-    ring.reset();
-    cmd.begin();
-    record(cmd, ring, pl, bodies, pairs, pairCount, nullptr, params);
-    cmd.submit();
-    cmd.wait();
+    m_ring.reset();
+    m_cmd.begin();
+    record(m_cmd, m_ring, pl, bodies, pairs, pairCount, nullptr, params);
+    m_cmd.submit();
+    m_cmd.wait();
     finish(pairCount);
 }
 

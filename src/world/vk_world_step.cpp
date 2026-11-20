@@ -222,7 +222,6 @@ void VkWorld::setupFront()
     auto &islandRec = S.islandRec;
     auto &floodBound = S.floodBound;
     auto &islandBound = S.islandBound;
-    auto &cbr = S.cbr;
     auto &cmr = S.cmr;
     auto &cjr = S.cjr;
     auto &csr = S.csr;
@@ -375,7 +374,6 @@ void VkWorld::recordFront()
     auto &npb = S.npb;
     auto &npp = S.npp;
     auto &tsStart = S.tsStart;
-    auto &slots = S.slots;
     auto &jpRounds = S.jpRounds;
     auto &colorBound = S.colorBound;
     auto &tSolve = S.tSolve;
@@ -498,7 +496,6 @@ void VkWorld::recordSleepFirstHalf()
     auto &merge = S.merge;
     auto &mergeIsland = S.mergeIsland;
     auto &isArgs = S.isArgs;
-    auto &pass = S.pass;
     auto &phase4ThisPass = S.phase4ThisPass;
     phase4ThisPass = !phase4Done;
     S.phase4ThisPass = phase4ThisPass;
@@ -660,7 +657,6 @@ void VkWorld::recordIterations()
     CommandList &cmd = m_stepCmd;
     auto &edgeCount = S.edgeCount;
     auto &slots = S.slots;
-    auto &pass = S.pass;
     auto &coarseIters = S.coarseIters;
     auto &withForces = S.withForces;
     auto &warp4 = S.warp4;
@@ -696,7 +692,6 @@ void VkWorld::recordIterationLoop()
     auto &slots = S.slots;
     auto &m = S.m;
     auto &colorBound = S.colorBound;
-    auto &pass = S.pass;
     auto &coarseIters = S.coarseIters;
     auto &gateSlots = S.gateSlots;
     auto &g = S.g;
@@ -841,13 +836,10 @@ void VkWorld::recordTail()
     CommandList &cmd = m_stepCmd;
     HostRingBuffer &ring = m_stepRing;
     auto &b = S.b;
-    auto &p = S.p;
     auto &slots = S.slots;
     auto &m = S.m;
-    auto &pass = S.pass;
     auto &g = S.g;
     auto &restitutionOn = S.restitutionOn;
-    auto &ca = S.ca;
     // --- Phase 7: velocity, explosion guard, kill-fallen -------------------------
     IntegrateBodySoAGpu ib{};
     ib.pos = pos.address();

@@ -579,9 +579,9 @@ void VkWorld::append(const SceneDesc &scene)
         vb(jBroken, jc * sizeof(unsigned char));
         vb(jFrameA, jc * sizeof(quat));
         vb(jFrameB, jc * sizeof(quat));
-        vb(jAxisMode, jc * 6 * sizeof(unsigned char));
-        vb(jAxisLo, jc * 6 * sizeof(float));
-        vb(jAxisHi, jc * 6 * sizeof(float));
+        vb(jAxisMode, (size_t)jc * 6 * sizeof(unsigned char));
+        vb(jAxisLo, (size_t)jc * 6 * sizeof(float));
+        vb(jAxisHi, (size_t)jc * 6 * sizeof(float));
         vb(jGeneric, jc * sizeof(unsigned char));
         vb(sBodyA, sc * sizeof(int));
         vb(sBodyB, sc * sizeof(int));

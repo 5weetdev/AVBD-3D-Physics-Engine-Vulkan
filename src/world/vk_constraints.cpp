@@ -47,8 +47,8 @@ void ConstraintsPipelines::destroy()
 void VkConstraints::init(Device &dev)
 {
     m_dev = &dev;
-    ring.init(dev, 1 << 20);
-    cmd.init(dev, 4);
+    m_ring.init(dev, 1 << 20);
+    m_cmd.init(dev, 4);
 
     rawKeys.init(dev);
     sortedKeys.init(dev);
@@ -73,8 +73,8 @@ void VkConstraints::destroy()
 {
     release();
     readout.destroy();
-    cmd.destroy();
-    ring.destroy();
+    m_cmd.destroy();
+    m_ring.destroy();
 }
 
 void VkConstraints::release()
@@ -139,24 +139,24 @@ void VkConstraints::build(ConstraintsPipelines &pl, PrimitivesPipelines &prim, R
     reserveRadix(radix, (uint32_t)maxEntries, 8, 4);
     reserveRadix(radix, (uint32_t)dynamicCount, 4, 4);
 
-    ring.reset();
-    cmd.begin();
+    m_ring.reset();
+    m_cmd.begin();
     int first;
     if (smallBuildEligible(dynamicCount))
     {
-        first = recordSmall(cmd, ring, pl, bodies, manifolds, joints, springs, dynamicIdx, dynamicCount,
+        first = recordSmall(m_cmd, m_ring, pl, bodies, manifolds, joints, springs, dynamicIdx, dynamicCount,
                             dynamicCountAddr, jpBound());
     }
     else
     {
         smallSortStats().multiBuilds++;
-        record(cmd, ring, pl, prim, radix, bodies, manifolds, joints, springs, dynamicIdx, dynamicCount,
+        record(m_cmd, m_ring, pl, prim, radix, bodies, manifolds, joints, springs, dynamicIdx, dynamicCount,
                dynamicCountAddr);
-        first = recordColoring(cmd, ring, pl, prim, radix, bodies, manifolds, joints, springs, dynamicIdx, dynamicCount,
-                               0, jpBound(), dynamicCountAddr);
+        first = recordColoring(m_cmd, m_ring, pl, prim, radix, bodies, manifolds, joints, springs, dynamicIdx,
+                               dynamicCount, 0, jpBound(), dynamicCountAddr);
     }
-    cmd.submit();
-    cmd.wait();
+    m_cmd.submit();
+    m_cmd.wait();
     finish();
 
     // Rare path: the bound was too small (a scene switch, a sudden pile-up). JP resumes
@@ -166,12 +166,12 @@ void VkConstraints::build(ConstraintsPipelines &pl, PrimitivesPipelines &prim, R
     while (dynamicCount > 0 && rounds < 0 && recorded < kMaxJpRounds)
     {
         const int more = std::min(recorded, kMaxJpRounds - recorded);
-        ring.reset();
-        cmd.begin();
-        recorded += recordColoring(cmd, ring, pl, prim, radix, bodies, manifolds, joints, springs, dynamicIdx,
+        m_ring.reset();
+        m_cmd.begin();
+        recorded += recordColoring(m_cmd, m_ring, pl, prim, radix, bodies, manifolds, joints, springs, dynamicIdx,
                                    dynamicCount, recorded, more, dynamicCountAddr);
-        cmd.submit();
-        cmd.wait();
+        m_cmd.submit();
+        m_cmd.wait();
         finishColoring(recorded);
     }
     if (rounds < 0)
@@ -383,7 +383,8 @@ bool VkConstraints::smallBuildEligible(int dynamicBound) const
 int VkConstraints::recordSmall(CommandList &cmd, HostRingBuffer &ring, ConstraintsPipelines &pl,
                                const VkConstraintsBodyRefs &bodies, const VkConstraintsManifoldRefs &manifolds,
                                const VkConstraintsJointRefs &joints, const VkConstraintsSpringRefs &springs,
-                               const Buffer &dynamicIdx, int dynamicBound, VkDeviceAddress dynamicCountAddr, int rounds)
+                               const Buffer &dynamicIdx, int dynamicBound, VkDeviceAddress dynamicCountAddr,
+                               int blindRounds)
 {
     smallSortStats().smallBuilds++;
     CsBuildSmallArgsGpu a{};
@@ -414,13 +415,13 @@ int VkConstraints::recordSmall(CommandList &cmd, HostRingBuffer &ring, Constrain
     a.bodyCount = (uint32_t)maxBodies;
     a.dynCount = (uint32_t)dynamicBound;
     a.capacity = maxEntries;
-    a.rounds = (uint32_t)rounds;
+    a.rounds = (uint32_t)blindRounds;
     cmd.barrier(); // producers of the manifolds, bodies and dyn list (the multi path opens with a fill)
     cmd.dispatchArgs(pl.buildSmall, 1, ring, a);
     cmd.barrier();
     m_recorded = true;
-    m_recordedRounds = rounds;
-    return rounds;
+    m_recordedRounds = blindRounds;
+    return blindRounds;
 }
 
 void VkConstraints::prepare(RadixScratch &radix, int dynamicBound)

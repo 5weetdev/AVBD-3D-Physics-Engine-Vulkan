@@ -310,9 +310,9 @@ void reserveRadix(RadixScratch &scratch, uint32_t n, uint32_t keyBytes, uint32_t
 // ---------------------------------------------------------------------------
 
 template <typename KeyT>
-static void recordSkipMask(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl, RadixScratch &scratch,
-                           const Buffer &keysIn, uint32_t n, int numPasses, Pipeline &reducePipeline,
-                           Pipeline &finalizePipeline, bool isU64, VkDeviceAddress countAddr)
+static void recordSkipMask(CommandList &cmd, HostRingBuffer &ring, RadixScratch &scratch, const Buffer &keysIn,
+                           uint32_t n, int numPasses, Pipeline &reducePipeline, Pipeline &finalizePipeline, bool isU64,
+                           VkDeviceAddress countAddr)
 {
     Device &dev = *scratch.m_dev;
     VkDeviceSize keyWordBytes = isU64 ? 8 : 4;
@@ -386,8 +386,8 @@ void radixSortPairsU32(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelin
     ensureBytes(scratch.valsPong, dev, (VkDeviceSize)n * sizeof(int32_t));
 
     const int numPasses = 4;
-    recordSkipMask<uint32_t>(cmd, ring, pl, scratch, keysIn, n, numPasses, pl.reduceOrAndU32, pl.finalizeSkipMaskU32,
-                             false, countAddr);
+    recordSkipMask<uint32_t>(cmd, ring, scratch, keysIn, n, numPasses, pl.reduceOrAndU32, pl.finalizeSkipMaskU32, false,
+                             countAddr);
 
     const Buffer *curKeys = &keysIn;
     const Buffer *curVals = &valsIn;
@@ -461,8 +461,8 @@ void radixSortPairsU64(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelin
     ensureBytes(scratch.valsPong, dev, (VkDeviceSize)n * sizeof(uint32_t));
 
     const int numPasses = 8;
-    recordSkipMask<uint64_t>(cmd, ring, pl, scratch, keysIn, n, numPasses, pl.reduceOrAndU64, pl.finalizeSkipMaskU64,
-                             true, countAddr);
+    recordSkipMask<uint64_t>(cmd, ring, scratch, keysIn, n, numPasses, pl.reduceOrAndU64, pl.finalizeSkipMaskU64, true,
+                             countAddr);
 
     const Buffer *curKeys = &keysIn;
     const Buffer *curVals = &valsIn;
@@ -546,8 +546,8 @@ void radixSortKeysU64(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipeline
     ensureBytes(scratch.keysPong, dev, (VkDeviceSize)n * sizeof(uint64_t));
 
     const int numPasses = 8;
-    recordSkipMask<uint64_t>(cmd, ring, pl, scratch, keysIn, n, numPasses, pl.reduceOrAndU64, pl.finalizeSkipMaskU64,
-                             true, countAddr);
+    recordSkipMask<uint64_t>(cmd, ring, scratch, keysIn, n, numPasses, pl.reduceOrAndU64, pl.finalizeSkipMaskU64, true,
+                             countAddr);
 
     const Buffer *curKeys = &keysIn;
     Buffer *pingPongKeys[2] = {&scratch.keysPing, &scratch.keysPong};

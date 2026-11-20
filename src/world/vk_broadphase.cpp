@@ -48,8 +48,8 @@ void BroadphasePipelines::destroy()
 void VkBroadphase::init(Device &dev)
 {
     m_dev = &dev;
-    ring.init(dev, 1 << 22);
-    cmd.init(dev, 8);
+    m_ring.init(dev, 1 << 22);
+    m_cmd.init(dev, 8);
 
     aabbMin.init(dev);
     aabbMax.init(dev);
@@ -77,8 +77,8 @@ void VkBroadphase::destroy()
 {
     release();
     m_readout.destroy();
-    cmd.destroy();
-    ring.destroy();
+    m_cmd.destroy();
+    m_ring.destroy();
 }
 
 void VkBroadphase::release()
@@ -141,17 +141,17 @@ void VkBroadphase::build(BroadphasePipelines &pl, PrimitivesPipelines &prim, Rad
 {
     // Standalone (gate) form: the caller's statics may have changed between calls.
     m_staticDirty = true;
-    ring.reset();
-    cmd.begin();
-    cmd.writeTimestamp(0);
-    record(cmd, ring, pl, prim, radix, bodyPos, bodyRot, shapes, dynamicIdx, dynamicCount, staticIdx, staticCount,
+    m_ring.reset();
+    m_cmd.begin();
+    m_cmd.writeTimestamp(0);
+    record(m_cmd, m_ring, pl, prim, radix, bodyPos, bodyRot, shapes, dynamicIdx, dynamicCount, staticIdx, staticCount,
            cellSize, ignore, ignoreCount, oversize);
-    cmd.writeTimestamp(1);
-    cmd.submit();
-    cmd.wait();
+    m_cmd.writeTimestamp(1);
+    m_cmd.submit();
+    m_cmd.wait();
     finish();
 
-    double ms0 = cmd.timestampDeltaNs(0, 1) / 1.0e6;
+    double ms0 = m_cmd.timestampDeltaNs(0, 1) / 1.0e6;
     m_lastBuildMs = ms0 > 0 ? ms0 : 0.0;
 }
 

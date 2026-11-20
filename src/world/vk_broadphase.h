@@ -144,8 +144,8 @@ public:
 
 private:
     Device *m_dev = nullptr;
-    HostRingBuffer ring;
-    CommandList cmd;
+    HostRingBuffer m_ring;
+    CommandList m_cmd;
 
     Buffer aabbMin, aabbMax;
     Buffer cellId;
