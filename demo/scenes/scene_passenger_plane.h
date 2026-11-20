@@ -44,32 +44,32 @@
 // addJointWorld().
 struct PassengerPlaneConfig
 {
-    float breakHeavy   = 5000.0f; // Main wing spars, gear trunnions, center carry-through
-    float breakFrame   = 2000.0f; // Fuselage formers, engine pylons, fin spars
-    float breakSkin    = 2500.0f; // Outer skin panels, floor slabs, tail skins
-    float breakMinor   = 1500.0f; // Interior seats, window mullions, control flaps
+    float breakHeavy = 5000.0f;   // Main wing spars, gear trunnions, center carry-through
+    float breakFrame = 2000.0f;   // Fuselage formers, engine pylons, fin spars
+    float breakSkin = 2500.0f;    // Outer skin panels, floor slabs, tail skins
+    float breakMinor = 1500.0f;   // Interior seats, window mullions, control flaps
     float breakPropHub = 1800.0f; // Propeller shaft / bearing fracture load
-    float breakBlade   = 1500.0f; // Propeller blade fracture load
-    float breakPylon   = 2000.0f; // Engine pylons (shear off cleanly)
-    float breakGear    = 4000.0f; // Landing gear (collapse under hard impact)
+    float breakBlade = 1500.0f;   // Propeller blade fracture load
+    float breakPylon = 2000.0f;   // Engine pylons (shear off cleanly)
+    float breakGear = 4000.0f;    // Landing gear (collapse under hard impact)
 };
 
 template <typename Builder>
-static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg = PassengerPlaneConfig{})
+static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig &cfg = PassengerPlaneConfig{})
 {
     s->clear();
 
     // -------------------------------------------------------------------------
     // 0. Physical Constants & Calibrated Fracture Forces
     // -------------------------------------------------------------------------
-    const float kBreakHeavy   = cfg.breakHeavy;
-    const float kBreakFrame   = cfg.breakFrame;
-    const float kBreakSkin    = cfg.breakSkin;
-    const float kBreakMinor   = cfg.breakMinor;
+    const float kBreakHeavy = cfg.breakHeavy;
+    const float kBreakFrame = cfg.breakFrame;
+    const float kBreakSkin = cfg.breakSkin;
+    const float kBreakMinor = cfg.breakMinor;
     const float kBreakPropHub = cfg.breakPropHub;
-    const float kBreakBlade   = cfg.breakBlade;
-    const float kBreakPylon   = cfg.breakPylon;
-    const float kBreakGear    = cfg.breakGear;
+    const float kBreakBlade = cfg.breakBlade;
+    const float kBreakPylon = cfg.breakPylon;
+    const float kBreakGear = cfg.breakGear;
 
     // A finite angular stiffness is a spring: the penalty is clamped to it and the dual
     // variable is never accumulated, so the joint carries load only in proportion to how
@@ -84,7 +84,7 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
     const float kDensityAlloy = 1.0f; // Standard structural density
     const float kDensityHeavy = 2.0f; // Engine blocks and landing gear struts
     const float kDensityLight = 0.5f; // Cladding, seats, cowlings
-    const float kFrictionAir  = 0.5f;
+    const float kFrictionAir = 0.5f;
 
     // Centerline altitude of aircraft fuselage: rests on tricycle landing gear
     const float zPlane = 5.20f;
@@ -124,23 +124,27 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
     const float formerThick = 0.10f;
     const float formerDepth = 0.14f;
 
-    auto getBayRadius = [&](float x) -> float {
+    auto getBayRadius = [&](float x) -> float
+    {
         if (x > 13.0f) // Nose taper
         {
             float u = (21.0f - x) / (21.0f - 13.0f);
-            if (u < 0.15f) u = 0.15f;
+            if (u < 0.15f)
+                u = 0.15f;
             return rBase * sqrtf(u);
         }
         else if (x < -10.0f) // Tail cone taper
         {
             float u = (x - (-21.0f)) / (-10.0f - (-21.0f));
-            if (u < 0.12f) u = 0.12f;
+            if (u < 0.12f)
+                u = 0.12f;
             return rBase * powf(u, 0.75f);
         }
         return rBase; // Main cabin
     };
 
-    auto getBayCenterZ = [&](float x) -> float {
+    auto getBayCenterZ = [&](float x) -> float
+    {
         if (x > 13.0f) // Slight cockpit downward nose droop
         {
             float u = (21.0f - x) / (21.0f - 13.0f);
@@ -177,7 +181,8 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
     // and the centerline rises along +X. Zero through the constant-radius cabin, and
     // non-zero through the nose and tail cones, where the panels have to tilt to lie on
     // the surface instead of staying parallel to the axis.
-    auto getBaySlope = [&](float x, float *drdx, float *dzdx) {
+    auto getBaySlope = [&](float x, float *drdx, float *dzdx)
+    {
         const float h = bayPitch * 0.5f;
         *drdx = (getBayRadius(x + h) - getBayRadius(x - h)) / (2.0f * h);
         *dzdx = (getBayCenterZ(x + h) - getBayCenterZ(x - h)) / (2.0f * h);
@@ -234,26 +239,25 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
             const float sinPitch = fabsf(sinf(pitchAngle));
             const float cosPitch = fabsf(cosf(pitchAngle));
 
-            const float rSkinMin = rCur - skinThick * 0.5f
-                                 - 0.5f * (bayLen * sinPitch + skinThick * cosPitch);
+            const float rSkinMin = rCur - skinThick * 0.5f - 0.5f * (bayLen * sinPitch + skinThick * cosPitch);
             const float facetW = 2.0f * fmaxf(rSkinMin, 0.05f) * sinf(dPhi * 0.5f) * 0.96f;
 
-            const float rFormerMin = rCur - skinThick - formerDepth * 0.5f
-                                   - 0.5f * (bayLen * 0.40f * sinPitch + formerDepth * cosPitch);
+            const float rFormerMin =
+                rCur - skinThick - formerDepth * 0.5f - 0.5f * (bayLen * 0.40f * sinPitch + formerDepth * cosPitch);
             const float formerW = 2.0f * fmaxf(rFormerMin, 0.04f) * sinf(dPhi * 0.5f) * 0.95f;
 
             // 1. Outer Skin Panel
             const float rSkinCenter = rCur - skinThick * 0.5f;
             const vec3 pSkin = {xC, rSkinCenter * sinP, zC + rSkinCenter * cosP};
-            int sBody = s->addBody({bayLen, facetW, skinThick}, kDensityLight, kFrictionAir,
-                                   pSkin, {0,0,0}, {0,0,0}, rotPanel);
+            int sBody = s->addBody({bayLen, facetW, skinThick}, kDensityLight, kFrictionAir, pSkin, {0, 0, 0},
+                                   {0, 0, 0}, rotPanel);
             skinBodies[b][f] = sBody;
 
             // 2. Internal Ring Former Strut
             const float rFormerCenter = rCur - skinThick - formerDepth * 0.5f;
             const vec3 pFormer = {xC, rFormerCenter * sinP, zC + rFormerCenter * cosP};
-            int fBody = s->addBody({bayLen * 0.40f, formerW, formerDepth}, kDensityAlloy, kFrictionAir,
-                                   pFormer, {0,0,0}, {0,0,0}, rotPanel);
+            int fBody = s->addBody({bayLen * 0.40f, formerW, formerDepth}, kDensityAlloy, kFrictionAir, pFormer,
+                                   {0, 0, 0}, {0, 0, 0}, rotPanel);
             formerBodies[b][f] = fBody;
 
             // Joint: Skin to Former
@@ -296,47 +300,54 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
             // has an inner radius of 1.58m and the lower corner of the slab is 0.41m below
             // the axis, which leaves 1.50m of room -- the old 1.35m slab reached exactly
             // that limit and broke through as soon as the radius tapered at bay 28.
-            cabinFloorL[b] = s->addBody({bayLen, 1.29f, 0.12f}, kDensityAlloy, kFrictionAir,
-                                        {xC, -0.825f, zFloor});
+            cabinFloorL[b] = s->addBody({bayLen, 1.29f, 0.12f}, kDensityAlloy, kFrictionAir, {xC, -0.825f, zFloor});
             // Right passenger floor slab
-            cabinFloorR[b] = s->addBody({bayLen, 1.29f, 0.12f}, kDensityAlloy, kFrictionAir,
-                                        {xC, +0.825f, zFloor});
+            cabinFloorR[b] = s->addBody({bayLen, 1.29f, 0.12f}, kDensityAlloy, kFrictionAir, {xC, +0.825f, zFloor});
             // Cargo hold deck slab
-            cargoFloor[b] = s->addBody({bayLen, 1.80f, 0.10f}, kDensityAlloy, kFrictionAir,
-                                       {xC, 0.0f, zCargo});
+            cargoFloor[b] = s->addBody({bayLen, 1.80f, 0.10f}, kDensityAlloy, kFrictionAir, {xC, 0.0f, zCargo});
 
             // Anchor floors to fuselage ring formers
-            s->addJointWorld(formerBodies[b][4], cabinFloorR[b], {xC, +1.45f, zFloor}, INFINITY, kAngStiffRigid, localBreakFrame);
-            s->addJointWorld(formerBodies[b][12], cabinFloorL[b], {xC, -1.45f, zFloor}, INFINITY, kAngStiffRigid, localBreakFrame);
-            s->addJointWorld(formerBodies[b][8], cargoFloor[b], {xC, 0.0f, zCargo - 0.05f}, INFINITY, kAngStiffRigid, localBreakFrame);
+            s->addJointWorld(formerBodies[b][4], cabinFloorR[b], {xC, +1.45f, zFloor}, INFINITY, kAngStiffRigid,
+                             localBreakFrame);
+            s->addJointWorld(formerBodies[b][12], cabinFloorL[b], {xC, -1.45f, zFloor}, INFINITY, kAngStiffRigid,
+                             localBreakFrame);
+            s->addJointWorld(formerBodies[b][8], cargoFloor[b], {xC, 0.0f, zCargo - 0.05f}, INFINITY, kAngStiffRigid,
+                             localBreakFrame);
 
             // Connect floor slabs longitudinally
             if (b > 9)
             {
-                s->addJointWorld(cabinFloorL[b - 1], cabinFloorL[b], {xC - bayPitch * 0.5f, -0.825f, zFloor}, INFINITY, kAngStiffRigid, localBreakFrame);
-                s->addJointWorld(cabinFloorR[b - 1], cabinFloorR[b], {xC - bayPitch * 0.5f, +0.825f, zFloor}, INFINITY, kAngStiffRigid, localBreakFrame);
-                s->addJointWorld(cargoFloor[b - 1], cargoFloor[b], {xC - bayPitch * 0.5f, 0.0f, zCargo}, INFINITY, kAngStiffRigid, localBreakFrame);
+                s->addJointWorld(cabinFloorL[b - 1], cabinFloorL[b], {xC - bayPitch * 0.5f, -0.825f, zFloor}, INFINITY,
+                                 kAngStiffRigid, localBreakFrame);
+                s->addJointWorld(cabinFloorR[b - 1], cabinFloorR[b], {xC - bayPitch * 0.5f, +0.825f, zFloor}, INFINITY,
+                                 kAngStiffRigid, localBreakFrame);
+                s->addJointWorld(cargoFloor[b - 1], cargoFloor[b], {xC - bayPitch * 0.5f, 0.0f, zCargo}, INFINITY,
+                                 kAngStiffRigid, localBreakFrame);
             }
 
             // 4. Passenger Seats (2-seat benches)
             if (b >= 10 && b <= 27)
             {
-                int seatL = s->addBody({0.55f, 0.90f, 0.65f}, kDensityLight, kFrictionAir,
-                                       {xC, -0.90f, zFloor + 0.385f});
-                int seatR = s->addBody({0.55f, 0.90f, 0.65f}, kDensityLight, kFrictionAir,
-                                       {xC, +0.90f, zFloor + 0.385f});
+                int seatL =
+                    s->addBody({0.55f, 0.90f, 0.65f}, kDensityLight, kFrictionAir, {xC, -0.90f, zFloor + 0.385f});
+                int seatR =
+                    s->addBody({0.55f, 0.90f, 0.65f}, kDensityLight, kFrictionAir, {xC, +0.90f, zFloor + 0.385f});
 
-                s->addJointWorld(cabinFloorL[b], seatL, {xC, -0.90f, zFloor + 0.06f}, INFINITY, kAngStiffRigid, kBreakMinor);
-                s->addJointWorld(cabinFloorR[b], seatR, {xC, +0.90f, zFloor + 0.06f}, INFINITY, kAngStiffRigid, kBreakMinor);
+                s->addJointWorld(cabinFloorL[b], seatL, {xC, -0.90f, zFloor + 0.06f}, INFINITY, kAngStiffRigid,
+                                 kBreakMinor);
+                s->addJointWorld(cabinFloorR[b], seatR, {xC, +0.90f, zFloor + 0.06f}, INFINITY, kAngStiffRigid,
+                                 kBreakMinor);
 
                 // 5. Overhead Luggage Bins above passenger seats
-                int binL = s->addBody({bayLen * 0.86f, 0.50f, 0.30f}, kDensityLight, kFrictionAir,
-                                      {xC, -1.00f, zC + 0.75f});
-                int binR = s->addBody({bayLen * 0.86f, 0.50f, 0.30f}, kDensityLight, kFrictionAir,
-                                      {xC, +1.00f, zC + 0.75f});
+                int binL =
+                    s->addBody({bayLen * 0.86f, 0.50f, 0.30f}, kDensityLight, kFrictionAir, {xC, -1.00f, zC + 0.75f});
+                int binR =
+                    s->addBody({bayLen * 0.86f, 0.50f, 0.30f}, kDensityLight, kFrictionAir, {xC, +1.00f, zC + 0.75f});
 
-                s->addJointWorld(formerBodies[b][14], binL, {xC, -1.00f, zC + 0.85f}, INFINITY, kAngStiffRigid, kBreakMinor);
-                s->addJointWorld(formerBodies[b][2],  binR, {xC, +1.00f, zC + 0.85f}, INFINITY, kAngStiffRigid, kBreakMinor);
+                s->addJointWorld(formerBodies[b][14], binL, {xC, -1.00f, zC + 0.85f}, INFINITY, kAngStiffRigid,
+                                 kBreakMinor);
+                s->addJointWorld(formerBodies[b][2], binR, {xC, +1.00f, zC + 0.85f}, INFINITY, kAngStiffRigid,
+                                 kBreakMinor);
 
                 // 6. Passenger Window Mullions (Vertical frames along cabin walls)
                 for (int side = 0; side < 2; side++)
@@ -353,8 +364,8 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
                         const float yMullion = sgn * (rCur - 0.36f);
                         int mullion = s->addBody({0.08f, 0.06f, 0.45f}, kDensityLight, kFrictionAir,
                                                  {xMullion, yMullion, zFloor + 0.60f});
-                        s->addJointWorld(formerBodies[b][fIndex], mullion,
-                                         {xMullion, yMullion, zFloor + 0.60f}, INFINITY, kAngStiffRigid, kBreakMinor);
+                        s->addJointWorld(formerBodies[b][fIndex], mullion, {xMullion, yMullion, zFloor + 0.60f},
+                                         INFINITY, kAngStiffRigid, kBreakMinor);
                     }
                 }
             }
@@ -381,19 +392,22 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
         int wallR = s->addBody({0.08f, 1.05f, 1.27f}, kDensityAlloy, kFrictionAir, {xWall, +0.675f, zWall});
 
         if (cabinFloorL[bb] >= 0)
-            s->addJointWorld(cabinFloorL[bb], wallL, {xC - bayLen * 0.5f, -0.675f, zC - 0.29f}, INFINITY, kAngStiffRigid, kBreakFrame);
+            s->addJointWorld(cabinFloorL[bb], wallL, {xC - bayLen * 0.5f, -0.675f, zC - 0.29f}, INFINITY,
+                             kAngStiffRigid, kBreakFrame);
         if (cabinFloorR[bb] >= 0)
-            s->addJointWorld(cabinFloorR[bb], wallR, {xC - bayLen * 0.5f, +0.675f, zC - 0.29f}, INFINITY, kAngStiffRigid, kBreakFrame);
+            s->addJointWorld(cabinFloorR[bb], wallR, {xC - bayLen * 0.5f, +0.675f, zC - 0.29f}, INFINITY,
+                             kAngStiffRigid, kBreakFrame);
     }
 
     // 8. Cockpit Canopy & Windshield Visor (Matching reference image)
     {
         float xCockpit = xStart + 31 * bayPitch;
         float zCockpit = getBayCenterZ(xCockpit);
-        int dash = s->addBody({0.70f, 1.50f, 0.40f}, kDensityLight, kFrictionAir,
-                              {xCockpit + 0.20f, 0.0f, zCockpit + 0.15f});
+        int dash =
+            s->addBody({0.70f, 1.50f, 0.40f}, kDensityLight, kFrictionAir, {xCockpit + 0.20f, 0.0f, zCockpit + 0.15f});
         if (cabinFloorL[28] >= 0)
-            s->addJointWorld(cabinFloorL[28], dash, {xCockpit, 0.0f, zCockpit - 0.10f}, INFINITY, kAngStiffRigid, kBreakMinor);
+            s->addJointWorld(cabinFloorL[28], dash, {xCockpit, 0.0f, zCockpit - 0.10f}, INFINITY, kAngStiffRigid,
+                             kBreakMinor);
 
         // Pilot and Co-pilot seats
         int seatP1 = s->addBody({0.50f, 0.48f, 0.60f}, kDensityLight, kFrictionAir,
@@ -410,8 +424,8 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
             float yWin = w * 0.45f;
             int win = s->addBody({0.60f, 0.34f, 0.08f}, kDensityLight, kFrictionAir,
                                  {xCockpit + 0.35f, yWin, zCockpit + 0.80f});
-            s->addJointWorld(formerBodies[31][0], win, {xCockpit + 0.35f, yWin, zCockpit + 0.75f},
-                             INFINITY, kAngStiffRigid, kBreakMinor);
+            s->addJointWorld(formerBodies[31][0], win, {xCockpit + 0.35f, yWin, zCockpit + 0.75f}, INFINITY,
+                             kAngStiffRigid, kBreakMinor);
         }
     }
 
@@ -427,14 +441,14 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
         // leaves sqrt(1.58^2 - 1.055^2) = 1.18m of half-width. The old 3.60m spar drove
         // its ends straight out through the skin, the single worst overlap in the scene;
         // the wing root joints below reach the rest of the way as a lever.
-        carryThroughSpars[cs] = s->addBody({0.28f, 2.30f, 0.55f}, kDensityHeavy, kFrictionAir,
-                                           {xCarry[cs], 0.0f, zWingBox});
-        s->addJointWorld(formerBodies[17][8], carryThroughSpars[cs], {xCarry[cs], 0.0f, zPlane - 0.90f},
-                         INFINITY, kAngStiffRigid, kBreakHeavy);
-        s->addJointWorld(formerBodies[17][4], carryThroughSpars[cs], {xCarry[cs], +1.15f, zWingBox},
-                         INFINITY, kAngStiffRigid, kBreakHeavy);
-        s->addJointWorld(formerBodies[17][12], carryThroughSpars[cs], {xCarry[cs], -1.15f, zWingBox},
-                         INFINITY, kAngStiffRigid, kBreakHeavy);
+        carryThroughSpars[cs] =
+            s->addBody({0.28f, 2.30f, 0.55f}, kDensityHeavy, kFrictionAir, {xCarry[cs], 0.0f, zWingBox});
+        s->addJointWorld(formerBodies[17][8], carryThroughSpars[cs], {xCarry[cs], 0.0f, zPlane - 0.90f}, INFINITY,
+                         kAngStiffRigid, kBreakHeavy);
+        s->addJointWorld(formerBodies[17][4], carryThroughSpars[cs], {xCarry[cs], +1.15f, zWingBox}, INFINITY,
+                         kAngStiffRigid, kBreakHeavy);
+        s->addJointWorld(formerBodies[17][12], carryThroughSpars[cs], {xCarry[cs], -1.15f, zWingBox}, INFINITY,
+                         kAngStiffRigid, kBreakHeavy);
     }
 
     // -------------------------------------------------------------------------
@@ -483,55 +497,59 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
 
             // 1. Leading Edge Aerodynamic Slat / Nose Block
             const float slatChord = (xLE - xFS) * 0.92f;
-            int slat = s->addBody({slatChord, wingBayW, thick * 0.55f}, kDensityLight, kFrictionAir,
-                                  {xFS + slatChord * 0.5f + 0.02f, yC, zC + thick * 0.05f},
-                                  {0,0,0}, {0,0,0}, rotDihedral);
+            int slat =
+                s->addBody({slatChord, wingBayW, thick * 0.55f}, kDensityLight, kFrictionAir,
+                           {xFS + slatChord * 0.5f + 0.02f, yC, zC + thick * 0.05f}, {0, 0, 0}, {0, 0, 0}, rotDihedral);
 
             // 2. Front Spar (Primary bending shear web)
             wingFrontSpar[side][st] = s->addBody({0.20f, wingBayW, thick * 0.90f}, kDensityHeavy, kFrictionAir,
-                                                 {xFS, yC, zC}, {0,0,0}, {0,0,0}, rotDihedral);
+                                                 {xFS, yC, zC}, {0, 0, 0}, {0, 0, 0}, rotDihedral);
 
             // 3. Rear Spar (Secondary shear web)
             wingRearSpar[side][st] = s->addBody({0.18f, wingBayW, thick * 0.75f}, kDensityAlloy, kFrictionAir,
-                                                {xRS, yC, zC}, {0,0,0}, {0,0,0}, rotDihedral);
+                                                {xRS, yC, zC}, {0, 0, 0}, {0, 0, 0}, rotDihedral);
 
             // 4. Upper Skin Panel
-            wingUpperSkin[side][st] = s->addBody({boxChord * 0.95f, wingBayW, 0.08f}, kDensityLight, kFrictionAir,
-                                                 {(xFS + xRS) * 0.5f, yC, zC + zSkinOff},
-                                                 {0,0,0}, {0,0,0}, rotDihedral);
+            wingUpperSkin[side][st] =
+                s->addBody({boxChord * 0.95f, wingBayW, 0.08f}, kDensityLight, kFrictionAir,
+                           {(xFS + xRS) * 0.5f, yC, zC + zSkinOff}, {0, 0, 0}, {0, 0, 0}, rotDihedral);
 
             // 5. Lower Skin Panel
-            wingLowerSkin[side][st] = s->addBody({boxChord * 0.95f, wingBayW, 0.08f}, kDensityLight, kFrictionAir,
-                                                 {(xFS + xRS) * 0.5f, yC, zC - zSkinOff},
-                                                 {0,0,0}, {0,0,0}, rotDihedral);
+            wingLowerSkin[side][st] =
+                s->addBody({boxChord * 0.95f, wingBayW, 0.08f}, kDensityLight, kFrictionAir,
+                           {(xFS + xRS) * 0.5f, yC, zC - zSkinOff}, {0, 0, 0}, {0, 0, 0}, rotDihedral);
 
             // 6. Internal Chordwise Wing Rib
             wingRib[side][st] = s->addBody({boxChord * 0.90f, 0.12f, thick * 0.80f}, kDensityAlloy, kFrictionAir,
-                                           {(xFS + xRS) * 0.5f, yC, zC}, {0,0,0}, {0,0,0}, rotDihedral);
+                                           {(xFS + xRS) * 0.5f, yC, zC}, {0, 0, 0}, {0, 0, 0}, rotDihedral);
 
             // 7. Internal Spanwise Stiffener Stringer
             // Tucked immediately under the upper skin, which is where a stiffener goes and
             // also the only place it does not share volume with the skin it stiffens.
             const float zStringer = zC + zSkinOff - 0.085f;
             int stringer = s->addBody({0.08f, wingBayW, 0.08f}, kDensityAlloy, kFrictionAir,
-                                      {(xFS + xRS) * 0.5f, yC, zStringer},
-                                      {0,0,0}, {0,0,0}, rotDihedral);
-            s->addJointWorld(wingRib[side][st], stringer, {(xFS + xRS) * 0.5f, yC, zStringer},
-                             INFINITY, kAngStiffRigid, kBreakHeavy);
+                                      {(xFS + xRS) * 0.5f, yC, zStringer}, {0, 0, 0}, {0, 0, 0}, rotDihedral);
+            s->addJointWorld(wingRib[side][st], stringer, {(xFS + xRS) * 0.5f, yC, zStringer}, INFINITY, kAngStiffRigid,
+                             kBreakHeavy);
 
             // 8. Trailing Edge Control Surface (Flaps inboard st <= 10, Ailerons outboard st > 10)
             const float flapChord = (xRS - xTE) * 0.90f;
-            wingFlapAileron[side][st] = s->addBody({flapChord, wingBayW, thick * 0.35f}, kDensityLight, kFrictionAir,
-                                                   {xRS - flapChord * 0.5f - 0.05f, yC, zC - thick * 0.05f},
-                                                   {0,0,0}, {0,0,0}, rotDihedral);
+            wingFlapAileron[side][st] =
+                s->addBody({flapChord, wingBayW, thick * 0.35f}, kDensityLight, kFrictionAir,
+                           {xRS - flapChord * 0.5f - 0.05f, yC, zC - thick * 0.05f}, {0, 0, 0}, {0, 0, 0}, rotDihedral);
 
             // Structural chordwise joints
             s->addJointWorld(slat, wingFrontSpar[side][st], {xFS, yC, zC}, INFINITY, kAngStiffRigid, kBreakSkin);
-            s->addJointWorld(wingFrontSpar[side][st], wingRib[side][st], {xFS - 0.10f, yC, zC}, INFINITY, kAngStiffRigid, kBreakHeavy);
-            s->addJointWorld(wingRearSpar[side][st], wingRib[side][st], {xRS + 0.10f, yC, zC}, INFINITY, kAngStiffRigid, kBreakHeavy);
-            s->addJointWorld(wingUpperSkin[side][st], wingRib[side][st], {(xFS + xRS) * 0.5f, yC, zC + thick * 0.40f}, INFINITY, kAngStiffPanel, kBreakSkin);
-            s->addJointWorld(wingLowerSkin[side][st], wingRib[side][st], {(xFS + xRS) * 0.5f, yC, zC - thick * 0.40f}, INFINITY, kAngStiffPanel, kBreakSkin);
-            s->addJointWorld(wingRearSpar[side][st], wingFlapAileron[side][st], {xRS - 0.05f, yC, zC}, INFINITY, kAngStiffHinge, kBreakMinor);
+            s->addJointWorld(wingFrontSpar[side][st], wingRib[side][st], {xFS - 0.10f, yC, zC}, INFINITY,
+                             kAngStiffRigid, kBreakHeavy);
+            s->addJointWorld(wingRearSpar[side][st], wingRib[side][st], {xRS + 0.10f, yC, zC}, INFINITY, kAngStiffRigid,
+                             kBreakHeavy);
+            s->addJointWorld(wingUpperSkin[side][st], wingRib[side][st], {(xFS + xRS) * 0.5f, yC, zC + thick * 0.40f},
+                             INFINITY, kAngStiffPanel, kBreakSkin);
+            s->addJointWorld(wingLowerSkin[side][st], wingRib[side][st], {(xFS + xRS) * 0.5f, yC, zC - thick * 0.40f},
+                             INFINITY, kAngStiffPanel, kBreakSkin);
+            s->addJointWorld(wingRearSpar[side][st], wingFlapAileron[side][st], {xRS - 0.05f, yC, zC}, INFINITY,
+                             kAngStiffHinge, kBreakMinor);
 
             // Spanwise continuity
             if (st > 0)
@@ -541,31 +559,33 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
                 const float localBreakHeavy = kBreakHeavy * (1.0f - 0.7f * u); // Decreases to 30% strength at tips
                 const float localBreakSkin = kBreakSkin * (1.0f - 0.7f * u);
 
-                s->addJointWorld(wingFrontSpar[side][st - 1], wingFrontSpar[side][st],
-                                 {xFS, yInterface, zInterface}, INFINITY, kAngStiffRigid, localBreakHeavy);
-                s->addJointWorld(wingRearSpar[side][st - 1], wingRearSpar[side][st],
-                                 {xRS, yInterface, zInterface}, INFINITY, kAngStiffRigid, localBreakHeavy);
+                s->addJointWorld(wingFrontSpar[side][st - 1], wingFrontSpar[side][st], {xFS, yInterface, zInterface},
+                                 INFINITY, kAngStiffRigid, localBreakHeavy);
+                s->addJointWorld(wingRearSpar[side][st - 1], wingRearSpar[side][st], {xRS, yInterface, zInterface},
+                                 INFINITY, kAngStiffRigid, localBreakHeavy);
                 s->addJointWorld(wingUpperSkin[side][st - 1], wingUpperSkin[side][st],
-                                 {(xFS + xRS) * 0.5f, yInterface, zInterface + zSkinOff}, INFINITY, kAngStiffPanel, localBreakSkin);
+                                 {(xFS + xRS) * 0.5f, yInterface, zInterface + zSkinOff}, INFINITY, kAngStiffPanel,
+                                 localBreakSkin);
                 s->addJointWorld(wingLowerSkin[side][st - 1], wingLowerSkin[side][st],
-                                 {(xFS + xRS) * 0.5f, yInterface, zInterface - zSkinOff}, INFINITY, kAngStiffPanel, localBreakSkin);
+                                 {(xFS + xRS) * 0.5f, yInterface, zInterface - zSkinOff}, INFINITY, kAngStiffPanel,
+                                 localBreakSkin);
             }
             else
             {
-                s->addJointWorld(carryThroughSpars[0], wingFrontSpar[side][0],
-                                 {xCarry[0], sgn * yWingRoot, zWingBox}, INFINITY, kAngStiffRigid, kBreakHeavy);
-                s->addJointWorld(carryThroughSpars[2], wingRearSpar[side][0],
-                                 {xCarry[2], sgn * yWingRoot, zWingBox}, INFINITY, kAngStiffRigid, kBreakHeavy);
+                s->addJointWorld(carryThroughSpars[0], wingFrontSpar[side][0], {xCarry[0], sgn * yWingRoot, zWingBox},
+                                 INFINITY, kAngStiffRigid, kBreakHeavy);
+                s->addJointWorld(carryThroughSpars[2], wingRearSpar[side][0], {xCarry[2], sgn * yWingRoot, zWingBox},
+                                 INFINITY, kAngStiffRigid, kBreakHeavy);
             }
         }
 
         // Wingtip Fence / Winglet
         const float yTipEdge = sgn * (yWingTip + 0.10f);
         const float zTipEdge = zWingBox + tanDihedral * (yWingTip - yWingRoot);
-        int winglet = s->addBody({1.20f, 0.08f, 0.85f}, kDensityLight, kFrictionAir,
-                                 {0.0f, yTipEdge, zTipEdge + 0.50f});
-        s->addJointWorld(wingFrontSpar[side][nWingStations - 1], winglet,
-                         {0.0f, yTipEdge, zTipEdge}, INFINITY, kAngStiffRigid, kBreakSkin);
+        int winglet =
+            s->addBody({1.20f, 0.08f, 0.85f}, kDensityLight, kFrictionAir, {0.0f, yTipEdge, zTipEdge + 0.50f});
+        s->addJointWorld(wingFrontSpar[side][nWingStations - 1], winglet, {0.0f, yTipEdge, zTipEdge}, INFINITY,
+                         kAngStiffRigid, kBreakSkin);
     }
 
     // -------------------------------------------------------------------------
@@ -599,8 +619,7 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
         const float xEngCenter = xEngFront - nacLen * 0.5f;
 
         // 1. Heavy Central Engine Core / Crankcase Block
-        int engCore = s->addBody({nacLen * 0.70f, 0.70f, 0.70f}, kDensityHeavy, kFrictionAir,
-                                 {xEngCenter, yEng, zEng});
+        int engCore = s->addBody({nacLen * 0.70f, 0.70f, 0.70f}, kDensityHeavy, kFrictionAir, {xEngCenter, yEng, zEng});
 
         // 2. Engine Pylon Struts
         // Run from the core top face up to the wing underside, with a 0.04m gap so the
@@ -608,16 +627,20 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
         const float pylonH = (zWingLower - 0.04f) - (zEng + 0.35f);
         const float zPylon = (zWingLower - 0.04f + zEng + 0.35f) * 0.5f;
 
-        int pylonFront = s->addBody({0.30f, 0.18f, pylonH}, kDensityHeavy, kFrictionAir,
-                                    {xEngCenter + 0.60f, yEng, zPylon});
-        int pylonRear  = s->addBody({0.30f, 0.18f, pylonH}, kDensityHeavy, kFrictionAir,
-                                    {xEngCenter - 0.60f, yEng, zPylon});
+        int pylonFront =
+            s->addBody({0.30f, 0.18f, pylonH}, kDensityHeavy, kFrictionAir, {xEngCenter + 0.60f, yEng, zPylon});
+        int pylonRear =
+            s->addBody({0.30f, 0.18f, pylonH}, kDensityHeavy, kFrictionAir, {xEngCenter - 0.60f, yEng, zPylon});
 
-        s->addJointWorld(engCore, pylonFront, {xEngCenter + 0.60f, yEng, zEng + 0.35f}, INFINITY, kAngStiffRigid, kBreakPylon);
-        s->addJointWorld(engCore, pylonRear,  {xEngCenter - 0.60f, yEng, zEng + 0.35f}, INFINITY, kAngStiffRigid, kBreakPylon);
+        s->addJointWorld(engCore, pylonFront, {xEngCenter + 0.60f, yEng, zEng + 0.35f}, INFINITY, kAngStiffRigid,
+                         kBreakPylon);
+        s->addJointWorld(engCore, pylonRear, {xEngCenter - 0.60f, yEng, zEng + 0.35f}, INFINITY, kAngStiffRigid,
+                         kBreakPylon);
 
-        s->addJointWorld(wingFrontSpar[side][st], pylonFront, {xEngCenter + 0.60f, yEng, zWingLower}, INFINITY, kAngStiffRigid, kBreakPylon);
-        s->addJointWorld(wingLowerSkin[side][st], pylonRear,  {xEngCenter - 0.60f, yEng, zWingLower}, INFINITY, kAngStiffRigid, kBreakPylon);
+        s->addJointWorld(wingFrontSpar[side][st], pylonFront, {xEngCenter + 0.60f, yEng, zWingLower}, INFINITY,
+                         kAngStiffRigid, kBreakPylon);
+        s->addJointWorld(wingLowerSkin[side][st], pylonRear, {xEngCenter - 0.60f, yEng, zWingLower}, INFINITY,
+                         kAngStiffRigid, kBreakPylon);
 
         // 3. Octagonal Engine Cowling Shell (3 rings of 8 panels = 24 cowl panels per nacelle)
         const int nCowlFacets = 8;
@@ -642,8 +665,8 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
                 quat rotCowl = {sinf(halfP), 0.0f, 0.0f, cosf(halfP)};
 
                 vec3 pCowl = {xRingC, yEng + nacRadius * sinP, zEng + nacRadius * cosP};
-                int cowl = s->addBody({cowlRingLen * 0.96f, cowlPanelW, 0.06f}, kDensityLight, kFrictionAir,
-                                      pCowl, {0,0,0}, {0,0,0}, rotCowl);
+                int cowl = s->addBody({cowlRingLen * 0.96f, cowlPanelW, 0.06f}, kDensityLight, kFrictionAir, pCowl,
+                                      {0, 0, 0}, {0, 0, 0}, rotCowl);
 
                 vec3 pAnchorCore = {xRingC, yEng + 0.35f * sinP, zEng + 0.35f * cosP};
                 s->addJointWorld(engCore, cowl, pAnchorCore, INFINITY, kAngStiffRigid, kBreakSkin);
@@ -657,7 +680,8 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
             float halfV = -vPhi * 0.5f; // see fuselage rotRoll: radial roll is -phi
             quat rotVane = {sinf(halfV), 0.0f, 0.0f, cosf(halfV)};
             vec3 pVane = {xEngFront - 0.15f, yEng + 0.48f * sinf(vPhi), zEng + 0.48f * cosf(vPhi)};
-            int vane = s->addBody({0.20f, 0.08f, 0.22f}, kDensityLight, kFrictionAir, pVane, {0,0,0}, {0,0,0}, rotVane);
+            int vane =
+                s->addBody({0.20f, 0.08f, 0.22f}, kDensityLight, kFrictionAir, pVane, {0, 0, 0}, {0, 0, 0}, rotVane);
             s->addJointWorld(engCore, vane, pVane, INFINITY, kAngStiffRigid, kBreakMinor);
         }
 
@@ -668,8 +692,7 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
         const float spinDir = (e < 2) ? +1.0f : -1.0f;
         const vec3 propAngVel = {spinDir * propSpinRate, 0.0f, 0.0f};
 
-        int propHub = s->addBody({0.55f, 0.36f, 0.36f}, kDensityHeavy, kFrictionAir,
-                                 pPropHub, {0,0,0}, propAngVel);
+        int propHub = s->addBody({0.55f, 0.36f, 0.36f}, kDensityHeavy, kFrictionAir, pPropHub, {0, 0, 0}, propAngVel);
 
         // Spherical bearing joint: stiffnessLin = INFINITY, stiffnessAng = 0.0f
         const vec3 pBearingAnchor = {xEngFront, yEng, zEng};
@@ -680,25 +703,20 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
         const float bladeW = 0.22f;
         const float bladeT = 0.05f;
 
-        const vec3 bladeOffsets[4] = {
-            {0.0f, 0.0f, +(0.18f + bladeLen * 0.5f)},
-            {0.0f, +(0.18f + bladeLen * 0.5f), 0.0f},
-            {0.0f, 0.0f, -(0.18f + bladeLen * 0.5f)},
-            {0.0f, -(0.18f + bladeLen * 0.5f), 0.0f}
-        };
+        const vec3 bladeOffsets[4] = {{0.0f, 0.0f, +(0.18f + bladeLen * 0.5f)},
+                                      {0.0f, +(0.18f + bladeLen * 0.5f), 0.0f},
+                                      {0.0f, 0.0f, -(0.18f + bladeLen * 0.5f)},
+                                      {0.0f, -(0.18f + bladeLen * 0.5f), 0.0f}};
 
-        const vec3 bladeSizes[4] = {
-            {bladeT, bladeW, bladeLen},
-            {bladeT, bladeLen, bladeW},
-            {bladeT, bladeW, bladeLen},
-            {bladeT, bladeLen, bladeW}
-        };
+        const vec3 bladeSizes[4] = {{bladeT, bladeW, bladeLen},
+                                    {bladeT, bladeLen, bladeW},
+                                    {bladeT, bladeW, bladeLen},
+                                    {bladeT, bladeLen, bladeW}};
 
         for (int bl = 0; bl < 4; bl++)
         {
             vec3 pBlade = pPropHub + bladeOffsets[bl];
-            int blade = s->addBody(bladeSizes[bl], kDensityLight, kFrictionAir,
-                                   pBlade, {0,0,0}, propAngVel);
+            int blade = s->addBody(bladeSizes[bl], kDensityLight, kFrictionAir, pBlade, {0, 0, 0}, propAngVel);
 
             vec3 pBladeRoot = pPropHub + bladeOffsets[bl] * 0.40f;
             s->addJointWorld(propHub, blade, pBladeRoot, INFINITY, kAngStiffRigid, kBreakBlade);
@@ -728,33 +746,33 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
         float finThick = (0.36f - 0.18f * u) * 0.95f;
 
         float xFinSpar = xFinLE - finChord * 0.40f;
-        float xRudder  = xFinTE + finChord * 0.25f;
+        float xRudder = xFinTE + finChord * 0.25f;
 
-        int finSpar = s->addBody({0.24f, finThick, dFinZ * 0.95f}, kDensityAlloy, kFrictionAir,
-                                 {xFinSpar, 0.0f, zTier});
+        int finSpar =
+            s->addBody({0.24f, finThick, dFinZ * 0.95f}, kDensityAlloy, kFrictionAir, {xFinSpar, 0.0f, zTier});
 
         int finSkinL = s->addBody({finChord * 0.50f, 0.05f, dFinZ * 0.95f}, kDensityLight, kFrictionAir,
                                   {(xFinLE + xFinSpar) * 0.5f, -finThick * 0.45f, zTier});
         int finSkinR = s->addBody({finChord * 0.50f, 0.05f, dFinZ * 0.95f}, kDensityLight, kFrictionAir,
                                   {(xFinLE + xFinSpar) * 0.5f, +finThick * 0.45f, zTier});
 
-        int rudder = s->addBody({(xFinSpar - xFinTE) * 0.85f, finThick * 0.60f, dFinZ * 0.95f}, kDensityLight, kFrictionAir,
-                                {xRudder, 0.0f, zTier});
+        int rudder = s->addBody({(xFinSpar - xFinTE) * 0.85f, finThick * 0.60f, dFinZ * 0.95f}, kDensityLight,
+                                kFrictionAir, {xRudder, 0.0f, zTier});
 
         s->addJointWorld(finSpar, finSkinL, {xFinSpar, -finThick * 0.45f, zTier}, INFINITY, kAngStiffPanel, kBreakSkin);
         s->addJointWorld(finSpar, finSkinR, {xFinSpar, +finThick * 0.45f, zTier}, INFINITY, kAngStiffPanel, kBreakSkin);
-        s->addJointWorld(finSpar, rudder,   {xFinSpar - 0.15f, 0.0f, zTier}, INFINITY, kAngStiffHinge, kBreakMinor);
+        s->addJointWorld(finSpar, rudder, {xFinSpar - 0.15f, 0.0f, zTier}, INFINITY, kAngStiffHinge, kBreakMinor);
 
         if (prevFinSpar >= 0)
         {
             float localBreakFrame = kBreakFrame * (1.0f - 0.7f * u);
-            s->addJointWorld(prevFinSpar, finSpar, {xFinSpar, 0.0f, zTier - dFinZ * 0.5f},
-                             INFINITY, kAngStiffRigid, localBreakFrame);
+            s->addJointWorld(prevFinSpar, finSpar, {xFinSpar, 0.0f, zTier - dFinZ * 0.5f}, INFINITY, kAngStiffRigid,
+                             localBreakFrame);
         }
         else
         {
-            s->addJointWorld(formerBodies[5][0], finSpar, {xFinSpar, 0.0f, zFinRoot},
-                             INFINITY, kAngStiffRigid, kBreakHeavy);
+            s->addJointWorld(formerBodies[5][0], finSpar, {xFinSpar, 0.0f, zFinRoot}, INFINITY, kAngStiffRigid,
+                             kBreakHeavy);
         }
         prevFinSpar = finSpar;
     }
@@ -762,7 +780,7 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
     // 2. Horizontal Stabilizers (Tailplanes & Elevators)
     const int nTailStations = 9;
     const float yTailRoot = 0.80f;
-    const float yTailTip  = 7.20f;
+    const float yTailTip = 7.20f;
     const float dTailSpan = (yTailTip - yTailRoot) / (float)nTailStations;
 
     for (int side = 0; side < 2; side++)
@@ -782,25 +800,25 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
             float tThick = (0.30f - 0.14f * u) * 0.95f;
 
             float xTSpar = xTLE - tChord * 0.35f;
-            float xElev  = xTTE + tChord * 0.28f;
+            float xElev = xTTE + tChord * 0.28f;
 
-            int tailSpar = s->addBody({0.20f, dTailSpan * 0.95f, tThick}, kDensityAlloy, kFrictionAir,
-                                      {xTSpar, yT, zT});
-            int elevator = s->addBody({(xTSpar - xTTE) * 0.85f, dTailSpan * 0.95f, tThick * 0.40f}, kDensityLight, kFrictionAir,
-                                      {xElev, yT, zT});
+            int tailSpar =
+                s->addBody({0.20f, dTailSpan * 0.95f, tThick}, kDensityAlloy, kFrictionAir, {xTSpar, yT, zT});
+            int elevator = s->addBody({(xTSpar - xTTE) * 0.85f, dTailSpan * 0.95f, tThick * 0.40f}, kDensityLight,
+                                      kFrictionAir, {xElev, yT, zT});
 
             s->addJointWorld(tailSpar, elevator, {xTSpar - 0.10f, yT, zT}, INFINITY, kAngStiffHinge, kBreakMinor);
 
             if (prevTailSpar >= 0)
             {
                 float localBreakFrame = kBreakFrame * (1.0f - 0.7f * u);
-                s->addJointWorld(prevTailSpar, tailSpar, {xTSpar, sgn * (yTailRoot + tst * dTailSpan), zT},
-                                 INFINITY, kAngStiffRigid, localBreakFrame);
+                s->addJointWorld(prevTailSpar, tailSpar, {xTSpar, sgn * (yTailRoot + tst * dTailSpan), zT}, INFINITY,
+                                 kAngStiffRigid, localBreakFrame);
             }
             else
             {
-                s->addJointWorld(formerBodies[4][(side == 0) ? 12 : 4], tailSpar,
-                                 {xTSpar, sgn * yTailRoot, zT}, INFINITY, kAngStiffRigid, kBreakHeavy);
+                s->addJointWorld(formerBodies[4][(side == 0) ? 12 : 4], tailSpar, {xTSpar, sgn * yTailRoot, zT},
+                                 INFINITY, kAngStiffRigid, kBreakHeavy);
             }
             prevTailSpar = tailSpar;
         }
@@ -820,13 +838,14 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
         // centreline: the radius grows aft here, so the skin bay behind the strut hangs
         // lower than the station the strut is measured at.
         const float zNoseAttach = fminf(getBayCenterZ(xNose - 0.6f) - getBayRadius(xNose - 0.6f),
-                                        getBayCenterZ(xNose + 0.6f) - getBayRadius(xNose + 0.6f)) - 0.05f;
+                                        getBayCenterZ(xNose + 0.6f) - getBayRadius(xNose + 0.6f)) -
+                                  0.05f;
         const float noseStrutH = zNoseAttach - (zGround + wheelR);
 
         int noseStrut = s->addBody({0.24f, 0.24f, noseStrutH}, kDensityHeavy, kFrictionAir,
                                    {xNose, 0.0f, (zNoseAttach + zGround + wheelR) * 0.5f});
-        s->addJointWorld(formerBodies[29][8], noseStrut, {xNose, 0.0f, zNoseAttach},
-                         INFINITY, kAngStiffRigid, kBreakGear);
+        s->addJointWorld(formerBodies[29][8], noseStrut, {xNose, 0.0f, zNoseAttach}, INFINITY, kAngStiffRigid,
+                         kBreakGear);
 
         // Twin nose wheels
         for (int nw = 0; nw < 2; nw++)
@@ -834,8 +853,7 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
             float yNW = (nw == 0) ? -0.32f : +0.32f;
             int wheel = s->addBody({wheelR * 1.90f, 0.22f, wheelR * 1.90f}, kDensityHeavy, 0.7f,
                                    {xNose, yNW, zGround + wheelR});
-            s->addJointWorld(noseStrut, wheel, {xNose, yNW, zGround + wheelR},
-                             INFINITY, 0.0f, kBreakGear);
+            s->addJointWorld(noseStrut, wheel, {xNose, yNW, zGround + wheelR}, INFINITY, 0.0f, kBreakGear);
         }
     }
 
@@ -856,14 +874,12 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
 
         int mainStrut = s->addBody({0.36f, 0.36f, mainStrutH}, kDensityHeavy, kFrictionAir,
                                    {xMG, yMG, (zMGTop + zGround + wheelR) * 0.5f});
-        s->addJointWorld(wingFrontSpar[mg][4], mainStrut, {xMG, yMG, zMGTop},
-                         INFINITY, kAngStiffRigid, kBreakGear);
+        s->addJointWorld(wingFrontSpar[mg][4], mainStrut, {xMG, yMG, zMGTop}, INFINITY, kAngStiffRigid, kBreakGear);
 
         // 4-Wheel Main Gear Bogie Truck
-        int bogieBeam = s->addBody({1.60f, 0.28f, 0.25f}, kDensityHeavy, kFrictionAir,
-                                   {xMG, yMG, zGround + wheelR});
-        s->addJointWorld(mainStrut, bogieBeam, {xMG, yMG, zGround + wheelR + 0.15f},
-                         INFINITY, kAngStiffRigid, kBreakGear);
+        int bogieBeam = s->addBody({1.60f, 0.28f, 0.25f}, kDensityHeavy, kFrictionAir, {xMG, yMG, zGround + wheelR});
+        s->addJointWorld(mainStrut, bogieBeam, {xMG, yMG, zGround + wheelR + 0.15f}, INFINITY, kAngStiffRigid,
+                         kBreakGear);
 
         for (int fx = -1; fx <= 1; fx += 2)
         {
@@ -873,8 +889,7 @@ static SceneView buildPassengerPlane(Builder *s, const PassengerPlaneConfig& cfg
                 float yWheel = yMG + fy * 0.35f;
                 int wheel = s->addBody({wheelR * 1.92f, 0.26f, wheelR * 1.92f}, kDensityHeavy, 0.8f,
                                        {xWheel, yWheel, zGround + wheelR});
-                s->addJointWorld(bogieBeam, wheel, {xWheel, yWheel, zGround + wheelR},
-                                 INFINITY, 0.0f, kBreakGear);
+                s->addJointWorld(bogieBeam, wheel, {xWheel, yWheel, zGround + wheelR}, INFINITY, 0.0f, kBreakGear);
             }
         }
     }

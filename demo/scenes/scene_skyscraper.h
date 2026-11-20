@@ -63,11 +63,13 @@ static SceneView sceneSkyscraperGpu(SceneBuilder *s)
     const float finCY = faceY + spandrelT + finD * 0.5f;
 
     // Map a tower-local coordinate onto the bay index of the slab covering it.
-    auto bayX = [&](float lx) {
+    auto bayX = [&](float lx)
+    {
         int i = (int)floorf(lx / baySize + baysX * 0.5f);
         return i < 0 ? 0 : (i > baysX - 1 ? baysX - 1 : i);
     };
-    auto bayY = [&](float ly) {
+    auto bayY = [&](float ly)
+    {
         int j = (int)floorf(ly / baySize + baysY * 0.5f);
         return j < 0 ? 0 : (j > baysY - 1 ? baysY - 1 : j);
     };
@@ -109,13 +111,11 @@ static SceneView sceneSkyscraperGpu(SceneBuilder *s)
                 curSlabs[bx][by] = s->addBody({baySize, baySize, slabThick}, 1.2f, 0.6f, {cx, cy, zSlab});
 
                 if (bx > 0)
-                    s->addJointWorld(curSlabs[bx - 1][by], curSlabs[bx][by],
-                                     {cx - baySize * 0.5f, cy, zSlab},
-                                     INFINITY, panelAngStiffness, slabBreakForce);
+                    s->addJointWorld(curSlabs[bx - 1][by], curSlabs[bx][by], {cx - baySize * 0.5f, cy, zSlab}, INFINITY,
+                                     panelAngStiffness, slabBreakForce);
                 if (by > 0)
-                    s->addJointWorld(curSlabs[bx][by - 1], curSlabs[bx][by],
-                                     {cx, cy - baySize * 0.5f, zSlab},
-                                     INFINITY, panelAngStiffness, slabBreakForce);
+                    s->addJointWorld(curSlabs[bx][by - 1], curSlabs[bx][by], {cx, cy - baySize * 0.5f, zSlab}, INFINITY,
+                                     panelAngStiffness, slabBreakForce);
             }
         }
 
@@ -146,15 +146,15 @@ static SceneView sceneSkyscraperGpu(SceneBuilder *s)
                             continue;
 
                         // Head to current floor slab (pancaking joint)
-                        s->addJointWorld(col, curSlabs[bx][by], {cx, ly, zSlabTop},
-                                         INFINITY, panelAngStiffness, slabToColBreakForce);
+                        s->addJointWorld(col, curSlabs[bx][by], {cx, ly, zSlabTop}, INFINITY, panelAngStiffness,
+                                         slabToColBreakForce);
 
                         if (prevSlabs[bx][by] >= 0)
                         {
                             // Foot to previous floor slab (vertical column stack continuity)
                             // We use colAngStiffness instead of INFINITY to allow bending
-                            s->addJointWorld(prevSlabs[bx][by], col, {cx, ly, zBase},
-                                             INFINITY, colAngStiffness, floorBreakForce);
+                            s->addJointWorld(prevSlabs[bx][by], col, {cx, ly, zBase}, INFINITY, colAngStiffness,
+                                             floorBreakForce);
                         }
                     }
                 }
@@ -180,8 +180,8 @@ static SceneView sceneSkyscraperGpu(SceneBuilder *s)
                 if (k == 0)
                     s->addJointWorld(ground, band, {cx, wy, 0.0f}, INFINITY, INFINITY, breakForceMinor);
                 else if (prevSlabs[bx][by] >= 0)
-                    s->addJointWorld(prevSlabs[bx][by], band, {cx, wy, zBase},
-                                     INFINITY, panelAngStiffness, breakForceMinor);
+                    s->addJointWorld(prevSlabs[bx][by], band, {cx, wy, zBase}, INFINITY, panelAngStiffness,
+                                     breakForceMinor);
             }
         }
 
@@ -200,8 +200,8 @@ static SceneView sceneSkyscraperGpu(SceneBuilder *s)
                 if (k == 0)
                     s->addJointWorld(ground, band, {wx, ly, 0.0f}, INFINITY, INFINITY, breakForceMinor);
                 else if (prevSlabs[bx][by] >= 0)
-                    s->addJointWorld(prevSlabs[bx][by], band, {wx, ly, zBase},
-                                     INFINITY, panelAngStiffness, breakForceMinor);
+                    s->addJointWorld(prevSlabs[bx][by], band, {wx, ly, zBase}, INFINITY, panelAngStiffness,
+                                     breakForceMinor);
             }
         }
 
@@ -221,13 +221,13 @@ static SceneView sceneSkyscraperGpu(SceneBuilder *s)
                 // Aluminum/glass mullion fins are very lightweight (0.2f)
                 int fin = s->addBody({finW, finD, colHeight}, 0.2f, 0.6f, {lx, fy, zFin});
 
-                s->addJointWorld(fin, curSlabs[bx][by], {lx, fy, zSlabTop},
-                                 INFINITY, panelAngStiffness, breakForceMinor);
+                s->addJointWorld(fin, curSlabs[bx][by], {lx, fy, zSlabTop}, INFINITY, panelAngStiffness,
+                                 breakForceMinor);
                 if (k == 0)
                     s->addJointWorld(ground, fin, {lx, fy, 0.0f}, INFINITY, INFINITY, breakForceMinor);
                 else if (prevSlabs[bx][by] >= 0)
-                    s->addJointWorld(prevSlabs[bx][by], fin, {lx, fy, zBase},
-                                     INFINITY, panelAngStiffness, breakForceMinor);
+                    s->addJointWorld(prevSlabs[bx][by], fin, {lx, fy, zBase}, INFINITY, panelAngStiffness,
+                                     breakForceMinor);
             }
         }
 
@@ -243,13 +243,13 @@ static SceneView sceneSkyscraperGpu(SceneBuilder *s)
                 // Aluminum/glass mullion fins are very lightweight (0.2f)
                 int fin = s->addBody({finD, finW, colHeight}, 0.2f, 0.6f, {fx, ly, zFin});
 
-                s->addJointWorld(fin, curSlabs[bx][by], {fx, ly, zSlabTop},
-                                 INFINITY, panelAngStiffness, breakForceMinor);
+                s->addJointWorld(fin, curSlabs[bx][by], {fx, ly, zSlabTop}, INFINITY, panelAngStiffness,
+                                 breakForceMinor);
                 if (k == 0)
                     s->addJointWorld(ground, fin, {fx, ly, 0.0f}, INFINITY, INFINITY, breakForceMinor);
                 else if (prevSlabs[bx][by] >= 0)
-                    s->addJointWorld(prevSlabs[bx][by], fin, {fx, ly, zBase},
-                                     INFINITY, panelAngStiffness, breakForceMinor);
+                    s->addJointWorld(prevSlabs[bx][by], fin, {fx, ly, zBase}, INFINITY, panelAngStiffness,
+                                     breakForceMinor);
             }
         }
 
@@ -284,8 +284,7 @@ static SceneView sceneSkyscraperGpu(SceneBuilder *s)
             const float py = sgn * parCY;
             // Parapet cladding (0.4f)
             int par = s->addBody({baySize * 0.98f, parapetT, parapetH}, 0.4f, 0.6f, {cx, py, zPar});
-            s->addJointWorld(prevSlabs[b][edgeY], par, {cx, py, zRoof},
-                             INFINITY, panelAngStiffness, breakForceMinor);
+            s->addJointWorld(prevSlabs[b][edgeY], par, {cx, py, zRoof}, INFINITY, panelAngStiffness, breakForceMinor);
         }
 
         // Short runs along Y, trimmed to fit between the long runs.
@@ -295,8 +294,8 @@ static SceneView sceneSkyscraperGpu(SceneBuilder *s)
             const float px = sgn * parCX;
             // Parapet cladding (0.4f)
             int par = s->addBody({parapetT, parShortSeg * 0.98f, parapetH}, 0.4f, 0.6f, {px, cy, zPar});
-            s->addJointWorld(prevSlabs[edgeX][bayY(cy)], par, {px, cy, zRoof},
-                             INFINITY, panelAngStiffness, breakForceMinor);
+            s->addJointWorld(prevSlabs[edgeX][bayY(cy)], par, {px, cy, zRoof}, INFINITY, panelAngStiffness,
+                             breakForceMinor);
         }
     }
 
@@ -309,10 +308,10 @@ static SceneView sceneSkyscraperGpu(SceneBuilder *s)
     for (int m = 0; m < 3; m++)
     {
         // Heavy mechanical equipment (2.0f)
-        int box = s->addBody({mechSX[m], mechSY[m], mechH[m]}, 2.0f, 0.6f,
-                             {mechX[m], mechY[m], zRoof + mechH[m] * 0.5f});
-        s->addJointWorld(prevSlabs[bayX(mechX[m])][bayY(mechY[m])], box,
-                         {mechX[m], mechY[m], zRoof}, INFINITY, panelAngStiffness, breakForce);
+        int box =
+            s->addBody({mechSX[m], mechSY[m], mechH[m]}, 2.0f, 0.6f, {mechX[m], mechY[m], zRoof + mechH[m] * 0.5f});
+        s->addJointWorld(prevSlabs[bayX(mechX[m])][bayY(mechY[m])], box, {mechX[m], mechY[m], zRoof}, INFINITY,
+                         panelAngStiffness, breakForce);
     }
 
     for (int i = 1; i < s->bodyCount(); i++)

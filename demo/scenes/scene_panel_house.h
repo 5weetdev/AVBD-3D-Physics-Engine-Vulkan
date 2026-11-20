@@ -71,13 +71,11 @@ static SceneView scenePanelHouseGpu(SceneBuilder *s)
                     // Tie adjacent slabs in X
                     if (bx > 0)
                         s->addJointWorld(curFloorSlabs[bx - 1][by], curFloorSlabs[bx][by],
-                                         {cx - baySize * 0.5f, cy, zs},
-                                         INFINITY, INFINITY, breakForce);
+                                         {cx - baySize * 0.5f, cy, zs}, INFINITY, INFINITY, breakForce);
                     // Tie adjacent slabs in Y
                     if (by > 0)
                         s->addJointWorld(curFloorSlabs[bx][by - 1], curFloorSlabs[bx][by],
-                                         {cx, cy - baySize * 0.5f, zs},
-                                         INFINITY, INFINITY, breakForce);
+                                         {cx, cy - baySize * 0.5f, zs}, INFINITY, INFINITY, breakForce);
                 }
             }
 
@@ -96,21 +94,21 @@ static SceneView scenePanelHouseGpu(SceneBuilder *s)
 
                     // Joint to slab resting on top
                     if (bx < baysX)
-                        s->addJointWorld(wall, curFloorSlabs[bx][by], {wx, wy, zBase + wallHeight},
-                                         INFINITY, panelAngStiffness, breakForce);
+                        s->addJointWorld(wall, curFloorSlabs[bx][by], {wx, wy, zBase + wallHeight}, INFINITY,
+                                         panelAngStiffness, breakForce);
                     if (bx > 0)
-                        s->addJointWorld(wall, curFloorSlabs[bx - 1][by], {wx, wy, zBase + wallHeight},
-                                         INFINITY, panelAngStiffness, breakForce);
+                        s->addJointWorld(wall, curFloorSlabs[bx - 1][by], {wx, wy, zBase + wallHeight}, INFINITY,
+                                         panelAngStiffness, breakForce);
 
                     // Joint to lower slab below
                     if (prevFloorSlabs[0][0] >= 0)
                     {
                         if (bx < baysX)
-                            s->addJointWorld(prevFloorSlabs[bx][by], wall, {wx, wy, zBase},
-                                             INFINITY, panelAngStiffness, breakForce);
+                            s->addJointWorld(prevFloorSlabs[bx][by], wall, {wx, wy, zBase}, INFINITY, panelAngStiffness,
+                                             breakForce);
                         if (bx > 0)
-                            s->addJointWorld(prevFloorSlabs[bx - 1][by], wall, {wx, wy, zBase},
-                                             INFINITY, panelAngStiffness, breakForce);
+                            s->addJointWorld(prevFloorSlabs[bx - 1][by], wall, {wx, wy, zBase}, INFINITY,
+                                             panelAngStiffness, breakForce);
                     }
                 }
             }
@@ -130,21 +128,21 @@ static SceneView scenePanelHouseGpu(SceneBuilder *s)
 
                     // Joint to slab above
                     if (by < baysY)
-                        s->addJointWorld(wall, curFloorSlabs[bx][by], {wx, wy, zBase + wallHeight},
-                                         INFINITY, panelAngStiffness, breakForce);
+                        s->addJointWorld(wall, curFloorSlabs[bx][by], {wx, wy, zBase + wallHeight}, INFINITY,
+                                         panelAngStiffness, breakForce);
                     if (by > 0)
-                        s->addJointWorld(wall, curFloorSlabs[bx][by - 1], {wx, wy, zBase + wallHeight},
-                                         INFINITY, panelAngStiffness, breakForce);
+                        s->addJointWorld(wall, curFloorSlabs[bx][by - 1], {wx, wy, zBase + wallHeight}, INFINITY,
+                                         panelAngStiffness, breakForce);
 
                     // Joint to lower slab below
                     if (prevFloorSlabs[0][0] >= 0)
                     {
                         if (by < baysY)
-                            s->addJointWorld(prevFloorSlabs[bx][by], wall, {wx, wy, zBase},
-                                             INFINITY, panelAngStiffness, breakForce);
+                            s->addJointWorld(prevFloorSlabs[bx][by], wall, {wx, wy, zBase}, INFINITY, panelAngStiffness,
+                                             breakForce);
                         if (by > 0)
-                            s->addJointWorld(prevFloorSlabs[bx][by - 1], wall, {wx, wy, zBase},
-                                             INFINITY, panelAngStiffness, breakForce);
+                            s->addJointWorld(prevFloorSlabs[bx][by - 1], wall, {wx, wy, zBase}, INFINITY,
+                                             panelAngStiffness, breakForce);
                     }
                 }
             }
@@ -159,13 +157,14 @@ static SceneView scenePanelHouseGpu(SceneBuilder *s)
                     const float faceY = sgn * (baysY * 0.5f * baySize);
                     const float balY = faceY + sgn * 0.6f;
                     int balSlab = s->addBody({baySize * 0.95f, 1.2f, 0.15f}, 0.8f, 0.6f, {bxPos, balY, zs});
-                    int balRail = s->addBody({baySize * 0.95f, 0.15f, 0.9f}, 0.5f, 0.6f, {bxPos, balY + 0.5f * sgn, zs + 0.525f});
+                    int balRail =
+                        s->addBody({baySize * 0.95f, 0.15f, 0.9f}, 0.5f, 0.6f, {bxPos, balY + 0.5f * sgn, zs + 0.525f});
 
                     int attachedSlab = (side == 0) ? curFloorSlabs[bx][0] : curFloorSlabs[bx][baysY - 1];
-                    s->addJointWorld(attachedSlab, balSlab, {bxPos, faceY, zs},
-                                     INFINITY, panelAngStiffness, breakForceMinor);
-                    s->addJointWorld(balSlab, balRail, {bxPos, balY + 0.5f * sgn, zs + 0.075f},
-                                     INFINITY, panelAngStiffness, breakForceMinor);
+                    s->addJointWorld(attachedSlab, balSlab, {bxPos, faceY, zs}, INFINITY, panelAngStiffness,
+                                     breakForceMinor);
+                    s->addJointWorld(balSlab, balRail, {bxPos, balY + 0.5f * sgn, zs + 0.075f}, INFINITY,
+                                     panelAngStiffness, breakForceMinor);
                 }
             }
 
@@ -179,8 +178,8 @@ static SceneView scenePanelHouseGpu(SceneBuilder *s)
                     const float partH = wallHeight * 0.95f;
                     const float zw_part = (zBase + wallHeight) - partH * 0.5f;
                     int part = s->addBody({0.15f, 1.6f, partH}, 0.6f, 0.5f, {px, py, zw_part});
-                    s->addJointWorld(curFloorSlabs[bx][by], part, {px, py, zBase + wallHeight},
-                                     INFINITY, panelAngStiffness, breakForceMinor);
+                    s->addJointWorld(curFloorSlabs[bx][by], part, {px, py, zBase + wallHeight}, INFINITY,
+                                     panelAngStiffness, breakForceMinor);
                 }
             }
 
@@ -208,7 +207,8 @@ static SceneView scenePanelHouseGpu(SceneBuilder *s)
             if (i == 0)
             {
                 // Connect west end of skyway to Tower A's inner edge slab (at X = -4.0m)
-                s->addJointWorld(towerInnerSlabs[0][skyFloors[sf]], bSlab, {-4.0f, 0.0f, zs}, INFINITY, INFINITY, breakForce);
+                s->addJointWorld(towerInnerSlabs[0][skyFloors[sf]], bSlab, {-4.0f, 0.0f, zs}, INFINITY, INFINITY,
+                                 breakForce);
             }
 
             if (prevBridge >= 0)
@@ -218,7 +218,8 @@ static SceneView scenePanelHouseGpu(SceneBuilder *s)
             if (i == 3)
             {
                 // Connect east end of skyway to Tower B's inner edge slab (at X = +4.0m)
-                s->addJointWorld(bSlab, towerInnerSlabs[1][skyFloors[sf]], {+4.0f, 0.0f, zs}, INFINITY, INFINITY, breakForce);
+                s->addJointWorld(bSlab, towerInnerSlabs[1][skyFloors[sf]], {+4.0f, 0.0f, zs}, INFINITY, INFINITY,
+                                 breakForce);
             }
         }
     }

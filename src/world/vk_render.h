@@ -49,26 +49,26 @@ struct RenderPipelines
 // segmentation (args.shapeBase != 0) all match the instance writer's
 // k_write_instances exactly -- see render.slang. `shapeCount` sizes the dispatch.
 void launchWriteInstances(CommandList &cmd, HostRingBuffer &ring, RenderPipelines &pl,
-                           const WriteInstancesArgsGpu &args, int shapeCount);
+                          const WriteInstancesArgsGpu &args, int shapeCount);
 
 // the overlay reductions ports: three-pass per-frame overlay stat reduction
 // (clear -> per-manifold contact pass -> per-joint/spring force pass), then two-pass
 // peak-contact-load-per-body reduction (clear -> accumulate). Dispatch counts mirror
 // the reference launch bounds (n bodies / slots contacts / joints+springs).
 void launchOverlayStatsClear(CommandList &cmd, HostRingBuffer &ring, RenderPipelines &pl,
-                              const OverlayStatsClearArgsGpu &args, int n);
+                             const OverlayStatsClearArgsGpu &args, int n);
 void launchOverlayStatsContacts(CommandList &cmd, HostRingBuffer &ring, RenderPipelines &pl,
-                                 const OverlayStatsContactsArgsGpu &args, int slots);
+                                const OverlayStatsContactsArgsGpu &args, int slots);
 void launchOverlayStatsForces(CommandList &cmd, HostRingBuffer &ring, RenderPipelines &pl,
-                               const OverlayStatsForcesArgsGpu &args, int jointsAndSprings);
+                              const OverlayStatsForcesArgsGpu &args, int jointsAndSprings);
 void launchOverlayLoadClear(CommandList &cmd, HostRingBuffer &ring, RenderPipelines &pl,
-                             const OverlayLoadClearArgsGpu &args, int n);
+                            const OverlayLoadClearArgsGpu &args, int n);
 void launchOverlayLoadAccum(CommandList &cmd, HostRingBuffer &ring, RenderPipelines &pl,
-                             const OverlayLoadAccumArgsGpu &args, int slots);
+                            const OverlayLoadAccumArgsGpu &args, int slots);
 
 // the debug-draw writer ports: contact point/normal/manifold-link markers and
 // joint/spring force rods, each compacted via an atomic `counter`.
 void launchWriteDebugInstances(CommandList &cmd, HostRingBuffer &ring, RenderPipelines &pl,
-                                const WriteDebugInstancesArgsGpu &args, int slots);
+                               const WriteDebugInstancesArgsGpu &args, int slots);
 
 } // namespace avbdvk

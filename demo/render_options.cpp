@@ -129,10 +129,22 @@ void matLookAt(float out[16], vec3 eye, vec3 target, vec3 up)
     s = normalize(s);
     vec3 u = cross(s, f);
 
-    out[0] = s.x;  out[4] = s.y;  out[8] = s.z;   out[12] = -dot(s, eye);
-    out[1] = u.x;  out[5] = u.y;  out[9] = u.z;   out[13] = -dot(u, eye);
-    out[2] = -f.x; out[6] = -f.y; out[10] = -f.z; out[14] = dot(f, eye);
-    out[3] = 0;    out[7] = 0;    out[11] = 0;    out[15] = 1;
+    out[0] = s.x;
+    out[4] = s.y;
+    out[8] = s.z;
+    out[12] = -dot(s, eye);
+    out[1] = u.x;
+    out[5] = u.y;
+    out[9] = u.z;
+    out[13] = -dot(u, eye);
+    out[2] = -f.x;
+    out[6] = -f.y;
+    out[10] = -f.z;
+    out[14] = dot(f, eye);
+    out[3] = 0;
+    out[7] = 0;
+    out[11] = 0;
+    out[15] = 1;
 }
 } // namespace
 

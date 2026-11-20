@@ -35,7 +35,8 @@ namespace avbdvk
 
 struct BroadphasePipelines
 {
-    Pipeline aabbAndBin, aabbStatic, aabbBinStatic, resetRanges, cellRanges, emitPairs, emitCrossPairs, emitOversizePairs;
+    Pipeline aabbAndBin, aabbStatic, aabbBinStatic, resetRanges, cellRanges, emitPairs, emitCrossPairs,
+        emitOversizePairs;
 
     void init(Device &dev, PipelineLayout &layout, const uint32_t *spirv, size_t spirvWords);
     void destroy();
@@ -87,19 +88,15 @@ public:
     // table (see BroadphaseShapes). dynamicIdx/staticIdx list SHAPE indices -- see
     // broadphase.slang's BphBodySoA. ignore/ignoreCount: optional sorted PairKey (uint64) suppression
     // list, same contract as the reference class.
-    void build(BroadphasePipelines &pl, PrimitivesPipelines &prim, RadixScratch &radix,
-               VkDeviceAddress bodyPos, VkDeviceAddress bodyRot, const BroadphaseShapes &shapes,
-               const Buffer &dynamicIdx, int dynamicCount,
-               const Buffer &staticIdx, int staticCount,
-               float cellSize,
-               const Buffer *ignore = nullptr, int ignoreCount = 0,
-               const BroadphaseOversize *oversize = nullptr);
+    void build(BroadphasePipelines &pl, PrimitivesPipelines &prim, RadixScratch &radix, VkDeviceAddress bodyPos,
+               VkDeviceAddress bodyRot, const BroadphaseShapes &shapes, const Buffer &dynamicIdx, int dynamicCount,
+               const Buffer &staticIdx, int staticCount, float cellSize, const Buffer *ignore = nullptr,
+               int ignoreCount = 0, const BroadphaseOversize *oversize = nullptr);
 
     void record(CommandList &cmd, HostRingBuffer &ring, BroadphasePipelines &pl, PrimitivesPipelines &prim,
                 RadixScratch &radix, VkDeviceAddress bodyPos, VkDeviceAddress bodyRot, const BroadphaseShapes &shapes,
-                const Buffer &dynamicIdx, int dynamicCount, const Buffer &staticIdx, int staticCount,
-                float cellSize, const Buffer *ignore = nullptr, int ignoreCount = 0,
-                const BroadphaseOversize *oversize = nullptr);
+                const Buffer &dynamicIdx, int dynamicCount, const Buffer &staticIdx, int staticCount, float cellSize,
+                const Buffer *ignore = nullptr, int ignoreCount = 0, const BroadphaseOversize *oversize = nullptr);
     // After the recording submission has completed: reads the produced count back and
     // sets pairCount()/overflowed()/producedPairs().
     void finish();
@@ -136,10 +133,9 @@ public:
     // VkWorld::deviceBytesAllocated()'s memory gate.
     uint64_t bytesAllocated() const
     {
-        const Buffer *all[] = {&aabbMin, &aabbMax, &cellId, &hash, &hashSorted,
-                                &binBody, &binBodySorted, &cellStart, &cellEnd,
-                                &rawPairs, &sortedPairs, &m_counter,
-                                &sHash, &sHashSorted, &sBinBody, &sBinBodySorted, &sCellStart, &sCellEnd};
+        const Buffer *all[] = {&aabbMin,       &aabbMax,     &cellId,   &hash,           &hashSorted,  &binBody,
+                               &binBodySorted, &cellStart,   &cellEnd,  &rawPairs,       &sortedPairs, &m_counter,
+                               &sHash,         &sHashSorted, &sBinBody, &sBinBodySorted, &sCellStart,  &sCellEnd};
         uint64_t total = 0;
         for (const Buffer *b : all)
             total += (uint64_t)b->size();

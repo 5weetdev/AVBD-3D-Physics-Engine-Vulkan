@@ -38,8 +38,7 @@
 // catalogue entry builds its scene and then rotates it into the solver's frame; gpuScenes[]
 // therefore yields y-up content. camTargetHeight stays in the source frame, which is the
 // height along the up axis in both.
-template <SceneView (*Build)(SceneBuilder *)>
-static SceneView yUpScene(SceneBuilder *s)
+template <SceneView (*Build)(SceneBuilder *)> static SceneView yUpScene(SceneBuilder *s)
 {
     const SceneView v = Build(s);
     if (!s->keepZUpSource)
@@ -48,69 +47,24 @@ static SceneView yUpScene(SceneBuilder *s)
 }
 
 static SceneView (*gpuScenes[])(SceneBuilder *) = {
-    yUpScene<sceneEmptyGpu>,
-    yUpScene<sceneGroundGpu>,
-    yUpScene<sceneDynamicFrictionGpu>,
-    yUpScene<sceneStaticFrictionGpu>,
-    yUpScene<scenePyramidGpu>,
-    yUpScene<sceneStackGpu>,
-    yUpScene<sceneStackRatioGpu>,
-    yUpScene<sceneStackRatioDeepGpu>,
-    yUpScene<sceneFreshContactsGpu>,
-    yUpScene<sceneMassive10kGpu>,
-    yUpScene<sceneMassive100kGpu>,
-    yUpScene<sceneMassive200kGpu>,
-    yUpScene<sceneMassive400kGpu>,
-    yUpScene<sceneMassive600kGpu>,
-    yUpScene<scenePyramids10kGpu>,
-    yUpScene<scenePyramids100kGpu>,
-    yUpScene<scenePyramids200kGpu>,
-    yUpScene<scenePyramids400kGpu>,
-    yUpScene<sceneRopeGpu>,
-    yUpScene<sceneHeavyRopeGpu>,
-    yUpScene<sceneChainRatioGpu>,
-    yUpScene<sceneSpringGpu>,
-    yUpScene<sceneSpringsRatioGpu>,
-    yUpScene<sceneSoftBodyGpu>,
-    yUpScene<sceneBridgeGpu>,
-    yUpScene<sceneRoundTowers20kGpu>,
-    yUpScene<sceneSquareTowers20kGpu>,
-    yUpScene<scenePanelHouseGpu>,
-    yUpScene<sceneSkyscraperGpu>,
-    yUpScene<sceneSuspensionBridgeGpu>,
+    yUpScene<sceneEmptyGpu>,          yUpScene<sceneGroundGpu>,         yUpScene<sceneDynamicFrictionGpu>,
+    yUpScene<sceneStaticFrictionGpu>, yUpScene<scenePyramidGpu>,        yUpScene<sceneStackGpu>,
+    yUpScene<sceneStackRatioGpu>,     yUpScene<sceneStackRatioDeepGpu>, yUpScene<sceneFreshContactsGpu>,
+    yUpScene<sceneMassive10kGpu>,     yUpScene<sceneMassive100kGpu>,    yUpScene<sceneMassive200kGpu>,
+    yUpScene<sceneMassive400kGpu>,    yUpScene<sceneMassive600kGpu>,    yUpScene<scenePyramids10kGpu>,
+    yUpScene<scenePyramids100kGpu>,   yUpScene<scenePyramids200kGpu>,   yUpScene<scenePyramids400kGpu>,
+    yUpScene<sceneRopeGpu>,           yUpScene<sceneHeavyRopeGpu>,      yUpScene<sceneChainRatioGpu>,
+    yUpScene<sceneSpringGpu>,         yUpScene<sceneSpringsRatioGpu>,   yUpScene<sceneSoftBodyGpu>,
+    yUpScene<sceneBridgeGpu>,         yUpScene<sceneRoundTowers20kGpu>, yUpScene<sceneSquareTowers20kGpu>,
+    yUpScene<scenePanelHouseGpu>,     yUpScene<sceneSkyscraperGpu>,     yUpScene<sceneSuspensionBridgeGpu>,
     yUpScene<scenePassengerPlaneGpu>};
 
 static const char *gpuSceneNames[] = {
-    "Empty",
-    "Ground",
-    "Dynamic Friction",
-    "Static Friction",
-    "Pyramid",
-    "Stack",
-    "Stack Ratio",
-    "Stack Ratio Deep",
-    "Fresh Contacts",
-    "Massive 10k",
-    "Massive 100k",
-    "Massive 200k",
-    "Massive 400k",
-    "Massive 600k",
-    "Pyramids 10k",
-    "Pyramids 100k",
-    "Pyramids 200k",
-    "Pyramids 400k",
-    "Rope",
-    "Heavy Rope",
-    "Chain Ratio",
-    "Spring",
-    "Spring Ratio",
-    "Soft Body",
-    "Bridge",
-    "Round Towers 20k",
-    "Square Towers 20k",
-    "Panel House",
-    "Skyscraper",
-    "Suspension Bridge",
+    "Empty",          "Ground",           "Dynamic Friction",  "Static Friction", "Pyramid",       "Stack",
+    "Stack Ratio",    "Stack Ratio Deep", "Fresh Contacts",    "Massive 10k",     "Massive 100k",  "Massive 200k",
+    "Massive 400k",   "Massive 600k",     "Pyramids 10k",      "Pyramids 100k",   "Pyramids 200k", "Pyramids 400k",
+    "Rope",           "Heavy Rope",       "Chain Ratio",       "Spring",          "Spring Ratio",  "Soft Body",
+    "Bridge",         "Round Towers 20k", "Square Towers 20k", "Panel House",     "Skyscraper",    "Suspension Bridge",
     "Passenger Plane"};
 
 static const int gpuSceneCount = sizeof(gpuScenes) / sizeof(gpuScenes[0]);

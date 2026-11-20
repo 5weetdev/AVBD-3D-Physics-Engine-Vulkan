@@ -95,8 +95,8 @@ void MutatePipelines::destroy()
 // sleep.slang launchers
 // ---------------------------------------------------------------------------
 
-void launchActiveFlags(CommandList &cmd, HostRingBuffer &ring, SleepPipelines &pl,
-                        const ActiveFlagsArgsGpu &args, int dynCount)
+void launchActiveFlags(CommandList &cmd, HostRingBuffer &ring, SleepPipelines &pl, const ActiveFlagsArgsGpu &args,
+                       int dynCount)
 {
     uint32_t groups = ceilDiv(dynCount, 256);
     if (groups == 0)
@@ -188,8 +188,8 @@ void launchWakeDetect(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl,
     }
 }
 
-void launchWakeIslandSeed(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl,
-                           const WakeIslandSeedArgsGpu &args, int dynCount)
+void launchWakeIslandSeed(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl, const WakeIslandSeedArgsGpu &args,
+                          int dynCount)
 {
     uint32_t groups = ceilDiv(dynCount, 256);
     if (groups == 0)
@@ -198,8 +198,8 @@ void launchWakeIslandSeed(CommandList &cmd, HostRingBuffer &ring, WakePipelines 
     cmd.dispatch(pl.wakeIslandSeed, groups, a);
 }
 
-void launchWakeApply(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl,
-                      const WakeApplyArgsGpu &args, int dynCount)
+void launchWakeApply(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl, const WakeApplyArgsGpu &args,
+                     int dynCount)
 {
     uint32_t groups = ceilDiv(dynCount, 256);
     if (groups == 0)
@@ -208,8 +208,7 @@ void launchWakeApply(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl,
     cmd.dispatch(pl.wakeApply, groups, a);
 }
 
-void launchWakeAll(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl,
-                    const WakeAllArgsGpu &args, int dynCount)
+void launchWakeAll(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl, const WakeAllArgsGpu &args, int dynCount)
 {
     uint32_t groups = ceilDiv(dynCount, 256);
     if (groups == 0)
@@ -222,8 +221,8 @@ void launchWakeAll(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl,
 // mutate.slang launchers
 // ---------------------------------------------------------------------------
 
-void launchMutateApply(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl,
-                        const MutateApplyArgsGpu &args, int count)
+void launchMutateApply(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl, const MutateApplyArgsGpu &args,
+                       int count)
 {
     uint32_t groups = ceilDiv(count, 256);
     if (groups == 0)
@@ -232,8 +231,8 @@ void launchMutateApply(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &
     cmd.dispatch(pl.mutateApply, groups, a);
 }
 
-void launchJointWrite(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl,
-                      const JointWriteArgsGpu &args, int count)
+void launchJointWrite(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl, const JointWriteArgsGpu &args,
+                      int count)
 {
     uint32_t groups = ceilDiv(count, 64);
     if (groups == 0)
@@ -243,7 +242,7 @@ void launchJointWrite(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &p
 }
 
 void launchWakeSeedRegion(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl,
-                           const WakeSeedRegionArgsGpu &args, int dynCount)
+                          const WakeSeedRegionArgsGpu &args, int dynCount)
 {
     uint32_t groups = ceilDiv(dynCount, 256);
     if (groups == 0)
@@ -253,7 +252,7 @@ void launchWakeSeedRegion(CommandList &cmd, HostRingBuffer &ring, MutatePipeline
 }
 
 void launchWakeFloodJoints(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl,
-                            const WakeFloodJointsArgsGpu &args, int edgeCount)
+                           const WakeFloodJointsArgsGpu &args, int edgeCount)
 {
     uint32_t groups = ceilDiv(edgeCount, 256);
     if (groups == 0)
@@ -262,8 +261,8 @@ void launchWakeFloodJoints(CommandList &cmd, HostRingBuffer &ring, MutatePipelin
     cmd.dispatch(pl.wakeFloodJoints, groups, a);
 }
 
-void launchWakeSeedMerge(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl,
-                          const WakeSeedMergeArgsGpu &args, int dynCount)
+void launchWakeSeedMerge(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl, const WakeSeedMergeArgsGpu &args,
+                         int dynCount)
 {
     uint32_t groups = ceilDiv(dynCount, 256);
     if (groups == 0)
@@ -273,8 +272,8 @@ void launchWakeSeedMerge(CommandList &cmd, HostRingBuffer &ring, MutatePipelines
 }
 
 void recordWakeFloodRounds(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl,
-                           WakeFloodContactsArgsGpu contactsArgs, WakeFloodJointsArgsGpu jointsArgs,
-                           int slots, int edgeCount, VkDeviceAddress changedSlots, int firstRound, int count)
+                           WakeFloodContactsArgsGpu contactsArgs, WakeFloodJointsArgsGpu jointsArgs, int slots,
+                           int edgeCount, VkDeviceAddress changedSlots, int firstRound, int count)
 {
     for (int r = 0; r < count; r++)
     {
@@ -295,8 +294,8 @@ void recordWakeFloodRounds(CommandList &cmd, HostRingBuffer &ring, MutatePipelin
     }
 }
 
-void launchBodyGather(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl,
-                       const BodyGatherArgsGpu &args, int count)
+void launchBodyGather(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl, const BodyGatherArgsGpu &args,
+                      int count)
 {
     uint32_t groups = ceilDiv(count, 256);
     if (groups == 0)
@@ -311,11 +310,9 @@ void launchBodyGather(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &p
 // JP coloring -- this loop's unit of work is fixed at "one round" per readback check,
 // matching the reference source exactly rather than growing a batch).
 void launchWakeFlood(Device &dev, MutatePipelines &mutPl, WakePipelines &wakePl,
-                      const WakeFloodContactsArgsGpu &contactsArgs,
-                      const WakeFloodJointsArgsGpu &jointsArgs,
-                      const WakeSeedMergeArgsGpu &mergeArgs,
-                      int slots, int edgeCount, int dynCount,
-                      Buffer &floodChanged)
+                     const WakeFloodContactsArgsGpu &contactsArgs, const WakeFloodJointsArgsGpu &jointsArgs,
+                     const WakeSeedMergeArgsGpu &mergeArgs, int slots, int edgeCount, int dynCount,
+                     Buffer &floodChanged)
 {
     (void)wakePl; // reserved: flood kernels live in MutatePipelines, not WakePipelines
 

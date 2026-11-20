@@ -57,14 +57,14 @@ struct SolverParams
     // of solving every dynamic body every step.
     // sleepEnabled is the master switch, separate from sleepFrames so the UI can flip
     // deactivation off and back on without losing the tuned window length.
-    bool sleepEnabled;  // Master switch; false solves every dynamic body every step
-    int sleepFrames;    // Consecutive quiet steps before a body may sleep
-    float sleepLinVel;  // Linear speed above which a step is disqualified outright
-    float sleepAngVel;  // Angular speed above which a step is disqualified outright
+    bool sleepEnabled; // Master switch; false solves every dynamic body every step
+    int sleepFrames;   // Consecutive quiet steps before a body may sleep
+    float sleepLinVel; // Linear speed above which a step is disqualified outright
+    float sleepAngVel; // Angular speed above which a step is disqualified outright
     // Net displacement allowed over the whole sleepFrames window. This, not the
     // velocity pair above, is what actually decides rest: the velocity test is only a
     // fast reject for bodies that are unambiguously moving.
-    float sleepDisp;    // Metres of net movement allowed across the rest window
+    float sleepDisp; // Metres of net movement allowed across the rest window
     // Leaky streak. 0 = classic: one fast step resets the
     // quiet-step count. > 0: the point-speed metric d = |v| + r|w| against e = 2*sleepLinVel;
     // a step with d > e costs leak*d/e steps of progress instead of all of them.
@@ -79,7 +79,6 @@ struct SolverParams
     // generalized inverse mass. Only affects contacts with no warm start to inherit.
     // See DUAL_STEP_CONTROL_PLAN.md for the measurements behind this being on.
     bool autoKStart;
-
 
     // Dual damping strength, in [0, 1] (default `0.1`). Scales back the contact dual
     // warm start in proportion to how far that contact's penalty has been ramped above
@@ -265,7 +264,8 @@ inline SolverParams defaultSolverParams()
     // sleep" switch, so this is a starting point to tune against a scene rather than a
     // measured optimum. See k_sleep_mark for why net displacement is the right quantity
     // regardless of where the threshold is set.
-    params.sleepDisp = 0.005f; // 2026-10: 0.001 kept 85-45% of Pyramids 10k awake at 900 steps (8/12 it); 0.005 sleeps all, same height
+    params.sleepDisp =
+        0.005f; // 2026-10: 0.001 kept 85-45% of Pyramids 10k awake at 900 steps (8/12 it); 0.005 sleeps all, same height
     params.sleepLeak = 0.0f;
 
     // 80% of the fracture load. Below this a joint has enough headroom that it is not

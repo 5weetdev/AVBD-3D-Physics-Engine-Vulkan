@@ -11,16 +11,16 @@
 #include <cstdio>
 
 static int g_fail = 0;
-#define CHECK(cond, ...)                                                                                              \
-    do                                                                                                                \
-    {                                                                                                                 \
-        if (!(cond))                                                                                                  \
-        {                                                                                                             \
-            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                               \
-            std::printf(__VA_ARGS__);                                                                                 \
-            std::printf("\n");                                                                                        \
-            g_fail++;                                                                                                 \
-        }                                                                                                             \
+#define CHECK(cond, ...)                                                                                               \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        if (!(cond))                                                                                                   \
+        {                                                                                                              \
+            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                                \
+            std::printf(__VA_ARGS__);                                                                                  \
+            std::printf("\n");                                                                                         \
+            g_fail++;                                                                                                  \
+        }                                                                                                              \
     } while (0)
 
 static Avbd3dBodyId makeBox(Avbd3dWorld *w, Avbd3dBodyType type, Avbd3dVec3 p, float h = 0.5f)

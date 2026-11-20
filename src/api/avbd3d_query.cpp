@@ -35,8 +35,14 @@ namespace
 {
 constexpr int kMaxPlanesPerShape = 64;
 
-b3Vec3 toB(avbd3d_Vec3 v) { return b3Vec3{v.x, v.y, v.z}; }
-avbd3d_Vec3 fromB(b3Vec3 v) { return avbd3d_Vec3{v.x, v.y, v.z}; }
+b3Vec3 toB(avbd3d_Vec3 v)
+{
+    return b3Vec3{v.x, v.y, v.z};
+}
+avbd3d_Vec3 fromB(b3Vec3 v)
+{
+    return avbd3d_Vec3{v.x, v.y, v.z};
+}
 
 // Box3D's shape filter rule: the shape and the query must each accept the other.
 // Sensors are invisible to queries, as in Box3D.
@@ -60,16 +66,16 @@ b3CastOutput rayCastLocal(const ShapeRec &r, const b3RayCastInput &in)
     const b3Mesh meshView = r.geom.mesh ? r.geom.meshView() : b3Mesh{nullptr, b3Vec3{1.0f, 1.0f, 1.0f}};
     switch (r.type)
     {
-        case avbd3d_sphereShape:
-            return b3RayCastSphere(&r.geom.sphere, &in);
-        case avbd3d_capsuleShape:
-            return b3RayCastCapsule(&r.geom.capsule, &in);
-        case avbd3d_meshShape:
-            return b3RayCastMesh(&meshView, &in);
-        case avbd3d_heightShape:
-            return b3RayCastHeightField(r.geom.heightField.get(), &in);
-        default:
-            return b3RayCastHull(r.geom.hullData(), &in);
+    case avbd3d_sphereShape:
+        return b3RayCastSphere(&r.geom.sphere, &in);
+    case avbd3d_capsuleShape:
+        return b3RayCastCapsule(&r.geom.capsule, &in);
+    case avbd3d_meshShape:
+        return b3RayCastMesh(&meshView, &in);
+    case avbd3d_heightShape:
+        return b3RayCastHeightField(r.geom.heightField.get(), &in);
+    default:
+        return b3RayCastHull(r.geom.hullData(), &in);
     }
 }
 
@@ -78,16 +84,16 @@ b3CastOutput shapeCastLocal(const ShapeRec &r, const b3ShapeCastInput &in)
     const b3Mesh meshView = r.geom.mesh ? r.geom.meshView() : b3Mesh{nullptr, b3Vec3{1.0f, 1.0f, 1.0f}};
     switch (r.type)
     {
-        case avbd3d_sphereShape:
-            return b3ShapeCastSphere(&r.geom.sphere, &in);
-        case avbd3d_capsuleShape:
-            return b3ShapeCastCapsule(&r.geom.capsule, &in);
-        case avbd3d_meshShape:
-            return b3ShapeCastMesh(&meshView, &in);
-        case avbd3d_heightShape:
-            return b3ShapeCastHeightField(r.geom.heightField.get(), &in);
-        default:
-            return b3ShapeCastHull(r.geom.hullData(), &in);
+    case avbd3d_sphereShape:
+        return b3ShapeCastSphere(&r.geom.sphere, &in);
+    case avbd3d_capsuleShape:
+        return b3ShapeCastCapsule(&r.geom.capsule, &in);
+    case avbd3d_meshShape:
+        return b3ShapeCastMesh(&meshView, &in);
+    case avbd3d_heightShape:
+        return b3ShapeCastHeightField(r.geom.heightField.get(), &in);
+    default:
+        return b3ShapeCastHull(r.geom.hullData(), &in);
     }
 }
 
@@ -96,16 +102,16 @@ bool overlapLocal(const ShapeRec &r, b3Transform xf, const b3ShapeProxy *proxy)
     const b3Mesh meshView = r.geom.mesh ? r.geom.meshView() : b3Mesh{nullptr, b3Vec3{1.0f, 1.0f, 1.0f}};
     switch (r.type)
     {
-        case avbd3d_sphereShape:
-            return b3OverlapSphere(&r.geom.sphere, xf, proxy);
-        case avbd3d_capsuleShape:
-            return b3OverlapCapsule(&r.geom.capsule, xf, proxy);
-        case avbd3d_meshShape:
-            return b3OverlapMesh(&meshView, xf, proxy);
-        case avbd3d_heightShape:
-            return b3OverlapHeightField(r.geom.heightField.get(), xf, proxy);
-        default:
-            return b3OverlapHull(r.geom.hullData(), xf, proxy);
+    case avbd3d_sphereShape:
+        return b3OverlapSphere(&r.geom.sphere, xf, proxy);
+    case avbd3d_capsuleShape:
+        return b3OverlapCapsule(&r.geom.capsule, xf, proxy);
+    case avbd3d_meshShape:
+        return b3OverlapMesh(&meshView, xf, proxy);
+    case avbd3d_heightShape:
+        return b3OverlapHeightField(r.geom.heightField.get(), xf, proxy);
+    default:
+        return b3OverlapHull(r.geom.hullData(), xf, proxy);
     }
 }
 
@@ -113,19 +119,19 @@ int collideMoverLocal(const ShapeRec &r, b3PlaneResult *out, const b3Capsule *mo
 {
     switch (r.type)
     {
-        case avbd3d_sphereShape:
-            return b3CollideMoverAndSphere(out, &r.geom.sphere, mover);
-        case avbd3d_capsuleShape:
-            return b3CollideMoverAndCapsule(out, &r.geom.capsule, mover);
-        case avbd3d_meshShape:
-        {
-            const b3Mesh meshView = r.geom.meshView();
-            return b3CollideMoverAndMesh(out, kMaxPlanesPerShape, &meshView, mover);
-        }
-        case avbd3d_heightShape:
-            return b3CollideMoverAndHeightField(out, kMaxPlanesPerShape, r.geom.heightField.get(), mover);
-        default:
-            return b3CollideMoverAndHull(out, r.geom.hullData(), mover);
+    case avbd3d_sphereShape:
+        return b3CollideMoverAndSphere(out, &r.geom.sphere, mover);
+    case avbd3d_capsuleShape:
+        return b3CollideMoverAndCapsule(out, &r.geom.capsule, mover);
+    case avbd3d_meshShape:
+    {
+        const b3Mesh meshView = r.geom.meshView();
+        return b3CollideMoverAndMesh(out, kMaxPlanesPerShape, &meshView, mover);
+    }
+    case avbd3d_heightShape:
+        return b3CollideMoverAndHeightField(out, kMaxPlanesPerShape, r.geom.heightField.get(), mover);
+    default:
+        return b3CollideMoverAndHull(out, r.geom.hullData(), mover);
     }
 }
 
@@ -133,16 +139,16 @@ b3AABB shapeAABB(const ShapeRec &r, b3Transform xf)
 {
     switch (r.type)
     {
-        case avbd3d_sphereShape:
-            return b3ComputeSphereAABB(&r.geom.sphere, xf);
-        case avbd3d_capsuleShape:
-            return b3ComputeCapsuleAABB(&r.geom.capsule, xf);
-        case avbd3d_meshShape:
-            return b3ComputeMeshAABB(r.geom.mesh.get(), xf, b3Vec3{1.0f, 1.0f, 1.0f});
-        case avbd3d_heightShape:
-            return b3ComputeHeightFieldAABB(r.geom.heightField.get(), xf);
-        default:
-            return b3ComputeHullAABB(r.geom.hullData(), xf);
+    case avbd3d_sphereShape:
+        return b3ComputeSphereAABB(&r.geom.sphere, xf);
+    case avbd3d_capsuleShape:
+        return b3ComputeCapsuleAABB(&r.geom.capsule, xf);
+    case avbd3d_meshShape:
+        return b3ComputeMeshAABB(r.geom.mesh.get(), xf, b3Vec3{1.0f, 1.0f, 1.0f});
+    case avbd3d_heightShape:
+        return b3ComputeHeightFieldAABB(r.geom.heightField.get(), xf);
+    default:
+        return b3ComputeHullAABB(r.geom.hullData(), xf);
     }
 }
 
@@ -214,8 +220,8 @@ float rayCastCallback(const b3RayCastInput *input, int, uint64_t userData, void 
         return input->maxFraction;
 
     const avbd3d_WorldCastOutput w = toWorldOutput(out, c.origin, xf);
-    return c.fcn(c.w->shapeId(s), w.point, w.normal, w.fraction, r.material.userMaterialId, w.triangleIndex, w.childIndex,
-                 c.user);
+    return c.fcn(c.w->shapeId(s), w.point, w.normal, w.fraction, r.material.userMaterialId, w.triangleIndex,
+                 w.childIndex, c.user);
 }
 
 struct ClosestCtx
@@ -292,8 +298,8 @@ float shapeCastCallback(const b3BoxCastInput *input, int, uint64_t userData, voi
         return input->maxFraction;
 
     const avbd3d_WorldCastOutput w = toWorldOutput(out, c.origin, xf);
-    return c.fcn(c.w->shapeId(s), w.point, w.normal, w.fraction, r.material.userMaterialId, w.triangleIndex, w.childIndex,
-                 c.user);
+    return c.fcn(c.w->shapeId(s), w.point, w.normal, w.fraction, r.material.userMaterialId, w.triangleIndex,
+                 w.childIndex, c.user);
 }
 
 // ---- mover cast (capsule swept through the tree; Box3D MoverCastCallback)
@@ -322,7 +328,8 @@ float moverCastCallback(const b3BoxCastInput *input, int, uint64_t userData, voi
         return c.fraction;
 
     const b3Transform xf = relTransform(*c.w, s, c.origin);
-    const b3Vec3 pts[2] = {b3InvTransformPoint(xf, toB(c.mover->center1)), b3InvTransformPoint(xf, toB(c.mover->center2))};
+    const b3Vec3 pts[2] = {b3InvTransformPoint(xf, toB(c.mover->center1)),
+                           b3InvTransformPoint(xf, toB(c.mover->center2))};
     b3ShapeCastInput local;
     local.proxy.points = pts;
     local.proxy.count = 2;
@@ -449,7 +456,8 @@ bool drawCallback(int, uint64_t userData, void *ctx)
         return true;
 
     const b3Transform xf = c.w->shapeWorldTransform(s);
-    const avbd3d_HexColor color = c.w->bodies[r.body].type == avbd3d_staticBody ? avbd3d_colorDimGray : avbd3d_colorWhite;
+    const avbd3d_HexColor color =
+        c.w->bodies[r.body].type == avbd3d_staticBody ? avbd3d_colorDimGray : avbd3d_colorWhite;
     if (c.draw->drawShapes && c.draw->DrawShapeFcn)
     {
         avbd3d_WorldTransform t{fromB(xf.p), avbd3d_Quat{fromB(xf.q.v), xf.q.s}};
@@ -459,7 +467,8 @@ bool drawCallback(int, uint64_t userData, void *ctx)
     if (c.draw->drawBounds && c.draw->DrawBoundsFcn)
     {
         const b3AABB box = shapeAABB(r, xf);
-        c.draw->DrawBoundsFcn(avbd3d_AABB{fromB(box.lowerBound), fromB(box.upperBound)}, avbd3d_colorYellow, c.draw->context);
+        c.draw->DrawBoundsFcn(avbd3d_AABB{fromB(box.lowerBound), fromB(box.upperBound)}, avbd3d_colorYellow,
+                              c.draw->context);
     }
     return true;
 }
@@ -545,8 +554,9 @@ avbd3d_TreeStats avbd3d_World_OverlapShape(avbd3d_WorldId worldId, avbd3d_Pos or
     return toStats(b3DynamicTree_Query(&w->queryTree(), box, filter.maskBits, false, overlapShapeCallback, &ctx));
 }
 
-float avbd3d_World_CastMover(avbd3d_WorldId worldId, avbd3d_Pos origin, const avbd3d_Capsule *mover, avbd3d_Vec3 translation,
-                             avbd3d_QueryFilter filter, avbd3d_MoverFilterFcn *fcn, void *context)
+float avbd3d_World_CastMover(avbd3d_WorldId worldId, avbd3d_Pos origin, const avbd3d_Capsule *mover,
+                             avbd3d_Vec3 translation, avbd3d_QueryFilter filter, avbd3d_MoverFilterFcn *fcn,
+                             void *context)
 {
     World *w = settled(worldId);
     if (!w || !mover)
@@ -663,7 +673,10 @@ float proxyRadius(const ShapeRec &r)
     return 0.0f;
 }
 
-vec3 toVv(b3Vec3 v) { return vec3{v.x, v.y, v.z}; }
+vec3 toVv(b3Vec3 v)
+{
+    return vec3{v.x, v.y, v.z};
+}
 
 // Box3D's sensor visitor rules (b3SensorQueryCallback in external/box3d/src/sensor.c): the
 // visitor is not the sensor, is not on the sensor's body, has enableSensorEvents, passes the
@@ -816,9 +829,11 @@ void World::collectSensors()
         std::set_difference(now.begin(), now.end(), sr.overlaps.begin(), sr.overlaps.end(), std::back_inserter(begun));
         std::set_difference(sr.overlaps.begin(), sr.overlaps.end(), now.begin(), now.end(), std::back_inserter(ended));
         for (uint64_t k : begun)
-            sensorBegin.push_back(avbd3d_SensorBeginTouchEvent{shapeIdAt(s, sr.gen), shapeIdAt((int)(k >> 16), (uint16_t)(k & 0xFFFFu))});
+            sensorBegin.push_back(
+                avbd3d_SensorBeginTouchEvent{shapeIdAt(s, sr.gen), shapeIdAt((int)(k >> 16), (uint16_t)(k & 0xFFFFu))});
         for (uint64_t k : ended)
-            sensorEnd.push_back(avbd3d_SensorEndTouchEvent{shapeIdAt(s, sr.gen), shapeIdAt((int)(k >> 16), (uint16_t)(k & 0xFFFFu))});
+            sensorEnd.push_back(
+                avbd3d_SensorEndTouchEvent{shapeIdAt(s, sr.gen), shapeIdAt((int)(k >> 16), (uint16_t)(k & 0xFFFFu))});
         sr.overlaps.swap(now);
     }
 }
@@ -827,7 +842,8 @@ void World::explode(const avbd3d_ExplosionDef &def)
 {
     const float extent = def.radius + def.falloff;
     const b3Vec3 p = toB(def.position);
-    const b3AABB box{b3Vec3{p.x - extent, p.y - extent, p.z - extent}, b3Vec3{p.x + extent, p.y + extent, p.z + extent}};
+    const b3AABB box{b3Vec3{p.x - extent, p.y - extent, p.z - extent},
+                     b3Vec3{p.x + extent, p.y + extent, p.z + extent}};
     ExplodeCtx ctx{this, p, def.radius, def.falloff, def.impulsePerArea};
     b3DynamicTree_Query(&queryTree(), box, def.maskBits, false, explodeCallback, &ctx);
 }
@@ -874,7 +890,8 @@ bool convexShape(const ShapeRec &r)
 } // namespace
 
 avbd3d_BodyCastResult avbd3d_Body_CastRay(avbd3d_BodyId bodyId, avbd3d_Pos origin, avbd3d_Vec3 translation,
-                                          avbd3d_QueryFilter filter, float maxFraction, avbd3d_WorldTransform bodyTransform)
+                                          avbd3d_QueryFilter filter, float maxFraction,
+                                          avbd3d_WorldTransform bodyTransform)
 {
     avbd3d_BodyCastResult result{};
     int b = -1;
@@ -953,8 +970,9 @@ bool avbd3d_Body_OverlapShape(avbd3d_BodyId bodyId, avbd3d_Pos origin, const avb
     return false;
 }
 
-int avbd3d_Body_CollideMover(avbd3d_BodyId bodyId, avbd3d_BodyPlaneResult *bodyPlanes, int planeCapacity, avbd3d_Pos origin,
-                             const avbd3d_Capsule *mover, avbd3d_QueryFilter filter, avbd3d_WorldTransform bodyTransform)
+int avbd3d_Body_CollideMover(avbd3d_BodyId bodyId, avbd3d_BodyPlaneResult *bodyPlanes, int planeCapacity,
+                             avbd3d_Pos origin, const avbd3d_Capsule *mover, avbd3d_QueryFilter filter,
+                             avbd3d_WorldTransform bodyTransform)
 {
     int b = -1;
     World *w = worldOfBody(bodyId, b);

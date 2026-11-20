@@ -11,8 +11,14 @@
 namespace
 {
 
-Avbd3dVec3 v3(const vec3 &v) { return Avbd3dVec3{v.x, v.y, v.z}; }
-Avbd3dQuat q4(const quat &q) { return Avbd3dQuat{Avbd3dVec3{q.x, q.y, q.z}, q.w}; }
+Avbd3dVec3 v3(const vec3 &v)
+{
+    return Avbd3dVec3{v.x, v.y, v.z};
+}
+Avbd3dQuat q4(const quat &q)
+{
+    return Avbd3dQuat{Avbd3dVec3{q.x, q.y, q.z}, q.w};
+}
 
 // A failed create leaves the id null; the demo reports it and carries on.
 void must(Avbd3dResult r, const char *what)
@@ -92,14 +98,16 @@ void SceneImport::importTail(Avbd3dWorld *w, const SceneDesc &d)
     }
 
     // Is a pair in the desc's ignore list (jointed neighbours and ignoreCollision)?
-    const auto ignored = [&](int a, int b) {
+    const auto ignored = [&](int a, int b)
+    {
         if (a < 0 || b < 0)
             return false;
         return std::binary_search(d.ignorePairs.begin(), d.ignorePairs.end(), pairKey(a, b));
     };
     // A joint or spring between two bodies collides unless the desc ignores the pair; the API
     // then adds the same ignore, so the pair needs no filter joint below.
-    const auto baseOf = [&](Avbd3dJointDef &base, int a, int b) {
+    const auto baseOf = [&](Avbd3dJointDef &base, int a, int b)
+    {
         base.bodyIdA = body(a);
         base.bodyIdB = body(b);
         base.collideConnected = a >= 0 && b >= 0 && !ignored(a, b);
@@ -124,8 +132,8 @@ void SceneImport::importTail(Avbd3dWorld *w, const SceneDesc &d)
             jd.base.localFrameA.q = q4(d.jointFrameA[j]);
             jd.base.localFrameB.q = q4(d.jointFrameB[j]);
             for (int k = 0; k < 6; k++)
-                jd.axes[k] = Avbd3dGenericAxis{d.jointAxisMode[j * 6 + k], d.jointAxisLo[j * 6 + k],
-                                               d.jointAxisHi[j * 6 + k]};
+                jd.axes[k] =
+                    Avbd3dGenericAxis{d.jointAxisMode[j * 6 + k], d.jointAxisLo[j * 6 + k], d.jointAxisHi[j * 6 + k]};
         }
         Avbd3dJointId jid{};
         must(avbd3d_create_generic_joint(w, &jd, &jid), "create_generic_joint");

@@ -22,9 +22,9 @@
 // in the shaders, repeated here so a caller does not have to include them.
 struct JointAxis
 {
-    int mode = 0;    // JointAxisFree
-    float lo = 0.0f; // limit low / motor target / spring target
-    float hi = 0.0f; // limit high / motor max force / spring stiffness
+    int mode = 0;         // JointAxisFree
+    float lo = 0.0f;      // limit low / motor target / spring target
+    float hi = 0.0f;      // limit high / motor max force / spring stiffness
     float damping = 0.0f; // spring damping ratio zeta (SPRING / SPRING_F only), 1/16 steps up to 1.94
 };
 
@@ -66,11 +66,11 @@ struct JointDesc
 enum OverlayMode
 {
     OVERLAY_NONE = 0,
-    OVERLAY_SLEEP,       // asleep vs awake, with the settling countdown as a gradient
-    OVERLAY_GRID,        // broadphase hash grid: one hue per occupied cell
-    OVERLAY_GRAPH_COLOR, // graph coloring, i.e. the parallel batches of the primal solve
-    OVERLAY_LOAD,        // peak contact normal force on the body: the force chains
-    OVERLAY_SPEED,       // linear speed
+    OVERLAY_SLEEP,        // asleep vs awake, with the settling countdown as a gradient
+    OVERLAY_GRID,         // broadphase hash grid: one hue per occupied cell
+    OVERLAY_GRAPH_COLOR,  // graph coloring, i.e. the parallel batches of the primal solve
+    OVERLAY_LOAD,         // peak contact normal force on the body: the force chains
+    OVERLAY_SPEED,        // linear speed
     OVERLAY_DEGREE,       // number of bodies this one is touching
     OVERLAY_JOINT_DEGREE, // number of unbroken joints and springs attached to this body
     OVERLAY_JOINT_LOAD,   // worst connected joint load, signed: compression vs tension
@@ -123,10 +123,10 @@ enum ContactTint
 // grows no buffer -- the whole feature is one `if` on the render path.
 struct DebugDrawOptions
 {
-    bool contactPoints = false;   // a small cube at each contact point
-    bool contactNormals = false;  // a needle along the contact normal, scaled by force
-    bool manifoldLinks = false;   // a rod joining the centres of each touching pair
-    bool jointLoadRods = false;   // recolour the joint rods by signed axial load
+    bool contactPoints = false;  // a small cube at each contact point
+    bool contactNormals = false; // a needle along the contact normal, scaled by force
+    bool manifoldLinks = false;  // a rod joining the centres of each touching pair
+    bool jointLoadRods = false;  // recolour the joint rods by signed axial load
 
     ContactTint contactTint = CONTACT_TINT_FORCE;
 
@@ -148,8 +148,8 @@ struct DebugDrawOptions
 // the separate, destructive threshold).
 enum JointEventBits
 {
-    JOINT_EVENT_FORCE = 1,  // |force| > the joint's force threshold
-    JOINT_EVENT_TORQUE = 2  // |torque| > the joint's torque threshold
+    JOINT_EVENT_FORCE = 1, // |force| > the joint's force threshold
+    JOINT_EVENT_TORQUE = 2 // |torque| > the joint's torque threshold
 };
 
 struct JointForce
@@ -192,8 +192,8 @@ struct BodyTransform
 // default never reads or dispatches anything for it.
 enum BodyPropFlags : unsigned
 {
-    BODY_KINEMATIC = 1u,    // infinite mass, moved by its own velocity, not solved
-    BODY_NO_SLEEP = 2u,     // never fall asleep (sleep test only)
+    BODY_KINEMATIC = 1u, // infinite mass, moved by its own velocity, not solved
+    BODY_NO_SLEEP = 2u,  // never fall asleep (sleep test only)
     BODY_LOCK_LIN_X = 4u,
     BODY_LOCK_LIN_Y = 8u,
     BODY_LOCK_LIN_Z = 16u,
@@ -201,7 +201,7 @@ enum BodyPropFlags : unsigned
     BODY_LOCK_ANG_Y = 64u,
     BODY_LOCK_ANG_Z = 128u,
     BODY_LOCK_ANY = 4u | 8u | 16u | 32u | 64u | 128u,
-    BODY_BULLET = 256u,     // swept against non-bullet dynamics too (ccd.slang)
+    BODY_BULLET = 256u, // swept against non-bullet dynamics too (ccd.slang)
 };
 
 // How two bodies' friction coefficients combine; a pair uses the larger enum value of
@@ -217,29 +217,29 @@ enum FrictionMix : unsigned
 
 struct BodyProps
 {
-    float linearDamping = 0.0f;   // v *= 1/(1+dt*c) before the inertial target
+    float linearDamping = 0.0f; // v *= 1/(1+dt*c) before the inertial target
     float angularDamping = 0.0f;
     float gravityScale = 1.0f;
-    float maxLinearSpeed = 0.0f;  // m/s, 0 = no clamp
-    float sleepThreshold = 0.0f;  // m/s, 0 = SolverParams.sleepLinVel/AngVel
-    unsigned flags = 0;           // BodyPropFlags
-    float tangentSpeed = 0.0f;    // conveyor surface velocity in the body frame, m/s: x
+    float maxLinearSpeed = 0.0f;    // m/s, 0 = no clamp
+    float sleepThreshold = 0.0f;    // m/s, 0 = SolverParams.sleepLinVel/AngVel
+    unsigned flags = 0;             // BodyPropFlags
+    float tangentSpeed = 0.0f;      // conveyor surface velocity in the body frame, m/s: x
     float rollingResistance = 0.0f; // bound = rr * |Fn| on the contact rolling torque
-    unsigned userMaterialId = 0;  // passed through to manifolds, never read by the solver
-    unsigned frictionMix = 0;     // FrictionMix
-    float restitution = 0.0f;     // bounce, max of the pair; > 0 turns on restitution.slang
-    float tangentY = 0.0f;        // ... y of the body-frame belt velocity
-    float tangentZ = 0.0f;        // ... z of the body-frame belt velocity
+    unsigned userMaterialId = 0;    // passed through to manifolds, never read by the solver
+    unsigned frictionMix = 0;       // FrictionMix
+    float restitution = 0.0f;       // bounce, max of the pair; > 0 turns on restitution.slang
+    float tangentY = 0.0f;          // ... y of the body-frame belt velocity
+    float tangentZ = 0.0f;          // ... z of the body-frame belt velocity
     unsigned _pad = 0;
 };
 static_assert(sizeof(BodyProps) == 56, "BodyProps mirrors types.slang BodyProps");
 
 inline bool bodyPropsDefault(const BodyProps &p)
 {
-    return p.linearDamping == 0.0f && p.angularDamping == 0.0f && p.gravityScale == 1.0f &&
-           p.maxLinearSpeed == 0.0f && p.sleepThreshold == 0.0f && p.flags == 0 &&
-           p.tangentSpeed == 0.0f && p.tangentY == 0.0f && p.tangentZ == 0.0f && p.rollingResistance == 0.0f && p.userMaterialId == 0 &&
-           p.frictionMix == 0 && p.restitution == 0.0f;
+    return p.linearDamping == 0.0f && p.angularDamping == 0.0f && p.gravityScale == 1.0f && p.maxLinearSpeed == 0.0f &&
+           p.sleepThreshold == 0.0f && p.flags == 0 && p.tangentSpeed == 0.0f && p.tangentY == 0.0f &&
+           p.tangentZ == 0.0f && p.rollingResistance == 0.0f && p.userMaterialId == 0 && p.frictionMix == 0 &&
+           p.restitution == 0.0f;
 }
 
 // BodyWrite::Target payload: move a kinematic body to this pose over dt.

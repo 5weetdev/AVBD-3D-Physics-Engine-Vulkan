@@ -19,13 +19,19 @@ void VkCcd::init(Device &dev, PipelineLayout &layout)
     flag.init(dev, layout, ccd_spirv, ccd_spirv_words, "csCcdFlag", "csCcdFlag");
     toi.init(dev, layout, ccd_spirv, ccd_spirv_words, "csCcdToi", "csCcdToi");
     apply.init(dev, layout, ccd_spirv, ccd_spirv_words, "csCcdApply", "csCcdApply");
-    list.init(dev); counter.init(dev); frac.init(dev); scratch.init(dev);
+    list.init(dev);
+    counter.init(dev);
+    frac.init(dev);
+    scratch.init(dev);
     m_init = true;
 }
 
 void VkCcd::release()
 {
-    list.destroy(); counter.destroy(); frac.destroy(); scratch.destroy();
+    list.destroy();
+    counter.destroy();
+    frac.destroy();
+    scratch.destroy();
     m_fracBytes = 0;
 }
 
@@ -34,7 +40,9 @@ void VkCcd::destroy()
     if (!m_init)
         return;
     release();
-    flag.destroy(); toi.destroy(); apply.destroy();
+    flag.destroy();
+    toi.destroy();
+    apply.destroy();
     m_init = false;
 }
 

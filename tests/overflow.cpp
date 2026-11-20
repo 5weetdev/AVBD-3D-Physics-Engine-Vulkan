@@ -104,7 +104,8 @@ Run runSceneByName(VkWorld &w, const Overrides &o, const char *name, bool sleep,
 {
     Run run;
     w.setDebugOverrides(o);
-    SceneBuilder author; author.params.gravity = vec3{0.0f, 0.0f, -10.0f};
+    SceneBuilder author;
+    author.params.gravity = vec3{0.0f, 0.0f, -10.0f};
     gpuScenes[findScene(name)](&author);
     author.params.sleepEnabled = sleep;
     const SceneDesc desc = author.finalize();
@@ -124,7 +125,8 @@ Run runTower(VkWorld &w, const Overrides &o)
     p.dt = 1.0f / 60.0f;
     p.sleepEnabled = true;
     const int layers = 24;
-    SceneBuilder s; s.params.gravity = vec3{0.0f, 0.0f, -10.0f};
+    SceneBuilder s;
+    s.params.gravity = vec3{0.0f, 0.0f, -10.0f};
     s.clear();
     s.addBody(vec3{40, 40, 1}, 0.0f, 0.5f, vec3{0, 0, -0.5f});
     for (int i = 0; i < layers; i++)
@@ -152,7 +154,8 @@ Run runIsland(VkWorld &w, const Overrides &o)
     SolverParams p = zUpParams();
     p.dt = 1.0f / 60.0f;
     p.sleepEnabled = true;
-    SceneBuilder s; s.params.gravity = vec3{0.0f, 0.0f, -10.0f};
+    SceneBuilder s;
+    s.params.gravity = vec3{0.0f, 0.0f, -10.0f};
     s.clear();
     s.addBody(vec3{60, 60, 1}, 0.0f, 0.5f, vec3{0, 0, -0.5f});
     s.addBody(vec3{1, 1, 1}, 1.0f, 0.5f, vec3{0, 0, 0.5f});
@@ -218,8 +221,10 @@ int main()
         Fn fn;
     };
     const Sc scs[] = {
-        {"Pyramid/sleep off", [](VkWorld &w, const Overrides &o) { return runSceneByName(w, o, "Pyramid", false, 100); }},
-        {"Square Towers 20k/sleep on", [](VkWorld &w, const Overrides &o) { return runSceneByName(w, o, "Square Towers 20k", true, 150); }},
+        {"Pyramid/sleep off",
+         [](VkWorld &w, const Overrides &o) { return runSceneByName(w, o, "Pyramid", false, 100); }},
+        {"Square Towers 20k/sleep on",
+         [](VkWorld &w, const Overrides &o) { return runSceneByName(w, o, "Square Towers 20k", true, 150); }},
         {"tower nudge", runTower},
         {"joint island wake", runIsland},
     };
@@ -299,8 +304,8 @@ int main()
     for (const Hard &h : hards)
     {
         const Run r = runSceneByName(vk, h.o, "Square Towers 20k", false, 40);
-        const bool named = r.truncatedSteps > 0 && r.failPhase && r.failResource &&
-                           strcmp(r.failPhase, h.phase) == 0 && strcmp(r.failResource, h.resource) == 0;
+        const bool named = r.truncatedSteps > 0 && r.failPhase && r.failResource && strcmp(r.failPhase, h.phase) == 0 &&
+                           strcmp(r.failResource, h.resource) == 0;
         const bool over = r.required > r.capacity;
         // The first steps may have no contact yet (the pile is still falling): what must
         // hold is that once the pile is in contact the ceiling is reported, every step.

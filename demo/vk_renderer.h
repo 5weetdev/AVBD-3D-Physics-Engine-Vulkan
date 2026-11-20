@@ -79,8 +79,8 @@ public:
 
     // Outside any render pass, once the fence for frameSlot (0..kMaxFramesInFlight-1)
     // has signalled: this overwrites that slot's parameters.
-    void prepare(VkCommandBuffer cmd, int frameSlot, const VkDrawItem *items, int itemCount,
-                 const float viewProj[16], const RenderOptions &opts);
+    void prepare(VkCommandBuffer cmd, int frameSlot, const VkDrawItem *items, int itemCount, const float viewProj[16],
+                 const RenderOptions &opts);
     // Inside mainPass, with the viewport and scissor set to the full extent.
     void drawScene(VkCommandBuffer cmd, const VkDrawItem *items, int itemCount);
 

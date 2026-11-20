@@ -20,7 +20,10 @@ static constexpr int kInternalValue = 1152023; // the legacy defs' internalValue
 #include <type_traits>
 
 // Scalars pass through the conversions unchanged.
-template <class T, class = typename std::enable_if<std::is_arithmetic<T>::value>::type> static inline T lg(T v) { return v; }
+template <class T, class = typename std::enable_if<std::is_arithmetic<T>::value>::type> static inline T lg(T v)
+{
+    return v;
+}
 
 #include "avbd3d_capi_conv.h"
 

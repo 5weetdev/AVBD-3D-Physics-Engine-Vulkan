@@ -41,8 +41,8 @@ void IntegratePipelines::destroy()
     velocityProps.destroy();
 }
 
-void launchIntegrate(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl,
-                     const IntegrateArgsGpu &args, int bodyCount)
+void launchIntegrate(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl, const IntegrateArgsGpu &args,
+                     int bodyCount)
 {
     uint32_t groups = ceilDiv(bodyCount, 256);
     if (groups == 0)
@@ -51,8 +51,8 @@ void launchIntegrate(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines 
     cmd.dispatch(pl.integrate, groups, argsAddr);
 }
 
-void launchVelocity(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl,
-                    const VelocityArgsGpu &args, int bodyCount)
+void launchVelocity(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl, const VelocityArgsGpu &args,
+                    int bodyCount)
 {
     uint32_t groups = ceilDiv(bodyCount, 256);
     if (groups == 0)
@@ -81,8 +81,8 @@ void launchVelocityProps(CommandList &cmd, HostRingBuffer &ring, IntegratePipeli
     cmd.dispatch(pl.velocityProps, groups, argsAddr);
 }
 
-void launchKillFallen(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl,
-                      const KillFallenArgsGpu &args, int dynCount)
+void launchKillFallen(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl, const KillFallenArgsGpu &args,
+                      int dynCount)
 {
     uint32_t groups = ceilDiv(dynCount, 256);
     if (groups == 0)

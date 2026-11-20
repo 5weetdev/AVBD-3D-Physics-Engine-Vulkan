@@ -57,15 +57,24 @@ void VkBroadphase::init(Device &dev)
     ring.init(dev, 1 << 22);
     cmd.init(dev, 8);
 
-    aabbMin.init(dev); aabbMax.init(dev);
+    aabbMin.init(dev);
+    aabbMax.init(dev);
     cellId.init(dev);
-    hash.init(dev); hashSorted.init(dev);
-    binBody.init(dev); binBodySorted.init(dev);
-    cellStart.init(dev); cellEnd.init(dev);
-    rawPairs.init(dev); sortedPairs.init(dev);
+    hash.init(dev);
+    hashSorted.init(dev);
+    binBody.init(dev);
+    binBodySorted.init(dev);
+    cellStart.init(dev);
+    cellEnd.init(dev);
+    rawPairs.init(dev);
+    sortedPairs.init(dev);
     m_counter.init(dev);
-    sHash.init(dev); sHashSorted.init(dev); sBinBody.init(dev); sBinBodySorted.init(dev);
-    sCellStart.init(dev); sCellEnd.init(dev);
+    sHash.init(dev);
+    sHashSorted.init(dev);
+    sBinBody.init(dev);
+    sBinBodySorted.init(dev);
+    sCellStart.init(dev);
+    sCellEnd.init(dev);
     if (!m_readout.mapped())
         m_readout.init(dev, sizeof(int32_t), VK_BUFFER_USAGE_TRANSFER_DST_BIT, MappedBuffer::HostAccess::Read);
 }
@@ -80,15 +89,24 @@ void VkBroadphase::destroy()
 
 void VkBroadphase::release()
 {
-    aabbMin.destroy(); aabbMax.destroy();
+    aabbMin.destroy();
+    aabbMax.destroy();
     cellId.destroy();
-    hash.destroy(); hashSorted.destroy();
-    binBody.destroy(); binBodySorted.destroy();
-    cellStart.destroy(); cellEnd.destroy();
-    rawPairs.destroy(); sortedPairs.destroy();
+    hash.destroy();
+    hashSorted.destroy();
+    binBody.destroy();
+    binBodySorted.destroy();
+    cellStart.destroy();
+    cellEnd.destroy();
+    rawPairs.destroy();
+    sortedPairs.destroy();
     m_counter.destroy();
-    sHash.destroy(); sHashSorted.destroy(); sBinBody.destroy(); sBinBodySorted.destroy();
-    sCellStart.destroy(); sCellEnd.destroy();
+    sHash.destroy();
+    sHashSorted.destroy();
+    sBinBody.destroy();
+    sBinBodySorted.destroy();
+    sCellStart.destroy();
+    sCellEnd.destroy();
     m_staticDirty = true;
     m_staticBuiltCount = -1;
 }
@@ -124,18 +142,16 @@ void VkBroadphase::reserve(int maxBodies /* shapes */, int maxPairs)
 
 void VkBroadphase::build(BroadphasePipelines &pl, PrimitivesPipelines &prim, RadixScratch &radix,
                          VkDeviceAddress bodyPos, VkDeviceAddress bodyRot, const BroadphaseShapes &shapes,
-                         const Buffer &dynamicIdx, int dynamicCount,
-                         const Buffer &staticIdx, int staticCount,
-                         float cellSize,
-                         const Buffer *ignore, int ignoreCount, const BroadphaseOversize *oversize)
+                         const Buffer &dynamicIdx, int dynamicCount, const Buffer &staticIdx, int staticCount,
+                         float cellSize, const Buffer *ignore, int ignoreCount, const BroadphaseOversize *oversize)
 {
     // Standalone (gate) form: the caller's statics may have changed between calls.
     m_staticDirty = true;
     ring.reset();
     cmd.begin();
     cmd.writeTimestamp(0);
-    record(cmd, ring, pl, prim, radix, bodyPos, bodyRot, shapes, dynamicIdx, dynamicCount, staticIdx,
-           staticCount, cellSize, ignore, ignoreCount, oversize);
+    record(cmd, ring, pl, prim, radix, bodyPos, bodyRot, shapes, dynamicIdx, dynamicCount, staticIdx, staticCount,
+           cellSize, ignore, ignoreCount, oversize);
     cmd.writeTimestamp(1);
     cmd.submit();
     cmd.wait();
@@ -171,11 +187,11 @@ void VkBroadphase::recordReadout(CommandList &cmd)
     m_readoutRecorded = true;
 }
 
-void VkBroadphase::record(CommandList &cmd, HostRingBuffer &ring, BroadphasePipelines &pl,
-                          PrimitivesPipelines &prim, RadixScratch &radix, VkDeviceAddress bodyPos,
-                          VkDeviceAddress bodyRot, const BroadphaseShapes &shapes, const Buffer &dynamicIdx,
-                          int dynamicCount, const Buffer &staticIdx, int staticCount, float cellSize,
-                          const Buffer *ignore, int ignoreCount, const BroadphaseOversize *oversize)
+void VkBroadphase::record(CommandList &cmd, HostRingBuffer &ring, BroadphasePipelines &pl, PrimitivesPipelines &prim,
+                          RadixScratch &radix, VkDeviceAddress bodyPos, VkDeviceAddress bodyRot,
+                          const BroadphaseShapes &shapes, const Buffer &dynamicIdx, int dynamicCount,
+                          const Buffer &staticIdx, int staticCount, float cellSize, const Buffer *ignore,
+                          int ignoreCount, const BroadphaseOversize *oversize)
 {
     // The counter is zeroed even with nothing to do: a consumer recorded after this
     // reads it on device, and must see zero pairs rather than last build's count.
@@ -196,22 +212,29 @@ void VkBroadphase::record(CommandList &cmd, HostRingBuffer &ring, BroadphasePipe
     if (staticCount > 0)
         reserveRadix(radix, (uint32_t)staticCount, sizeof(uint32_t), sizeof(int32_t));
 
-    BphBodySoAGpu b{bodyPos,         bodyRot,          shapes.shapeBody, shapes.localPos,
-                    shapes.localRot, shapes.halfExtents, shapes.flags,     0u,
-                    0u};
+    BphBodySoAGpu b{
+        bodyPos, bodyRot, shapes.shapeBody, shapes.localPos, shapes.localRot, shapes.halfExtents, shapes.flags, 0u, 0u};
 
     // The grid only bins the non-oversized bodies; oversized ones (too wide for the
     // 27-cell neighbourhood to be exact at this cell size) are tested brute force.
-    const bool split = oversize && oversize->oversizeCount > 0 && oversize->gridCount > 0 &&
-                       oversize->gridIdx && oversize->oversizeIdx;
+    const bool split = oversize && oversize->oversizeCount > 0 && oversize->gridCount > 0 && oversize->gridIdx &&
+                       oversize->oversizeIdx;
     const bool useGrid = split;
     const Buffer &gridIdx = useGrid ? *oversize->gridIdx : dynamicIdx;
     const int gridCount = useGrid ? oversize->gridCount : dynamicCount;
     reserveRadix(radix, (uint32_t)gridCount, sizeof(uint32_t), sizeof(int32_t));
 
-    AabbBinArgsGpu abArgs{b, gridIdx.address(), (uint32_t)gridCount, invCellSize,
-                          aabbMin.address(), aabbMax.address(), cellId.address(), hash.address(),
-                          binBody.address(), mask, 0u};
+    AabbBinArgsGpu abArgs{b,
+                          gridIdx.address(),
+                          (uint32_t)gridCount,
+                          invCellSize,
+                          aabbMin.address(),
+                          aabbMax.address(),
+                          cellId.address(),
+                          hash.address(),
+                          binBody.address(),
+                          mask,
+                          0u};
     VkDeviceAddress abAddr = ring.write(&abArgs, sizeof(abArgs));
     cmd.dispatch(pl.aabbAndBin, (gridCount + block - 1) / block, abAddr);
 
@@ -219,8 +242,12 @@ void VkBroadphase::record(CommandList &cmd, HostRingBuffer &ring, BroadphasePipe
     {
         // aabbStatic is just "AABB of every body in this list" -- exactly what the
         // oversized bodies need, since they skip aabbAndBin.
-        AabbStaticArgsGpu aoArgs{b, oversize->oversizeIdx->address(), (uint32_t)oversize->oversizeCount, 0u,
-                                 aabbMin.address(), aabbMax.address()};
+        AabbStaticArgsGpu aoArgs{b,
+                                 oversize->oversizeIdx->address(),
+                                 (uint32_t)oversize->oversizeCount,
+                                 0u,
+                                 aabbMin.address(),
+                                 aabbMax.address()};
         VkDeviceAddress aoAddr = ring.write(&aoArgs, sizeof(aoArgs));
         cmd.dispatch(pl.aabbStatic, (oversize->oversizeCount + block - 1) / block, aoAddr);
     }
@@ -231,24 +258,30 @@ void VkBroadphase::record(CommandList &cmd, HostRingBuffer &ring, BroadphasePipe
     // their AABBs, cell ids and sorted table stay valid across steps. Its sort runs
     // before the dynamic one and shares `radix` with it, separated by barriers.
     const uint32_t sMask = (uint32_t)(sTableSize - 1);
-    if (staticCount > 0 &&
-        (m_staticDirty || m_staticCell != cellSize || m_staticBuiltCount != staticCount))
+    if (staticCount > 0 && (m_staticDirty || m_staticCell != cellSize || m_staticBuiltCount != staticCount))
     {
-        StaticBinArgsGpu sbArgs{b, staticIdx.address(), (uint32_t)staticCount, invCellSize,
-                                aabbMin.address(), aabbMax.address(), cellId.address(), sHash.address(),
-                                sBinBody.address(), sMask, cellSize};
+        StaticBinArgsGpu sbArgs{b,
+                                staticIdx.address(),
+                                (uint32_t)staticCount,
+                                invCellSize,
+                                aabbMin.address(),
+                                aabbMax.address(),
+                                cellId.address(),
+                                sHash.address(),
+                                sBinBody.address(),
+                                sMask,
+                                cellSize};
         VkDeviceAddress sbAddr = ring.write(&sbArgs, sizeof(sbArgs));
         cmd.dispatch(pl.aabbBinStatic, (staticCount + block - 1) / block, sbAddr);
         cmd.barrier();
-        radixSortPairsU32(cmd, ring, prim, radix, sHash, sHashSorted, sBinBody, sBinBodySorted,
-                          (uint32_t)staticCount);
+        radixSortPairsU32(cmd, ring, prim, radix, sHash, sHashSorted, sBinBody, sBinBodySorted, (uint32_t)staticCount);
         cmd.barrier();
         ResetRangesArgsGpu srArgs{sCellStart.address(), sCellEnd.address(), (uint32_t)sTableSize + 1u, 0u};
         VkDeviceAddress srAddr = ring.write(&srArgs, sizeof(srArgs));
         cmd.dispatch(pl.resetRanges, (sTableSize + 1 + block - 1) / block, srAddr);
         cmd.barrier();
-        CellRangesArgsGpu scArgs{sHashSorted.address(), (uint32_t)staticCount, 0u,
-                                 sCellStart.address(), sCellEnd.address()};
+        CellRangesArgsGpu scArgs{sHashSorted.address(), (uint32_t)staticCount, 0u, sCellStart.address(),
+                                 sCellEnd.address()};
         VkDeviceAddress scAddr = ring.write(&scArgs, sizeof(scArgs));
         cmd.dispatch(pl.cellRanges, (staticCount + block - 1) / block, scAddr);
         cmd.barrier();
@@ -264,8 +297,7 @@ void VkBroadphase::record(CommandList &cmd, HostRingBuffer &ring, BroadphasePipe
     // unsubmitted aabbAndBin write -- fixed at the source: the primitives' skip-mask
     // pass is now record-only, appended to this same `cmd` like everything else, so a
     // single recording + one submit is correct again.)
-    radixSortPairsU32(cmd, ring, prim, radix, hash, hashSorted, binBody, binBodySorted,
-                      (uint32_t)gridCount);
+    radixSortPairsU32(cmd, ring, prim, radix, hash, hashSorted, binBody, binBodySorted, (uint32_t)gridCount);
     cmd.barrier();
 
     ResetRangesArgsGpu rrArgs{cellStart.address(), cellEnd.address(), (uint32_t)tableSize, 0u};
@@ -273,22 +305,36 @@ void VkBroadphase::record(CommandList &cmd, HostRingBuffer &ring, BroadphasePipe
     cmd.dispatch(pl.resetRanges, (tableSize + block - 1) / block, rrAddr);
     cmd.barrier();
 
-    CellRangesArgsGpu crArgs{hashSorted.address(), (uint32_t)gridCount, 0u,
-                             cellStart.address(), cellEnd.address()};
+    CellRangesArgsGpu crArgs{hashSorted.address(), (uint32_t)gridCount, 0u, cellStart.address(), cellEnd.address()};
     VkDeviceAddress crAddr = ring.write(&crArgs, sizeof(crArgs));
     cmd.dispatch(pl.cellRanges, (gridCount + block - 1) / block, crAddr);
     cmd.barrier();
 
     const VkDeviceAddress ignoreAddr = (ignore && ignoreCount > 0) ? ignore->address() : 0;
 
-    EmitPairsArgsGpu epArgs{binBodySorted.address(), (uint32_t)gridCount, 0u,
-                            cellId.address(), aabbMin.address(), aabbMax.address(),
-                            cellStart.address(), cellEnd.address(), invCellSize, mask,
-                            rawPairs.address(), m_counter.address(), pairCapacity, 0,
-                            ignoreAddr, ignoreCount, 0, shapes.shapeBody,
+    EmitPairsArgsGpu epArgs{binBodySorted.address(),
+                            (uint32_t)gridCount,
+                            0u,
+                            cellId.address(),
+                            aabbMin.address(),
+                            aabbMax.address(),
+                            cellStart.address(),
+                            cellEnd.address(),
+                            invCellSize,
+                            mask,
+                            rawPairs.address(),
+                            m_counter.address(),
+                            pairCapacity,
+                            0,
+                            ignoreAddr,
+                            ignoreCount,
+                            0,
+                            shapes.shapeBody,
                             staticCount > 0 ? sBinBodySorted.address() : 0,
                             staticCount > 0 ? sCellStart.address() : 0,
-                            staticCount > 0 ? sCellEnd.address() : 0, sMask, 0u};
+                            staticCount > 0 ? sCellEnd.address() : 0,
+                            sMask,
+                            0u};
     VkDeviceAddress epAddr = ring.write(&epArgs, sizeof(epArgs));
     cmd.dispatch(pl.emitPairs, (gridCount + block - 1) / block, epAddr);
 
@@ -298,20 +344,46 @@ void VkBroadphase::record(CommandList &cmd, HostRingBuffer &ring, BroadphasePipe
         // probed range); oversized dynamics x every static.
         const VkDeviceAddress bigStart = sCellStart.address() + (VkDeviceSize)(sMask + 1u) * sizeof(int32_t);
         const VkDeviceAddress bigEnd = sCellEnd.address() + (VkDeviceSize)(sMask + 1u) * sizeof(int32_t);
-        EmitCrossPairsArgsGpu ecArgs{gridIdx.address(), (uint32_t)gridCount, 0u,
-                                     sBinBodySorted.address(), (uint32_t)staticCount, 0u, bigStart, bigEnd,
-                                     aabbMin.address(), aabbMax.address(),
-                                     rawPairs.address(), m_counter.address(), pairCapacity, 0,
-                                     ignoreAddr, ignoreCount, 0, shapes.shapeBody};
+        EmitCrossPairsArgsGpu ecArgs{gridIdx.address(),
+                                     (uint32_t)gridCount,
+                                     0u,
+                                     sBinBodySorted.address(),
+                                     (uint32_t)staticCount,
+                                     0u,
+                                     bigStart,
+                                     bigEnd,
+                                     aabbMin.address(),
+                                     aabbMax.address(),
+                                     rawPairs.address(),
+                                     m_counter.address(),
+                                     pairCapacity,
+                                     0,
+                                     ignoreAddr,
+                                     ignoreCount,
+                                     0,
+                                     shapes.shapeBody};
         VkDeviceAddress ecAddr = ring.write(&ecArgs, sizeof(ecArgs));
         cmd.dispatch(pl.emitCrossPairs, (gridCount + block - 1) / block, ecAddr);
         if (split)
         {
-            EmitCrossPairsArgsGpu eosArgs{oversize->oversizeIdx->address(), (uint32_t)oversize->oversizeCount, 0u,
-                                          staticIdx.address(), (uint32_t)staticCount, 0u, 0, 0,
-                                          aabbMin.address(), aabbMax.address(),
-                                          rawPairs.address(), m_counter.address(), pairCapacity, 0,
-                                          ignoreAddr, ignoreCount, 0, shapes.shapeBody};
+            EmitCrossPairsArgsGpu eosArgs{oversize->oversizeIdx->address(),
+                                          (uint32_t)oversize->oversizeCount,
+                                          0u,
+                                          staticIdx.address(),
+                                          (uint32_t)staticCount,
+                                          0u,
+                                          0,
+                                          0,
+                                          aabbMin.address(),
+                                          aabbMax.address(),
+                                          rawPairs.address(),
+                                          m_counter.address(),
+                                          pairCapacity,
+                                          0,
+                                          ignoreAddr,
+                                          ignoreCount,
+                                          0,
+                                          shapes.shapeBody};
             VkDeviceAddress eosAddr = ring.write(&eosArgs, sizeof(eosArgs));
             cmd.dispatch(pl.emitCrossPairs, (oversize->oversizeCount + block - 1) / block, eosAddr);
         }
@@ -319,11 +391,22 @@ void VkBroadphase::record(CommandList &cmd, HostRingBuffer &ring, BroadphasePipe
     if (split)
     {
         cmd.barrier();
-        EmitOversizePairsArgsGpu eoArgs{gridIdx.address(), (uint32_t)gridCount, 0u,
-                                        oversize->oversizeIdx->address(), (uint32_t)oversize->oversizeCount, 0u,
-                                        aabbMin.address(), aabbMax.address(),
-                                        rawPairs.address(), m_counter.address(), pairCapacity, 0,
-                                        ignoreAddr, ignoreCount, 0, shapes.shapeBody};
+        EmitOversizePairsArgsGpu eoArgs{gridIdx.address(),
+                                        (uint32_t)gridCount,
+                                        0u,
+                                        oversize->oversizeIdx->address(),
+                                        (uint32_t)oversize->oversizeCount,
+                                        0u,
+                                        aabbMin.address(),
+                                        aabbMax.address(),
+                                        rawPairs.address(),
+                                        m_counter.address(),
+                                        pairCapacity,
+                                        0,
+                                        ignoreAddr,
+                                        ignoreCount,
+                                        0,
+                                        shapes.shapeBody};
         VkDeviceAddress eoAddr = ring.write(&eoArgs, sizeof(eoArgs));
         const uint32_t threads = (uint32_t)gridCount + (uint32_t)oversize->oversizeCount;
         cmd.dispatch(pl.emitOversizePairs, (threads + block - 1) / block, eoAddr);
@@ -336,8 +419,7 @@ void VkBroadphase::record(CommandList &cmd, HostRingBuffer &ring, BroadphasePipe
     // the capacity, which is also what the emit kernels' guard wrote up to), so the
     // host no longer needs the count before recording it.
     if (pairCapacity > 0)
-        radixSortKeysU64(cmd, ring, prim, radix, rawPairs, sortedPairs, (uint32_t)pairCapacity,
-                         m_counter.address());
+        radixSortKeysU64(cmd, ring, prim, radix, rawPairs, sortedPairs, (uint32_t)pairCapacity, m_counter.address());
 }
 
 } // namespace avbdvk

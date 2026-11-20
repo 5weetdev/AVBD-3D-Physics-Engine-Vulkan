@@ -65,8 +65,10 @@ static SceneView sceneSuspensionBridgeGpu(SceneBuilder *s)
                 }
                 else
                 {
-                    s->addJointWorld(prevLeg1[t][side], leg1, {tx - 0.82f, ty, zc - 1.5f}, INFINITY, INFINITY, 500000.0f);
-                    s->addJointWorld(prevLeg2[t][side], leg2, {tx + 0.82f, ty, zc - 1.5f}, INFINITY, INFINITY, 500000.0f);
+                    s->addJointWorld(prevLeg1[t][side], leg1, {tx - 0.82f, ty, zc - 1.5f}, INFINITY, INFINITY,
+                                     500000.0f);
+                    s->addJointWorld(prevLeg2[t][side], leg2, {tx + 0.82f, ty, zc - 1.5f}, INFINITY, INFINITY,
+                                     500000.0f);
                 }
 
                 prevLeg1[t][side] = leg1;
@@ -75,8 +77,10 @@ static SceneView sceneSuspensionBridgeGpu(SceneBuilder *s)
                 if (tr == 14)
                 {
                     towerSaddles[t][side] = s->addBody({1.6f, 1.2f, 0.8f}, 2.0f, 0.6f, {tx, ty, 45.4f});
-                    s->addJointWorld(leg1, towerSaddles[t][side], {tx - 0.82f, ty, 44.5f}, INFINITY, INFINITY, 500000.0f);
-                    s->addJointWorld(leg2, towerSaddles[t][side], {tx + 0.82f, ty, 44.5f}, INFINITY, INFINITY, 500000.0f);
+                    s->addJointWorld(leg1, towerSaddles[t][side], {tx - 0.82f, ty, 44.5f}, INFINITY, INFINITY,
+                                     500000.0f);
+                    s->addJointWorld(leg2, towerSaddles[t][side], {tx + 0.82f, ty, 44.5f}, INFINITY, INFINITY,
+                                     500000.0f);
                 }
             }
 
@@ -91,7 +95,8 @@ static SceneView sceneSuspensionBridgeGpu(SceneBuilder *s)
 
     // Main Suspension Cables (2 cables x 180 blocks = 360 blocks)
     // Pre-compute node positions along the catenary, then place rotated blocks.
-    auto cableZ = [](float x) -> float {
+    auto cableZ = [](float x) -> float
+    {
         if (fabsf(x) <= 45.0f)
         {
             const float t = x / 45.0f;
@@ -124,36 +129,37 @@ static SceneView sceneSuspensionBridgeGpu(SceneBuilder *s)
             const quat rot = {0.0f, sinf(theta * 0.5f), 0.0f, cosf(theta * 0.5f)};
 
             const float segLen = sqrtf(dx * dx + dz * dz);
-            cableNodes[side][i] = s->addBody({segLen * 0.7f, 0.25f, 0.25f}, 0.6f, 0.5f, {x, cy, z},
-                                             {0, 0, 0}, {0, 0, 0}, rot);
+            cableNodes[side][i] =
+                s->addBody({segLen * 0.7f, 0.25f, 0.25f}, 0.6f, 0.5f, {x, cy, z}, {0, 0, 0}, {0, 0, 0}, rot);
 
             if (prevNode >= 0)
             {
                 s->ignoreCollision(prevNode, cableNodes[side][i]);
                 vec3 mid = (s->bodyPos(prevNode) + s->bodyPos(cableNodes[side][i])) * 0.5f;
-                s->addJointWorld(prevNode, cableNodes[side][i], mid,
-                                 INFINITY, 0.0f, cableBreakForce);
+                s->addJointWorld(prevNode, cableNodes[side][i], mid, INFINITY, 0.0f, cableBreakForce);
             }
 
             // Connect cables to static shore cable anchorages
             if (i == 0)
             {
                 int anc = (side == 0) ? leftAnchorL : leftAnchorR;
-                s->addJointWorld(anc, cableNodes[side][0], {-90.0f, cy, 11.0f}, INFINITY, INFINITY, cableBreakForce * 2.0f);
+                s->addJointWorld(anc, cableNodes[side][0], {-90.0f, cy, 11.0f}, INFINITY, INFINITY,
+                                 cableBreakForce * 2.0f);
             }
             if (i == 180)
             {
                 int anc = (side == 0) ? rightAnchorL : rightAnchorR;
-                s->addJointWorld(anc, cableNodes[side][180], {+90.0f, cy, 11.0f}, INFINITY, INFINITY, cableBreakForce * 2.0f);
+                s->addJointWorld(anc, cableNodes[side][180], {+90.0f, cy, 11.0f}, INFINITY, INFINITY,
+                                 cableBreakForce * 2.0f);
             }
 
             // Connect cables to tower saddles
             if (fabsf(x - (-45.0f)) < 0.6f)
-                s->addJointWorld(cableNodes[side][i], towerSaddles[0][side], {-45.0f, cy, 45.4f},
-                                 INFINITY, INFINITY, cableBreakForce * 2.0f);
+                s->addJointWorld(cableNodes[side][i], towerSaddles[0][side], {-45.0f, cy, 45.4f}, INFINITY, INFINITY,
+                                 cableBreakForce * 2.0f);
             if (fabsf(x - (+45.0f)) < 0.6f)
-                s->addJointWorld(cableNodes[side][i], towerSaddles[1][side], {+45.0f, cy, 45.4f},
-                                 INFINITY, INFINITY, cableBreakForce * 2.0f);
+                s->addJointWorld(cableNodes[side][i], towerSaddles[1][side], {+45.0f, cy, 45.4f}, INFINITY, INFINITY,
+                                 cableBreakForce * 2.0f);
 
             prevNode = cableNodes[side][i];
         }
@@ -177,8 +183,10 @@ static SceneView sceneSuspensionBridgeGpu(SceneBuilder *s)
 
         if (prevBottomChordL >= 0)
         {
-            s->addJointWorld(prevBottomChordL, bChordL, {bx - 0.625f, -3.4f, 10.8f}, INFINITY, INFINITY, deckBreakForce);
-            s->addJointWorld(prevBottomChordR, bChordR, {bx - 0.625f, +3.4f, 10.8f}, INFINITY, INFINITY, deckBreakForce);
+            s->addJointWorld(prevBottomChordL, bChordL, {bx - 0.625f, -3.4f, 10.8f}, INFINITY, INFINITY,
+                             deckBreakForce);
+            s->addJointWorld(prevBottomChordR, bChordR, {bx - 0.625f, +3.4f, 10.8f}, INFINITY, INFINITY,
+                             deckBreakForce);
             s->addJointWorld(prevTopChordL, tChordL, {bx - 0.625f, -3.4f, 13.0f}, INFINITY, INFINITY, deckBreakForce);
             s->addJointWorld(prevTopChordR, tChordR, {bx - 0.625f, +3.4f, 13.0f}, INFINITY, INFINITY, deckBreakForce);
         }

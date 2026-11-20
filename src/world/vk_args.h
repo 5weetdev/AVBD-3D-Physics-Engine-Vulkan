@@ -59,8 +59,8 @@ namespace avbdvk
 
 struct BphBodySoAGpu
 {
-    VkDeviceAddress pos, rot;               // per body
-    VkDeviceAddress shapeBody;              // per shape from here down
+    VkDeviceAddress pos, rot;  // per body
+    VkDeviceAddress shapeBody; // per shape from here down
     VkDeviceAddress localPos, localRot, halfExtents, flags;
     uint32_t count, _pad0;
 };
@@ -171,12 +171,12 @@ static_assert(sizeof(EmitOversizePairsArgsGpu) % 8 == 0, "layout");
 
 struct NpBodySoAGpu
 {
-    VkDeviceAddress pos = 0, rot = 0;                 // per body
-    VkDeviceAddress shapeBody = 0, localPos = 0, localRot = 0; // per shape
+    VkDeviceAddress pos = 0, rot = 0;                                        // per body
+    VkDeviceAddress shapeBody = 0, localPos = 0, localRot = 0;               // per shape
     VkDeviceAddress halfExtents = 0, shapeType = 0, friction = 0, flags = 0; // per shape
-    VkDeviceAddress mass = 0, moment = 0;             // per body
+    VkDeviceAddress mass = 0, moment = 0;                                    // per body
     VkDeviceAddress velLin = 0, velAng = 0;
-    VkDeviceAddress props = 0;                        // may be 0 (no non-default BodyProps)
+    VkDeviceAddress props = 0;                         // may be 0 (no non-default BodyProps)
     VkDeviceAddress category = 0, mask = 0, group = 0; // per shape, may be 0 (no filtering)
     uint32_t count = 0, _pad0 = 0;
 };
@@ -260,14 +260,14 @@ static const uint32_t kHullScratchStride = 24576;
 struct NarrowphaseHullArgsGpu
 {
     NarrowphaseArgsGpu np;
-    VkDeviceAddress geomHeap = 0;    // base of the geometry heap
-    VkDeviceAddress geomOffset = 0;  // per shape: byte offset of its blob, 0xFFFFFFFF none
-    VkDeviceAddress scratch = 0;     // hullCapacity slots of scratchStride bytes
+    VkDeviceAddress geomHeap = 0;                  // base of the geometry heap
+    VkDeviceAddress geomOffset = 0;                // per shape: byte offset of its blob, 0xFFFFFFFF none
+    VkDeviceAddress scratch = 0;                   // hullCapacity slots of scratchStride bytes
     VkDeviceAddress satSepCur = 0, satBitsCur = 0; // per manifold slot
     VkDeviceAddress satSepPrev = 0, satBitsPrev = 0;
     uint64_t geomHeapBytes = 0;
-    uint32_t hullCapacity = 0;       // scratch slots; list entries at or past it are skipped
-    uint32_t scratchStride = 0;      // bytes per slot
+    uint32_t hullCapacity = 0;  // scratch slots; list entries at or past it are skipped
+    uint32_t scratchStride = 0; // bytes per slot
 };
 static_assert(sizeof(NarrowphaseHullArgsGpu) % 8 == 0, "layout");
 
@@ -298,8 +298,8 @@ static const uint32_t kMeshScratchStride = 24576;
 struct NarrowphaseMeshArgsGpu
 {
     NarrowphaseArgsGpu np;
-    VkDeviceAddress geomHeap = 0;     // base of the geometry heap
-    VkDeviceAddress geomOffset = 0;   // per shape: byte offset of its blob, 0xFFFFFFFF none
+    VkDeviceAddress geomHeap = 0;   // base of the geometry heap
+    VkDeviceAddress geomOffset = 0; // per shape: byte offset of its blob, 0xFFFFFFFF none
     uint64_t geomHeapBytes = 0;
     VkDeviceAddress childKeys = 0;    // raw child keys (unsorted)
     VkDeviceAddress childCounter = 0; // counted appends into childKeys
@@ -311,7 +311,7 @@ static_assert(sizeof(NarrowphaseMeshArgsGpu) % 8 == 0, "layout");
 // csMeshChild: the per-triangle narrowphase. Sorted child i is manifold slot childBase + i.
 struct NarrowphaseMeshChildArgsGpu
 {
-    NarrowphaseArgsGpu np;            // b, cur, prev, contact counters and the solver parameters
+    NarrowphaseArgsGpu np; // b, cur, prev, contact counters and the solver parameters
     VkDeviceAddress geomHeap = 0;
     VkDeviceAddress geomOffset = 0;
     VkDeviceAddress scratch = 0;      // kMeshWorkers slots of scratchStride bytes
@@ -319,12 +319,12 @@ struct NarrowphaseMeshChildArgsGpu
     VkDeviceAddress childCounter = 0; // device count of the sorted list (clamped to childCapacity)
     VkDeviceAddress childInfo = 0;    // per sorted child: Box3D class/feature and squared distance
     uint64_t geomHeapBytes = 0;
-    uint32_t childCapacity = 0;       // child manifold slots: [childBase, childBase + childCapacity)
-    uint32_t childBase = 0;           // first child manifold slot (= the pair slot capacity)
-    uint32_t prevChildBase = 0;       // previous step's first child slot
-    uint32_t prevChildCount = 0;      // previous step's committed child count
-    uint32_t workers = 0;             // lanes that loop over the list (kMeshWorkers)
-    uint32_t scratchStride = 0;       // bytes per slot
+    uint32_t childCapacity = 0;  // child manifold slots: [childBase, childBase + childCapacity)
+    uint32_t childBase = 0;      // first child manifold slot (= the pair slot capacity)
+    uint32_t prevChildBase = 0;  // previous step's first child slot
+    uint32_t prevChildCount = 0; // previous step's committed child count
+    uint32_t workers = 0;        // lanes that loop over the list (kMeshWorkers)
+    uint32_t scratchStride = 0;  // bytes per slot
 };
 static_assert(sizeof(NarrowphaseMeshChildArgsGpu) % 8 == 0, "layout");
 
@@ -423,14 +423,15 @@ struct CsBuildSmallArgsGpu
     VkDeviceAddress mass = 0, awake = 0, dyn = 0;
     VkDeviceAddress keys = 0, isA = 0, rowStart = 0, rowEnd = 0;
     VkDeviceAddress color = 0, bodyByColor = 0;
-    VkDeviceAddress ranges = 0;     // start[128], end[128]
+    VkDeviceAddress ranges = 0; // start[128], end[128]
     VkDeviceAddress counter = 0, remaining = 0;
     VkDeviceAddress dynCountPtr = 0; // may be 0
     uint32_t slots = 0, jointSlots = 0, springSlots = 0, bodyCount = 0, dynCount = 0;
     int32_t capacity = 0;
     uint32_t rounds = 0, _pad0 = 0;
 };
-static_assert(sizeof(CsBuildSmallArgsGpu) == 21 * 8 + 8 * 4, "CsBuildSmallArgsGpu drifted from constraints.slang BuildSmallArgs");
+static_assert(sizeof(CsBuildSmallArgsGpu) == 21 * 8 + 8 * 4,
+              "CsBuildSmallArgsGpu drifted from constraints.slang BuildSmallArgs");
 
 // ===========================================================================
 // scan.slang / compact.slang / radix.slang (Phase-2 primitives)
@@ -679,8 +680,8 @@ struct PrimalArgsGpu
     int32_t listCount = 0;
     SolverParamsGpu p;
     VkDeviceAddress colorStart = 0, colorEnd = 0; // M4 device colour range, see primal.slang
-    int32_t color = 0, heavyDegree = 0; // heavyDegree > 0: high-degree bodies go to csPrimalWide*
-    VkDeviceAddress shapeRolling = 0;   // per shape rolling resistance; may be null (no shape has any)
+    int32_t color = 0, heavyDegree = 0;           // heavyDegree > 0: high-degree bodies go to csPrimalWide*
+    VkDeviceAddress shapeRolling = 0;             // per shape rolling resistance; may be null (no shape has any)
 };
 
 // Mirrors CoarseArgs (primal.slang): the two-level AVBD coarse correction.
@@ -819,8 +820,8 @@ struct WriteInstancesArgsGpu
     VkDeviceAddress out = 0;
     int32_t maxInstances = 0;
     int32_t _pad0 = 0;
-    VkDeviceAddress frustum = 0;      // const float* (24 floats), or 0
-    VkDeviceAddress visible = 0;      // int* atomic counter, or 0
+    VkDeviceAddress frustum = 0; // const float* (24 floats), or 0
+    VkDeviceAddress visible = 0; // int* atomic counter, or 0
     OverlayViewGpu ov;
     VkDeviceAddress groupOf = 0;      // const int*, or 0
     VkDeviceAddress shapeBase = 0;    // const int*, or 0
@@ -1068,7 +1069,7 @@ struct CcdArgsGpu
     VkDeviceAddress shpBody = 0, shpLocalPos = 0, shpLocalRot = 0, shpHalf = 0, shpType = 0, shpFlags = 0;
     VkDeviceAddress shpCategory = 0, shpMask = 0, shpGroup = 0;
     VkDeviceAddress dynShape = 0, staticShape = 0;
-    VkDeviceAddress ignore = 0; // may be null when ignoreCount == 0
+    VkDeviceAddress ignore = 0;                   // may be null when ignoreCount == 0
     VkDeviceAddress geomHeap = 0, geomOffset = 0; // may be null (no hull or mesh in the scene)
     uint64_t geomHeapBytes = 0;
     VkDeviceAddress list = 0, counter = 0, frac = 0, scratch = 0;

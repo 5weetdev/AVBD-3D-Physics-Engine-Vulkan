@@ -29,11 +29,11 @@
 namespace avbd3d_impl
 {
 using avbdvk::ContactReportPointGpu;
-using avbdvk::Device;
 using avbdvk::ContactReportRecordGpu;
+using avbdvk::Device;
 using avbdvk::JointWriteRecGpu;
 using avbdvk::VkWorld;
-}
+} // namespace avbd3d_impl
 namespace avbd3d_impl
 {
 
@@ -77,9 +77,9 @@ struct ShapeGeom
 {
     b3Sphere sphere{};
     b3Capsule capsule{};
-    std::unique_ptr<b3BoxHull> box; // heap-allocated: b3MakeBoxHull returns by value
-    std::unique_ptr<b3HullData, HullFree> hull;            // general convex hull (not a box)
-    std::unique_ptr<b3MeshData, MeshFree> mesh;            // mesh shape, or height-field triangles
+    std::unique_ptr<b3BoxHull> box;                                  // heap-allocated: b3MakeBoxHull returns by value
+    std::unique_ptr<b3HullData, HullFree> hull;                      // general convex hull (not a box)
+    std::unique_ptr<b3MeshData, MeshFree> mesh;                      // mesh shape, or height-field triangles
     std::unique_ptr<b3HeightFieldData, HeightFieldFree> heightField; // original height field
 
     // The hull the query layer reads: the general hull, or the box hull.
@@ -108,7 +108,7 @@ struct ShapeRec
     vec3 localPos{0, 0, 0}; // shape frame relative to the body origin frame
     quat localRot{0, 0, 0, 1};
     ShapeGeom geom;
-    int proxy = -1;      // b3DynamicTree proxy id, -1 = none
+    int proxy = -1; // b3DynamicTree proxy id, -1 = none
     // The tight world AABB. The tree holds it fattened by a margin (Box3D's fatAABB), so a shape
     // that stays inside its fat box does not move its proxy.
     b3AABB aabb{};
@@ -118,7 +118,7 @@ struct ShapeRec
     // Sensors (docs/SOLVER_3D_ROADMAP.md Phase 4b-2). A sensor is uploaded with category 0, mask 0
     // and group 0, so the device never makes a contact for it; its overlaps are found on the host.
     bool isSensor = false;
-    bool sensorEvents = false;  // enableSensorEvents: gates the sensor and its visitor role alike
+    bool sensorEvents = false; // enableSensorEvents: gates the sensor and its visitor role alike
     float explosionScale = 1.0f;
     // Sensor only: the visitors inside it at the last step, sorted, one key per visitor:
     // (shape slot << 16) | generation.
@@ -135,11 +135,11 @@ struct JointRec
 {
     bool alive = false;
     uint16_t gen = 1;
-    int a = -1, b = 0;     // body slots, a < 0: the world
-    bool swapped = false;  // the def named the world-side body as A: its frames are swapped on build
+    int a = -1, b = 0;    // body slots, a < 0: the world
+    bool swapped = false; // the def named the world-side body as A: its frames are swapped on build
     int firstRow = 0, rowCount = 0;
     int firstSpring = 0, springCount = 0; // avbd3d_avbdSpring: its rows in desc's spring arrays
-    int type = 0;          // avbd3d_JointType
+    int type = 0;                         // avbd3d_JointType
     std::vector<unsigned long long> ignore;
     // The typed def as the caller passed it (avbd3d_<Type>JointDef, base first). The typed setters
     // write fields here; the rows are rebuilt from these bytes at the next flush.
@@ -175,7 +175,8 @@ public:
     // ---- bodies / shapes / joints
     avbd3d_BodyId createBody(const avbd3d_BodyDef &def);
     void destroyBody(int slot);
-    avbd3d_ShapeId createShape(int bodySlot, const avbd3d_ShapeDef &def, int kind, vec3 half, vec3 localPos, quat localRot);
+    avbd3d_ShapeId createShape(int bodySlot, const avbd3d_ShapeDef &def, int kind, vec3 half, vec3 localPos,
+                               quat localRot);
     // Attaches cooked or cloned geometry to a shape made by createShape: the host copy for the
     // queries, the device blob (desc.geomBlob index, -1 = none), and the refreshed proxy.
     void attachGeometry(int shapeSlot, int type, int blob, ShapeGeom &&geom);
@@ -357,7 +358,7 @@ public:
     std::vector<avbd3d_BodyMoveEvent> events; // see moveEvents()
     std::vector<avbd3d_BodyMoveEvent> &moveEvents();
     SceneDesc desc;
-    int worldIndex = 0; // index in the world table
+    int worldIndex = 0;  // index in the world table
     void *gpu = nullptr; // the avbd3d_Gpu the world was created on, null when it owns its device
     // The solver, for the render-data and stats extensions (avbd3d_vulkan.cpp).
     VkWorld &vk() { return m_vk; }
@@ -408,12 +409,12 @@ private:
         uint8_t movable = 0; // in m_movable
     };
     std::vector<BodyHot> m_hot;
-    VkWorld::SnapshotView m_view; // the host copy of the newest snapshot (view())
+    VkWorld::SnapshotView m_view;       // the host copy of the newest snapshot (view())
     VkWorld::JointSnapshotView m_jview; // the joint multipliers of the same snapshot
     std::vector<avbd3d_JointEvent> m_jevents;
-    uint64_t m_allSerial = 0;     // syncBodies() ran for this serial
-    uint64_t m_eventsSerial = 0;  // the move events are of this serial
-    bool m_wantSnapshot = false;  // something read the mirror since the last StepEnd
+    uint64_t m_allSerial = 0;    // syncBodies() ran for this serial
+    uint64_t m_eventsSerial = 0; // the move events are of this serial
+    bool m_wantSnapshot = false; // something read the mirror since the last StepEnd
     const VkWorld::SnapshotView &view();
     void pullBody(int b);
     // A host write to body b: its mirror holds until the next step that applies it.
@@ -449,7 +450,7 @@ private:
         bool alive = false;
         bool events = false; // a begin/end event is due (either shape has enableContactEvents)
         uint32_t gen = 1;
-        uint32_t stamp = 0;  // the step that last reported this pair
+        uint32_t stamp = 0; // the step that last reported this pair
         int shapeA = 0, shapeB = 0, bodyA = 0, bodyB = 0;
         uint16_t genA = 0, genB = 0; // the shapes' generations when the pair began (end events name them)
         uint64_t key = 0;
@@ -467,10 +468,22 @@ private:
     void releaseContact(int c);
 };
 
-inline vec3 toV(avbd3d_Vec3 v) { return vec3{v.x, v.y, v.z}; }
-inline avbd3d_Vec3 fromV(vec3 v) { return avbd3d_Vec3{v.x, v.y, v.z}; }
-inline quat toQ(avbd3d_Quat q) { return quat{q.v.x, q.v.y, q.v.z, q.s}; }
-inline avbd3d_Quat fromQ(quat q) { return avbd3d_Quat{avbd3d_Vec3{q.x, q.y, q.z}, q.w}; }
+inline vec3 toV(avbd3d_Vec3 v)
+{
+    return vec3{v.x, v.y, v.z};
+}
+inline avbd3d_Vec3 fromV(vec3 v)
+{
+    return avbd3d_Vec3{v.x, v.y, v.z};
+}
+inline quat toQ(avbd3d_Quat q)
+{
+    return quat{q.v.x, q.v.y, q.v.z, q.s};
+}
+inline avbd3d_Quat fromQ(quat q)
+{
+    return avbd3d_Quat{avbd3d_Vec3{q.x, q.y, q.z}, q.w};
+}
 // R diag(moment) R^T: the body-frame inertia about the centre of mass from the principal moments
 // and the principal rotation (principal frame -> body frame).
 inline avbd3d_Matrix3 principalToMatrix(vec3 moment, quat rot)

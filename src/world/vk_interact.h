@@ -36,10 +36,10 @@ struct InteractPipelines
     void destroy();
 };
 
-void launchDragUpdate(CommandList &cmd, HostRingBuffer &ring, InteractPipelines &pl,
-                       const DragUpdateArgsGpu &args, int count);
+void launchDragUpdate(CommandList &cmd, HostRingBuffer &ring, InteractPipelines &pl, const DragUpdateArgsGpu &args,
+                      int count);
 
-void launchDragRelease(CommandList &cmd, HostRingBuffer &ring, InteractPipelines &pl,
-                        const DragReleaseArgsGpu &args, int count);
+void launchDragRelease(CommandList &cmd, HostRingBuffer &ring, InteractPipelines &pl, const DragReleaseArgsGpu &args,
+                       int count);
 
 } // namespace avbdvk

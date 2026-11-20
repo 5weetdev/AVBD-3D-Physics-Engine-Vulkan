@@ -21,9 +21,9 @@ static inline void t3d_check(Avbd3dResult r, const char *what)
     }
 }
 
-static inline Avbd3dWorld * t3d_create_world(const Avbd3dWorldDef *def)
+static inline Avbd3dWorld *t3d_create_world(const Avbd3dWorldDef *def)
 {
-    Avbd3dWorld * v;
+    Avbd3dWorld *v;
     std::memset(&v, 0, sizeof v);
     t3d_check(avbd3d_create_world(def, &v), "avbd3d_create_world");
     return v;
@@ -172,7 +172,8 @@ static inline Avbd3dJointEvents t3d_world_get_joint_events(Avbd3dWorld *world)
     return v;
 }
 
-static inline Avbd3dRayResult t3d_world_cast_ray_closest(Avbd3dWorld *world, Avbd3dVec3 origin, Avbd3dVec3 translation, Avbd3dQueryFilter filter)
+static inline Avbd3dRayResult t3d_world_cast_ray_closest(Avbd3dWorld *world, Avbd3dVec3 origin, Avbd3dVec3 translation,
+                                                         Avbd3dQueryFilter filter)
 {
     Avbd3dRayResult v;
     std::memset(&v, 0, sizeof v);
@@ -211,9 +212,9 @@ static inline void t3d_body_set_user_data(Avbd3dBodyId id, void *userData)
     t3d_check(avbd3d_body_set_user_data(id, userData), "avbd3d_body_set_user_data");
 }
 
-static inline void * t3d_body_get_user_data(Avbd3dBodyId id)
+static inline void *t3d_body_get_user_data(Avbd3dBodyId id)
 {
-    void * v;
+    void *v;
     std::memset(&v, 0, sizeof v);
     t3d_check(avbd3d_body_get_user_data(id, &v), "avbd3d_body_get_user_data");
     return v;
@@ -349,7 +350,8 @@ static inline void t3d_body_apply_linear_impulse(Avbd3dBodyId id, Avbd3dVec3 imp
 
 static inline void t3d_body_apply_linear_impulse_to_center(Avbd3dBodyId id, Avbd3dVec3 impulse, int32_t wake)
 {
-    t3d_check(avbd3d_body_apply_linear_impulse_to_center(id, impulse, wake), "avbd3d_body_apply_linear_impulse_to_center");
+    t3d_check(avbd3d_body_apply_linear_impulse_to_center(id, impulse, wake),
+              "avbd3d_body_apply_linear_impulse_to_center");
 }
 
 static inline void t3d_body_apply_angular_impulse(Avbd3dBodyId id, Avbd3dVec3 impulse, int32_t wake)
@@ -385,7 +387,8 @@ static inline Avbd3dMatrix3 t3d_body_get_world_inverse_rotational_inertia(Avbd3d
 {
     Avbd3dMatrix3 v;
     std::memset(&v, 0, sizeof v);
-    t3d_check(avbd3d_body_get_world_inverse_rotational_inertia(id, &v), "avbd3d_body_get_world_inverse_rotational_inertia");
+    t3d_check(avbd3d_body_get_world_inverse_rotational_inertia(id, &v),
+              "avbd3d_body_get_world_inverse_rotational_inertia");
     return v;
 }
 
@@ -484,9 +487,9 @@ static inline void t3d_body_enable_hit_events(Avbd3dBodyId id, int32_t flag)
     t3d_check(avbd3d_body_enable_hit_events(id, flag), "avbd3d_body_enable_hit_events");
 }
 
-static inline Avbd3dWorld * t3d_body_get_world(Avbd3dBodyId id)
+static inline Avbd3dWorld *t3d_body_get_world(Avbd3dBodyId id)
 {
-    Avbd3dWorld * v;
+    Avbd3dWorld *v;
     std::memset(&v, 0, sizeof v);
     t3d_check(avbd3d_body_get_world(id, &v), "avbd3d_body_get_world");
     return v;
@@ -524,23 +527,32 @@ static inline Avbd3dAABB t3d_body_compute_aabb(Avbd3dBodyId id)
     return v;
 }
 
-static inline Avbd3dBodyCastResult t3d_body_cast_ray(Avbd3dBodyId id, Avbd3dVec3 origin, Avbd3dVec3 translation, Avbd3dQueryFilter filter, float maxFraction, Avbd3dTransform bodyTransform)
+static inline Avbd3dBodyCastResult t3d_body_cast_ray(Avbd3dBodyId id, Avbd3dVec3 origin, Avbd3dVec3 translation,
+                                                     Avbd3dQueryFilter filter, float maxFraction,
+                                                     Avbd3dTransform bodyTransform)
 {
     Avbd3dBodyCastResult v;
     std::memset(&v, 0, sizeof v);
-    t3d_check(avbd3d_body_cast_ray(id, origin, translation, filter, maxFraction, bodyTransform, &v), "avbd3d_body_cast_ray");
+    t3d_check(avbd3d_body_cast_ray(id, origin, translation, filter, maxFraction, bodyTransform, &v),
+              "avbd3d_body_cast_ray");
     return v;
 }
 
-static inline Avbd3dBodyCastResult t3d_body_cast_shape(Avbd3dBodyId id, Avbd3dVec3 origin, const Avbd3dShapeProxy *proxy, Avbd3dVec3 translation, Avbd3dQueryFilter filter, float maxFraction, int32_t canEncroach, Avbd3dTransform bodyTransform)
+static inline Avbd3dBodyCastResult t3d_body_cast_shape(Avbd3dBodyId id, Avbd3dVec3 origin,
+                                                       const Avbd3dShapeProxy *proxy, Avbd3dVec3 translation,
+                                                       Avbd3dQueryFilter filter, float maxFraction, int32_t canEncroach,
+                                                       Avbd3dTransform bodyTransform)
 {
     Avbd3dBodyCastResult v;
     std::memset(&v, 0, sizeof v);
-    t3d_check(avbd3d_body_cast_shape(id, origin, proxy, translation, filter, maxFraction, canEncroach, bodyTransform, &v), "avbd3d_body_cast_shape");
+    t3d_check(
+        avbd3d_body_cast_shape(id, origin, proxy, translation, filter, maxFraction, canEncroach, bodyTransform, &v),
+        "avbd3d_body_cast_shape");
     return v;
 }
 
-static inline int32_t t3d_body_overlap_shape(Avbd3dBodyId id, Avbd3dVec3 origin, const Avbd3dShapeProxy *proxy, Avbd3dQueryFilter filter, Avbd3dTransform bodyTransform)
+static inline int32_t t3d_body_overlap_shape(Avbd3dBodyId id, Avbd3dVec3 origin, const Avbd3dShapeProxy *proxy,
+                                             Avbd3dQueryFilter filter, Avbd3dTransform bodyTransform)
 {
     int32_t v;
     std::memset(&v, 0, sizeof v);
@@ -548,7 +560,8 @@ static inline int32_t t3d_body_overlap_shape(Avbd3dBodyId id, Avbd3dVec3 origin,
     return v;
 }
 
-static inline Avbd3dShapeId t3d_create_sphere_shape(Avbd3dBodyId bodyId, const Avbd3dShapeDef *def, const Avbd3dSphere *sphere)
+static inline Avbd3dShapeId t3d_create_sphere_shape(Avbd3dBodyId bodyId, const Avbd3dShapeDef *def,
+                                                    const Avbd3dSphere *sphere)
 {
     Avbd3dShapeId v;
     std::memset(&v, 0, sizeof v);
@@ -556,7 +569,8 @@ static inline Avbd3dShapeId t3d_create_sphere_shape(Avbd3dBodyId bodyId, const A
     return v;
 }
 
-static inline Avbd3dShapeId t3d_create_capsule_shape(Avbd3dBodyId bodyId, const Avbd3dShapeDef *def, const Avbd3dCapsule *capsule)
+static inline Avbd3dShapeId t3d_create_capsule_shape(Avbd3dBodyId bodyId, const Avbd3dShapeDef *def,
+                                                     const Avbd3dCapsule *capsule)
 {
     Avbd3dShapeId v;
     std::memset(&v, 0, sizeof v);
@@ -564,7 +578,8 @@ static inline Avbd3dShapeId t3d_create_capsule_shape(Avbd3dBodyId bodyId, const 
     return v;
 }
 
-static inline Avbd3dShapeId t3d_create_hull_shape(Avbd3dBodyId bodyId, const Avbd3dShapeDef *def, const Avbd3dHullData *hull)
+static inline Avbd3dShapeId t3d_create_hull_shape(Avbd3dBodyId bodyId, const Avbd3dShapeDef *def,
+                                                  const Avbd3dHullData *hull)
 {
     Avbd3dShapeId v;
     std::memset(&v, 0, sizeof v);
@@ -572,15 +587,19 @@ static inline Avbd3dShapeId t3d_create_hull_shape(Avbd3dBodyId bodyId, const Avb
     return v;
 }
 
-static inline Avbd3dShapeId t3d_create_transformed_hull_shape(Avbd3dBodyId bodyId, const Avbd3dShapeDef *def, const Avbd3dHullData *hull, Avbd3dTransform transform, Avbd3dVec3 scale)
+static inline Avbd3dShapeId t3d_create_transformed_hull_shape(Avbd3dBodyId bodyId, const Avbd3dShapeDef *def,
+                                                              const Avbd3dHullData *hull, Avbd3dTransform transform,
+                                                              Avbd3dVec3 scale)
 {
     Avbd3dShapeId v;
     std::memset(&v, 0, sizeof v);
-    t3d_check(avbd3d_create_transformed_hull_shape(bodyId, def, hull, transform, scale, &v), "avbd3d_create_transformed_hull_shape");
+    t3d_check(avbd3d_create_transformed_hull_shape(bodyId, def, hull, transform, scale, &v),
+              "avbd3d_create_transformed_hull_shape");
     return v;
 }
 
-static inline Avbd3dShapeId t3d_create_mesh_shape(Avbd3dBodyId bodyId, const Avbd3dShapeDef *def, const Avbd3dMeshData *mesh, Avbd3dVec3 scale)
+static inline Avbd3dShapeId t3d_create_mesh_shape(Avbd3dBodyId bodyId, const Avbd3dShapeDef *def,
+                                                  const Avbd3dMeshData *mesh, Avbd3dVec3 scale)
 {
     Avbd3dShapeId v;
     std::memset(&v, 0, sizeof v);
@@ -588,7 +607,8 @@ static inline Avbd3dShapeId t3d_create_mesh_shape(Avbd3dBodyId bodyId, const Avb
     return v;
 }
 
-static inline Avbd3dShapeId t3d_create_height_field_shape(Avbd3dBodyId bodyId, const Avbd3dShapeDef *def, const Avbd3dHeightFieldData *heightField)
+static inline Avbd3dShapeId t3d_create_height_field_shape(Avbd3dBodyId bodyId, const Avbd3dShapeDef *def,
+                                                          const Avbd3dHeightFieldData *heightField)
 {
     Avbd3dShapeId v;
     std::memset(&v, 0, sizeof v);
@@ -596,7 +616,8 @@ static inline Avbd3dShapeId t3d_create_height_field_shape(Avbd3dBodyId bodyId, c
     return v;
 }
 
-static inline Avbd3dShapeId t3d_create_baked_compound_shape(Avbd3dBodyId bodyId, Avbd3dShapeDef *def, const Avbd3dCompoundData *compound)
+static inline Avbd3dShapeId t3d_create_baked_compound_shape(Avbd3dBodyId bodyId, Avbd3dShapeDef *def,
+                                                            const Avbd3dCompoundData *compound)
 {
     Avbd3dShapeId v;
     std::memset(&v, 0, sizeof v);
@@ -625,9 +646,9 @@ static inline Avbd3dBodyId t3d_shape_get_body(Avbd3dShapeId id)
     return v;
 }
 
-static inline Avbd3dWorld * t3d_shape_get_world(Avbd3dShapeId id)
+static inline Avbd3dWorld *t3d_shape_get_world(Avbd3dShapeId id)
 {
-    Avbd3dWorld * v;
+    Avbd3dWorld *v;
     std::memset(&v, 0, sizeof v);
     t3d_check(avbd3d_shape_get_world(id, &v), "avbd3d_shape_get_world");
     return v;
@@ -646,9 +667,9 @@ static inline void t3d_shape_set_user_data(Avbd3dShapeId id, void *userData)
     t3d_check(avbd3d_shape_set_user_data(id, userData), "avbd3d_shape_set_user_data");
 }
 
-static inline void * t3d_shape_get_user_data(Avbd3dShapeId id)
+static inline void *t3d_shape_get_user_data(Avbd3dShapeId id)
 {
-    void * v;
+    void *v;
     std::memset(&v, 0, sizeof v);
     t3d_check(avbd3d_shape_get_user_data(id, &v), "avbd3d_shape_get_user_data");
     return v;
@@ -758,9 +779,9 @@ static inline Avbd3dBodyId t3d_joint_get_body_b(Avbd3dJointId id)
     return v;
 }
 
-static inline Avbd3dWorld * t3d_joint_get_world(Avbd3dJointId id)
+static inline Avbd3dWorld *t3d_joint_get_world(Avbd3dJointId id)
 {
-    Avbd3dWorld * v;
+    Avbd3dWorld *v;
     std::memset(&v, 0, sizeof v);
     t3d_check(avbd3d_joint_get_world(id, &v), "avbd3d_joint_get_world");
     return v;
@@ -786,9 +807,9 @@ static inline void t3d_joint_set_user_data(Avbd3dJointId id, void *userData)
     t3d_check(avbd3d_joint_set_user_data(id, userData), "avbd3d_joint_set_user_data");
 }
 
-static inline void * t3d_joint_get_user_data(Avbd3dJointId id)
+static inline void *t3d_joint_get_user_data(Avbd3dJointId id)
 {
-    void * v;
+    void *v;
     std::memset(&v, 0, sizeof v);
     t3d_check(avbd3d_joint_get_user_data(id, &v), "avbd3d_joint_get_user_data");
     return v;
@@ -850,7 +871,8 @@ static inline void t3d_distance_joint_enable_spring(Avbd3dJointId id, int32_t en
 
 static inline void t3d_distance_joint_set_spring_force_range(Avbd3dJointId id, float lowerForce, float upperForce)
 {
-    t3d_check(avbd3d_distance_joint_set_spring_force_range(id, lowerForce, upperForce), "avbd3d_distance_joint_set_spring_force_range");
+    t3d_check(avbd3d_distance_joint_set_spring_force_range(id, lowerForce, upperForce),
+              "avbd3d_distance_joint_set_spring_force_range");
 }
 
 static inline void t3d_distance_joint_set_spring_hertz(Avbd3dJointId id, float hertz)
@@ -860,7 +882,8 @@ static inline void t3d_distance_joint_set_spring_hertz(Avbd3dJointId id, float h
 
 static inline void t3d_distance_joint_set_spring_damping_ratio(Avbd3dJointId id, float dampingRatio)
 {
-    t3d_check(avbd3d_distance_joint_set_spring_damping_ratio(id, dampingRatio), "avbd3d_distance_joint_set_spring_damping_ratio");
+    t3d_check(avbd3d_distance_joint_set_spring_damping_ratio(id, dampingRatio),
+              "avbd3d_distance_joint_set_spring_damping_ratio");
 }
 
 static inline void t3d_distance_joint_enable_limit(Avbd3dJointId id, int32_t enableLimit)
@@ -870,7 +893,8 @@ static inline void t3d_distance_joint_enable_limit(Avbd3dJointId id, int32_t ena
 
 static inline void t3d_distance_joint_set_length_range(Avbd3dJointId id, float minLength, float maxLength)
 {
-    t3d_check(avbd3d_distance_joint_set_length_range(id, minLength, maxLength), "avbd3d_distance_joint_set_length_range");
+    t3d_check(avbd3d_distance_joint_set_length_range(id, minLength, maxLength),
+              "avbd3d_distance_joint_set_length_range");
 }
 
 static inline void t3d_distance_joint_enable_motor(Avbd3dJointId id, int32_t enableMotor)
@@ -949,7 +973,8 @@ static inline void t3d_motor_joint_set_angular_hertz(Avbd3dJointId id, float her
 
 static inline void t3d_motor_joint_set_angular_damping_ratio(Avbd3dJointId id, float damping)
 {
-    t3d_check(avbd3d_motor_joint_set_angular_damping_ratio(id, damping), "avbd3d_motor_joint_set_angular_damping_ratio");
+    t3d_check(avbd3d_motor_joint_set_angular_damping_ratio(id, damping),
+              "avbd3d_motor_joint_set_angular_damping_ratio");
 }
 
 static inline void t3d_motor_joint_set_max_spring_force(Avbd3dJointId id, float maxForce)
@@ -985,7 +1010,8 @@ static inline void t3d_parallel_joint_set_spring_hertz(Avbd3dJointId id, float h
 
 static inline void t3d_parallel_joint_set_spring_damping_ratio(Avbd3dJointId id, float dampingRatio)
 {
-    t3d_check(avbd3d_parallel_joint_set_spring_damping_ratio(id, dampingRatio), "avbd3d_parallel_joint_set_spring_damping_ratio");
+    t3d_check(avbd3d_parallel_joint_set_spring_damping_ratio(id, dampingRatio),
+              "avbd3d_parallel_joint_set_spring_damping_ratio");
 }
 
 static inline void t3d_parallel_joint_set_max_torque(Avbd3dJointId id, float force)
@@ -1013,12 +1039,14 @@ static inline void t3d_prismatic_joint_set_spring_hertz(Avbd3dJointId id, float 
 
 static inline void t3d_prismatic_joint_set_spring_damping_ratio(Avbd3dJointId id, float dampingRatio)
 {
-    t3d_check(avbd3d_prismatic_joint_set_spring_damping_ratio(id, dampingRatio), "avbd3d_prismatic_joint_set_spring_damping_ratio");
+    t3d_check(avbd3d_prismatic_joint_set_spring_damping_ratio(id, dampingRatio),
+              "avbd3d_prismatic_joint_set_spring_damping_ratio");
 }
 
 static inline void t3d_prismatic_joint_set_target_translation(Avbd3dJointId id, float targetTranslation)
 {
-    t3d_check(avbd3d_prismatic_joint_set_target_translation(id, targetTranslation), "avbd3d_prismatic_joint_set_target_translation");
+    t3d_check(avbd3d_prismatic_joint_set_target_translation(id, targetTranslation),
+              "avbd3d_prismatic_joint_set_target_translation");
 }
 
 static inline void t3d_prismatic_joint_enable_limit(Avbd3dJointId id, int32_t enableLimit)
@@ -1090,7 +1118,8 @@ static inline void t3d_revolute_joint_set_spring_hertz(Avbd3dJointId id, float h
 
 static inline void t3d_revolute_joint_set_spring_damping_ratio(Avbd3dJointId id, float dampingRatio)
 {
-    t3d_check(avbd3d_revolute_joint_set_spring_damping_ratio(id, dampingRatio), "avbd3d_revolute_joint_set_spring_damping_ratio");
+    t3d_check(avbd3d_revolute_joint_set_spring_damping_ratio(id, dampingRatio),
+              "avbd3d_revolute_joint_set_spring_damping_ratio");
 }
 
 static inline void t3d_revolute_joint_set_target_angle(Avbd3dJointId id, float targetRadians)
@@ -1105,7 +1134,8 @@ static inline void t3d_revolute_joint_enable_limit(Avbd3dJointId id, int32_t ena
 
 static inline void t3d_revolute_joint_set_limits(Avbd3dJointId id, float lowerLimitRadians, float upperLimitRadians)
 {
-    t3d_check(avbd3d_revolute_joint_set_limits(id, lowerLimitRadians, upperLimitRadians), "avbd3d_revolute_joint_set_limits");
+    t3d_check(avbd3d_revolute_joint_set_limits(id, lowerLimitRadians, upperLimitRadians),
+              "avbd3d_revolute_joint_set_limits");
 }
 
 static inline void t3d_revolute_joint_enable_motor(Avbd3dJointId id, int32_t enableMotor)
@@ -1170,9 +1200,11 @@ static inline void t3d_spherical_joint_enable_twist_limit(Avbd3dJointId id, int3
     t3d_check(avbd3d_spherical_joint_enable_twist_limit(id, enableLimit), "avbd3d_spherical_joint_enable_twist_limit");
 }
 
-static inline void t3d_spherical_joint_set_twist_limits(Avbd3dJointId id, float lowerLimitRadians, float upperLimitRadians)
+static inline void t3d_spherical_joint_set_twist_limits(Avbd3dJointId id, float lowerLimitRadians,
+                                                        float upperLimitRadians)
 {
-    t3d_check(avbd3d_spherical_joint_set_twist_limits(id, lowerLimitRadians, upperLimitRadians), "avbd3d_spherical_joint_set_twist_limits");
+    t3d_check(avbd3d_spherical_joint_set_twist_limits(id, lowerLimitRadians, upperLimitRadians),
+              "avbd3d_spherical_joint_set_twist_limits");
 }
 
 static inline void t3d_spherical_joint_enable_spring(Avbd3dJointId id, int32_t enableSpring)
@@ -1187,7 +1219,8 @@ static inline void t3d_spherical_joint_set_spring_hertz(Avbd3dJointId id, float 
 
 static inline void t3d_spherical_joint_set_spring_damping_ratio(Avbd3dJointId id, float dampingRatio)
 {
-    t3d_check(avbd3d_spherical_joint_set_spring_damping_ratio(id, dampingRatio), "avbd3d_spherical_joint_set_spring_damping_ratio");
+    t3d_check(avbd3d_spherical_joint_set_spring_damping_ratio(id, dampingRatio),
+              "avbd3d_spherical_joint_set_spring_damping_ratio");
 }
 
 static inline void t3d_spherical_joint_enable_motor(Avbd3dJointId id, int32_t enableMotor)
@@ -1197,7 +1230,8 @@ static inline void t3d_spherical_joint_enable_motor(Avbd3dJointId id, int32_t en
 
 static inline void t3d_spherical_joint_set_motor_velocity(Avbd3dJointId id, Avbd3dVec3 motorVelocity)
 {
-    t3d_check(avbd3d_spherical_joint_set_motor_velocity(id, motorVelocity), "avbd3d_spherical_joint_set_motor_velocity");
+    t3d_check(avbd3d_spherical_joint_set_motor_velocity(id, motorVelocity),
+              "avbd3d_spherical_joint_set_motor_velocity");
 }
 
 static inline void t3d_spherical_joint_set_max_motor_torque(Avbd3dJointId id, float torque)
@@ -1231,7 +1265,8 @@ static inline float t3d_spherical_joint_get_twist_angle(Avbd3dJointId id)
 
 static inline void t3d_spherical_joint_set_target_rotation(Avbd3dJointId id, Avbd3dQuat targetRotation)
 {
-    t3d_check(avbd3d_spherical_joint_set_target_rotation(id, targetRotation), "avbd3d_spherical_joint_set_target_rotation");
+    t3d_check(avbd3d_spherical_joint_set_target_rotation(id, targetRotation),
+              "avbd3d_spherical_joint_set_target_rotation");
 }
 
 static inline Avbd3dJointId t3d_create_weld_joint(Avbd3dWorld *world, const Avbd3dWeldJointDef *def)
@@ -1249,7 +1284,8 @@ static inline void t3d_weld_joint_set_linear_hertz(Avbd3dJointId id, float hertz
 
 static inline void t3d_weld_joint_set_linear_damping_ratio(Avbd3dJointId id, float dampingRatio)
 {
-    t3d_check(avbd3d_weld_joint_set_linear_damping_ratio(id, dampingRatio), "avbd3d_weld_joint_set_linear_damping_ratio");
+    t3d_check(avbd3d_weld_joint_set_linear_damping_ratio(id, dampingRatio),
+              "avbd3d_weld_joint_set_linear_damping_ratio");
 }
 
 static inline void t3d_weld_joint_set_angular_hertz(Avbd3dJointId id, float hertz)
@@ -1259,7 +1295,8 @@ static inline void t3d_weld_joint_set_angular_hertz(Avbd3dJointId id, float hert
 
 static inline void t3d_weld_joint_set_angular_damping_ratio(Avbd3dJointId id, float dampingRatio)
 {
-    t3d_check(avbd3d_weld_joint_set_angular_damping_ratio(id, dampingRatio), "avbd3d_weld_joint_set_angular_damping_ratio");
+    t3d_check(avbd3d_weld_joint_set_angular_damping_ratio(id, dampingRatio),
+              "avbd3d_weld_joint_set_angular_damping_ratio");
 }
 
 static inline Avbd3dJointId t3d_create_wheel_joint(Avbd3dWorld *world, const Avbd3dWheelJointDef *def)
@@ -1282,7 +1319,8 @@ static inline void t3d_wheel_joint_set_suspension_hertz(Avbd3dJointId id, float 
 
 static inline void t3d_wheel_joint_set_suspension_damping_ratio(Avbd3dJointId id, float dampingRatio)
 {
-    t3d_check(avbd3d_wheel_joint_set_suspension_damping_ratio(id, dampingRatio), "avbd3d_wheel_joint_set_suspension_damping_ratio");
+    t3d_check(avbd3d_wheel_joint_set_suspension_damping_ratio(id, dampingRatio),
+              "avbd3d_wheel_joint_set_suspension_damping_ratio");
 }
 
 static inline void t3d_wheel_joint_enable_suspension_limit(Avbd3dJointId id, int32_t flag)
@@ -1346,7 +1384,8 @@ static inline void t3d_wheel_joint_set_steering_hertz(Avbd3dJointId id, float he
 
 static inline void t3d_wheel_joint_set_steering_damping_ratio(Avbd3dJointId id, float dampingRatio)
 {
-    t3d_check(avbd3d_wheel_joint_set_steering_damping_ratio(id, dampingRatio), "avbd3d_wheel_joint_set_steering_damping_ratio");
+    t3d_check(avbd3d_wheel_joint_set_steering_damping_ratio(id, dampingRatio),
+              "avbd3d_wheel_joint_set_steering_damping_ratio");
 }
 
 static inline void t3d_wheel_joint_set_max_steering_torque(Avbd3dJointId id, float torque)
@@ -1361,12 +1400,14 @@ static inline void t3d_wheel_joint_enable_steering_limit(Avbd3dJointId id, int32
 
 static inline void t3d_wheel_joint_set_steering_limits(Avbd3dJointId id, float lowerRadians, float upperRadians)
 {
-    t3d_check(avbd3d_wheel_joint_set_steering_limits(id, lowerRadians, upperRadians), "avbd3d_wheel_joint_set_steering_limits");
+    t3d_check(avbd3d_wheel_joint_set_steering_limits(id, lowerRadians, upperRadians),
+              "avbd3d_wheel_joint_set_steering_limits");
 }
 
 static inline void t3d_wheel_joint_set_target_steering_angle(Avbd3dJointId id, float radians)
 {
-    t3d_check(avbd3d_wheel_joint_set_target_steering_angle(id, radians), "avbd3d_wheel_joint_set_target_steering_angle");
+    t3d_check(avbd3d_wheel_joint_set_target_steering_angle(id, radians),
+              "avbd3d_wheel_joint_set_target_steering_angle");
 }
 
 static inline Avbd3dJointId t3d_create_generic_joint(Avbd3dWorld *world, const Avbd3dGenericJointDef *def)
@@ -1403,9 +1444,9 @@ static inline void t3d_grab_end(Avbd3dWorld *world)
     t3d_check(avbd3d_grab_end(world), "avbd3d_grab_end");
 }
 
-static inline Avbd3dHullData * t3d_create_hull(const Avbd3dVec3 *points, int32_t point_count, int32_t max_vertex_count)
+static inline Avbd3dHullData *t3d_create_hull(const Avbd3dVec3 *points, int32_t point_count, int32_t max_vertex_count)
 {
-    Avbd3dHullData * v;
+    Avbd3dHullData *v;
     std::memset(&v, 0, sizeof v);
     t3d_check(avbd3d_create_hull(points, point_count, max_vertex_count, &v), "avbd3d_create_hull");
     return v;
@@ -1416,9 +1457,9 @@ static inline void t3d_destroy_hull(Avbd3dHullData *hull)
     t3d_check(avbd3d_destroy_hull(hull), "avbd3d_destroy_hull");
 }
 
-static inline Avbd3dMeshData * t3d_create_mesh(const Avbd3dMeshDef *def)
+static inline Avbd3dMeshData *t3d_create_mesh(const Avbd3dMeshDef *def)
 {
-    Avbd3dMeshData * v;
+    Avbd3dMeshData *v;
     std::memset(&v, 0, sizeof v);
     t3d_check(avbd3d_create_mesh(def, &v), "avbd3d_create_mesh");
     return v;
@@ -1429,9 +1470,9 @@ static inline void t3d_destroy_mesh(Avbd3dMeshData *mesh)
     t3d_check(avbd3d_destroy_mesh(mesh), "avbd3d_destroy_mesh");
 }
 
-static inline Avbd3dHeightFieldData * t3d_create_height_field(const Avbd3dHeightFieldDef *def)
+static inline Avbd3dHeightFieldData *t3d_create_height_field(const Avbd3dHeightFieldDef *def)
 {
-    Avbd3dHeightFieldData * v;
+    Avbd3dHeightFieldData *v;
     std::memset(&v, 0, sizeof v);
     t3d_check(avbd3d_create_height_field(def, &v), "avbd3d_create_height_field");
     return v;
@@ -1442,9 +1483,9 @@ static inline void t3d_destroy_height_field(Avbd3dHeightFieldData *height_field)
     t3d_check(avbd3d_destroy_height_field(height_field), "avbd3d_destroy_height_field");
 }
 
-static inline Avbd3dCompoundData * t3d_create_compound(const Avbd3dCompoundDef *def)
+static inline Avbd3dCompoundData *t3d_create_compound(const Avbd3dCompoundDef *def)
 {
-    Avbd3dCompoundData * v;
+    Avbd3dCompoundData *v;
     std::memset(&v, 0, sizeof v);
     t3d_check(avbd3d_create_compound(def, &v), "avbd3d_create_compound");
     return v;
@@ -1455,9 +1496,9 @@ static inline void t3d_destroy_compound(Avbd3dCompoundData *compound)
     t3d_check(avbd3d_destroy_compound(compound), "avbd3d_destroy_compound");
 }
 
-static inline Avbd3dGpu * t3d_create_gpu(const Avbd3dGpuDef *def)
+static inline Avbd3dGpu *t3d_create_gpu(const Avbd3dGpuDef *def)
 {
-    Avbd3dGpu * v;
+    Avbd3dGpu *v;
     std::memset(&v, 0, sizeof v);
     t3d_check(avbd3d_create_gpu(def, &v), "avbd3d_create_gpu");
     return v;
@@ -1468,9 +1509,9 @@ static inline void t3d_destroy_gpu(Avbd3dGpu *gpu)
     t3d_check(avbd3d_destroy_gpu(gpu), "avbd3d_destroy_gpu");
 }
 
-static inline Avbd3dWorld * t3d_create_world_on_gpu(Avbd3dGpu *gpu, const Avbd3dWorldDef *def)
+static inline Avbd3dWorld *t3d_create_world_on_gpu(Avbd3dGpu *gpu, const Avbd3dWorldDef *def)
 {
-    Avbd3dWorld * v;
+    Avbd3dWorld *v;
     std::memset(&v, 0, sizeof v);
     t3d_check(avbd3d_create_world_on_gpu(gpu, def, &v), "avbd3d_create_world_on_gpu");
     return v;
@@ -1566,16 +1607,17 @@ static inline int32_t t3d_world_get_contact_markers_requested(Avbd3dWorld *world
     return v;
 }
 
-
 // Calls whose result is a count or that take callbacks: checked, returning the count.
-static inline int32_t t3d_world_get_body_data(Avbd3dWorld *w, const Avbd3dBodyId *ids, int32_t n, Avbd3dBodyDataType t, void *data)
+static inline int32_t t3d_world_get_body_data(Avbd3dWorld *w, const Avbd3dBodyId *ids, int32_t n, Avbd3dBodyDataType t,
+                                              void *data)
 {
     int32_t v = 0;
     t3d_check(avbd3d_world_get_body_data(w, ids, n, t, data, &v), "avbd3d_world_get_body_data");
     return v;
 }
 
-static inline int32_t t3d_world_set_body_data(Avbd3dWorld *w, const Avbd3dBodyId *ids, int32_t n, Avbd3dBodyDataType t, const void *data)
+static inline int32_t t3d_world_set_body_data(Avbd3dWorld *w, const Avbd3dBodyId *ids, int32_t n, Avbd3dBodyDataType t,
+                                              const void *data)
 {
     int32_t v = 0;
     t3d_check(avbd3d_world_set_body_data(w, ids, n, t, data, &v), "avbd3d_world_set_body_data");
@@ -1617,22 +1659,25 @@ static inline int32_t t3d_shape_get_sensor_data(Avbd3dShapeId id, Avbd3dShapeId 
     return v;
 }
 
-static inline int32_t t3d_body_collide_mover(Avbd3dBodyId id, Avbd3dBodyPlaneResult *planes, int32_t cap, Avbd3dVec3 origin,
-                                             const Avbd3dCapsule *mover, Avbd3dQueryFilter filter, Avbd3dTransform xf)
+static inline int32_t t3d_body_collide_mover(Avbd3dBodyId id, Avbd3dBodyPlaneResult *planes, int32_t cap,
+                                             Avbd3dVec3 origin, const Avbd3dCapsule *mover, Avbd3dQueryFilter filter,
+                                             Avbd3dTransform xf)
 {
     int32_t v = 0;
     t3d_check(avbd3d_body_collide_mover(id, planes, cap, origin, mover, filter, xf, &v), "avbd3d_body_collide_mover");
     return v;
 }
 
-static inline int32_t t3d_grab_begin(Avbd3dWorld *w, Avbd3dBodyId seed, Avbd3dVec3 c, float r, int32_t follow, Avbd3dBodyId *out, int32_t max)
+static inline int32_t t3d_grab_begin(Avbd3dWorld *w, Avbd3dBodyId seed, Avbd3dVec3 c, float r, int32_t follow,
+                                     Avbd3dBodyId *out, int32_t max)
 {
     int32_t v = 0;
     t3d_check(avbd3d_grab_begin(w, seed, c, r, follow, out, max, &v), "avbd3d_grab_begin");
     return v;
 }
 
-static inline int32_t t3d_grab_survivors(Avbd3dWorld *w, Avbd3dBodyId seed, const Avbd3dBodyId *g, int32_t n, uint8_t *keep)
+static inline int32_t t3d_grab_survivors(Avbd3dWorld *w, Avbd3dBodyId seed, const Avbd3dBodyId *g, int32_t n,
+                                         uint8_t *keep)
 {
     int32_t v = 0;
     t3d_check(avbd3d_grab_survivors(w, seed, g, n, keep, &v), "avbd3d_grab_survivors");
@@ -1654,33 +1699,36 @@ static inline Avbd3dQuat t3d_quat_axis_angle(Avbd3dVec3 axis, float angle)
 
 static const Avbd3dTransform t3d_transform_identity = {{0, 0, 0}, {{0, 0, 0}, 1}};
 
-static inline void t3d_world_overlap_aabb(Avbd3dWorld *w, Avbd3dAABB aabb, Avbd3dQueryFilter f, Avbd3dOverlapResultFcn *fcn, void *ctx)
+static inline void t3d_world_overlap_aabb(Avbd3dWorld *w, Avbd3dAABB aabb, Avbd3dQueryFilter f,
+                                          Avbd3dOverlapResultFcn *fcn, void *ctx)
 {
     t3d_check(avbd3d_world_overlap_aabb(w, aabb, f, fcn, ctx), "avbd3d_world_overlap_aabb");
 }
 
-static inline void t3d_world_overlap_shape(Avbd3dWorld *w, Avbd3dVec3 origin, const Avbd3dShapeProxy *proxy, Avbd3dQueryFilter f,
-                                           Avbd3dOverlapResultFcn *fcn, void *ctx)
+static inline void t3d_world_overlap_shape(Avbd3dWorld *w, Avbd3dVec3 origin, const Avbd3dShapeProxy *proxy,
+                                           Avbd3dQueryFilter f, Avbd3dOverlapResultFcn *fcn, void *ctx)
 {
     t3d_check(avbd3d_world_overlap_shape(w, origin, proxy, f, fcn, ctx), "avbd3d_world_overlap_shape");
 }
 
-static inline void t3d_world_cast_shape(Avbd3dWorld *w, Avbd3dVec3 origin, const Avbd3dShapeProxy *proxy, Avbd3dVec3 translation,
-                                        Avbd3dQueryFilter f, Avbd3dCastResultFcn *fcn, void *ctx)
+static inline void t3d_world_cast_shape(Avbd3dWorld *w, Avbd3dVec3 origin, const Avbd3dShapeProxy *proxy,
+                                        Avbd3dVec3 translation, Avbd3dQueryFilter f, Avbd3dCastResultFcn *fcn,
+                                        void *ctx)
 {
     t3d_check(avbd3d_world_cast_shape(w, origin, proxy, translation, f, fcn, ctx), "avbd3d_world_cast_shape");
 }
 
-static inline float t3d_world_cast_mover(Avbd3dWorld *w, Avbd3dVec3 origin, const Avbd3dCapsule *mover, Avbd3dVec3 translation,
-                                         Avbd3dQueryFilter f, Avbd3dMoverFilterFcn *fcn, void *ctx)
+static inline float t3d_world_cast_mover(Avbd3dWorld *w, Avbd3dVec3 origin, const Avbd3dCapsule *mover,
+                                         Avbd3dVec3 translation, Avbd3dQueryFilter f, Avbd3dMoverFilterFcn *fcn,
+                                         void *ctx)
 {
     float v = 0.0f;
     t3d_check(avbd3d_world_cast_mover(w, origin, mover, translation, f, fcn, ctx, &v), "avbd3d_world_cast_mover");
     return v;
 }
 
-static inline void t3d_world_collide_mover(Avbd3dWorld *w, Avbd3dVec3 origin, const Avbd3dCapsule *mover, Avbd3dQueryFilter f,
-                                           Avbd3dPlaneResultFcn *fcn, void *ctx)
+static inline void t3d_world_collide_mover(Avbd3dWorld *w, Avbd3dVec3 origin, const Avbd3dCapsule *mover,
+                                           Avbd3dQueryFilter f, Avbd3dPlaneResultFcn *fcn, void *ctx)
 {
     t3d_check(avbd3d_world_collide_mover(w, origin, mover, f, fcn, ctx), "avbd3d_world_collide_mover");
 }

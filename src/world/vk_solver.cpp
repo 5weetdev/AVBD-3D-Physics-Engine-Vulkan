@@ -23,11 +23,11 @@ static uint32_t ceilDiv(int n, int d)
     return (uint32_t)((n + d - 1) / d);
 }
 
-void SolverPipelines::init(Device &dev, PipelineLayout &layout,
-                            const uint32_t *primalSpirv, size_t primalWords,
-                            const uint32_t *dualSpirv, size_t dualWords)
+void SolverPipelines::init(Device &dev, PipelineLayout &layout, const uint32_t *primalSpirv, size_t primalWords,
+                           const uint32_t *dualSpirv, size_t dualWords)
 {
-    primalThreadNoForces.init(dev, layout, primalSpirv, primalWords, "csPrimalThreadNoForces", "csPrimalThreadNoForces");
+    primalThreadNoForces.init(dev, layout, primalSpirv, primalWords, "csPrimalThreadNoForces",
+                              "csPrimalThreadNoForces");
     primalThreadForces.init(dev, layout, primalSpirv, primalWords, "csPrimalThreadForces", "csPrimalThreadForces");
     primalWarp4NoForces.init(dev, layout, primalSpirv, primalWords, "csPrimalWarp4NoForces", "csPrimalWarp4NoForces");
     primalWarp4Forces.init(dev, layout, primalSpirv, primalWords, "csPrimalWarp4Forces", "csPrimalWarp4Forces");
@@ -63,16 +63,19 @@ void SolverPipelines::destroy()
     stepFlagIfGreater.destroy();
     stepFlagIfSet.destroy();
     stepColorBound.destroy();
-    coarseReset.destroy(); coarseAssign.destroy(); coarseAssemble.destroy();
-    coarseSolve.destroy(); coarseApply.destroy();
+    coarseReset.destroy();
+    coarseAssign.destroy();
+    coarseAssemble.destroy();
+    coarseSolve.destroy();
+    coarseApply.destroy();
     jointInit.destroy();
     jointDual.destroy();
     dual.destroy();
     iterateSmall.destroy();
 }
 
-void launchPrimalColor(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl,
-                        const PrimalArgsGpu &args, bool warp4, bool withForces)
+void launchPrimalColor(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, const PrimalArgsGpu &args,
+                       bool warp4, bool withForces)
 {
     VkDeviceAddress argsAddr = ring.write(&args, sizeof(args));
 
@@ -96,9 +99,8 @@ void launchPrimalColor(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &
     cmd.dispatch(p, groups, argsAddr);
 }
 
-void launchPrimalDispatchArgs(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl,
-                              VkDeviceAddress colorStart, VkDeviceAddress colorEnd, Buffer &indirect,
-                              int colorCount, bool warp4)
+void launchPrimalDispatchArgs(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, VkDeviceAddress colorStart,
+                              VkDeviceAddress colorEnd, Buffer &indirect, int colorCount, bool warp4)
 {
     if (colorCount <= 0)
         return;
@@ -107,8 +109,8 @@ void launchPrimalDispatchArgs(CommandList &cmd, HostRingBuffer &ring, SolverPipe
     cmd.dispatch(pl.primalDispatchArgs, ceilDiv(colorCount, 128), argsAddr);
 }
 
-void launchPrimalColorIndirect(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl,
-                               const PrimalArgsGpu &args, bool warp4, bool withForces, const Buffer &indirect)
+void launchPrimalColorIndirect(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, const PrimalArgsGpu &args,
+                               bool warp4, bool withForces, const Buffer &indirect)
 {
     VkDeviceAddress argsAddr = ring.write(&args, sizeof(args));
     Pipeline &p = warp4 ? (withForces ? pl.primalWarp4Forces : pl.primalWarp4NoForces)
@@ -116,8 +118,8 @@ void launchPrimalColorIndirect(CommandList &cmd, HostRingBuffer &ring, SolverPip
     cmd.dispatchIndirect(p, indirect, (VkDeviceSize)args.color * 3 * sizeof(uint32_t), argsAddr);
 }
 
-void launchPrimalWideIndirect(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl,
-                              const PrimalArgsGpu &args, bool withForces, const Buffer &indirect)
+void launchPrimalWideIndirect(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, const PrimalArgsGpu &args,
+                              bool withForces, const Buffer &indirect)
 {
     VkDeviceAddress argsAddr = ring.write(&args, sizeof(args));
     Pipeline &p = withForces ? pl.primalWideForces : pl.primalWideNoForces;
@@ -165,8 +167,8 @@ void launchStepColorBound(CommandList &cmd, HostRingBuffer &ring, SolverPipeline
     cmd.dispatch(pl.stepColorBound, ceilDiv(maxColors - bound, 128), argsAddr);
 }
 
-void launchJointInit(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl,
-                      const JointInitArgsGpu &args, int jointCount)
+void launchJointInit(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, const JointInitArgsGpu &args,
+                     int jointCount)
 {
     VkDeviceAddress argsAddr = ring.write(&args, sizeof(args));
     uint32_t groups = ceilDiv(jointCount, 256);
@@ -175,8 +177,8 @@ void launchJointInit(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl
     cmd.dispatch(pl.jointInit, groups, argsAddr);
 }
 
-void launchJointDual(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl,
-                      const JointDualArgsGpu &args, int jointCount)
+void launchJointDual(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, const JointDualArgsGpu &args,
+                     int jointCount)
 {
     VkDeviceAddress argsAddr = ring.write(&args, sizeof(args));
     uint32_t groups = ceilDiv(jointCount, 256);
@@ -185,8 +187,7 @@ void launchJointDual(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl
     cmd.dispatch(pl.jointDual, groups, argsAddr);
 }
 
-void launchDual(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl,
-                const DualArgsGpu &args, int slots)
+void launchDual(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, const DualArgsGpu &args, int slots)
 {
     VkDeviceAddress argsAddr = ring.write(&args, sizeof(args));
     uint32_t groups = ceilDiv(slots, 256);
@@ -195,8 +196,8 @@ void launchDual(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl,
     cmd.dispatch(pl.dual, groups, argsAddr);
 }
 
-void launchCoarse(CommandList &cmd, HostRingBuffer &ring, Pipeline &pipeline, const CoarseArgsGpu &args,
-                  int threads, int groupSize)
+void launchCoarse(CommandList &cmd, HostRingBuffer &ring, Pipeline &pipeline, const CoarseArgsGpu &args, int threads,
+                  int groupSize)
 {
     VkDeviceAddress argsAddr = ring.write(&args, sizeof(args));
     cmd.dispatch(pipeline, ceilDiv(threads, groupSize), argsAddr);

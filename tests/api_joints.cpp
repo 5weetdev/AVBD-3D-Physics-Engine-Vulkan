@@ -10,16 +10,16 @@
 #include <cstdio>
 
 static int g_fail = 0;
-#define CHECK(cond, ...)                                                                                              \
-    do                                                                                                                \
-    {                                                                                                                 \
-        if (!(cond))                                                                                                  \
-        {                                                                                                             \
-            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                               \
-            std::printf(__VA_ARGS__);                                                                                 \
-            std::printf("\n");                                                                                        \
-            g_fail++;                                                                                                 \
-        }                                                                                                             \
+#define CHECK(cond, ...)                                                                                               \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        if (!(cond))                                                                                                   \
+        {                                                                                                              \
+            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                                \
+            std::printf(__VA_ARGS__);                                                                                  \
+            std::printf("\n");                                                                                         \
+            g_fail++;                                                                                                  \
+        }                                                                                                              \
     } while (0)
 
 static Avbd3dBodyId makeBox(Avbd3dWorld *w, Avbd3dBodyType type, Avbd3dVec3 p)
@@ -197,10 +197,10 @@ int main()
         Pair p = makePair(w);
         Avbd3dRevoluteJointDef rd = motorDef(p, 1.0f);
         Avbd3dJointId j = t3d_create_revolute_joint(w, &rd);
-        step(w, 30);               // speed 1 for 0.5 s
+        step(w, 30); // speed 1 for 0.5 s
         t3d_revolute_joint_set_motor_speed(j, 3.0f);
-        step(w, 30);               // speed 3 for 0.5 s
-        float ang = angleOf(p.b);  // expected 0.5 * 1 + 0.5 * 3 = 2.0 rad
+        step(w, 30);              // speed 3 for 0.5 s
+        float ang = angleOf(p.b); // expected 0.5 * 1 + 0.5 * 3 = 2.0 rad
         CHECK(std::fabs(ang - 2.0f) < 0.25f, "angle %g rad (want 2.0, the integral of speed)", ang);
         t3d_destroy_world(w);
     }
@@ -330,14 +330,15 @@ int main()
             const Avbd3dVec3 f = t3d_joint_get_constraint_force(j);
             if (pass == 0)
             {
-                CHECK(std::fabs(norm3(f) - weight) < 0.1f * weight, "kind %d: |F| = %g (want %g)", kind, norm3(f), weight);
+                CHECK(std::fabs(norm3(f) - weight) < 0.1f * weight, "kind %d: |F| = %g (want %g)", kind, norm3(f),
+                      weight);
                 CHECK(f.y > 0.0f, "kind %d: force on B points up: %g", kind, f.y);
             }
             Avbd3dJointEvents ev = t3d_world_get_joint_events(w);
             if (pass == 0)
             {
-                CHECK(ev.count == 1 && ev.jointEvents[0].jointId.index1 == j.index1, "kind %d: event above threshold (%d)",
-                      kind, ev.count);
+                CHECK(ev.count == 1 && ev.jointEvents[0].jointId.index1 == j.index1,
+                      "kind %d: event above threshold (%d)", kind, ev.count);
                 step(w, 1);
                 CHECK(t3d_world_get_joint_events(w).count == 1, "kind %d: event repeats every step", kind);
             }
@@ -403,7 +404,6 @@ int main()
               analytic);
     }
 
-
     // ---- 11. joint state readouts and the spherical target/3-axis motor -------------------
     {
         // Revolute: GetAngle matches the body rotation, GetSpeed matches the motor.
@@ -415,7 +415,8 @@ int main()
         step(w, 40);
         const float ang = t3d_revolute_joint_get_angle(j);
         const float bodyAng = angleOf(p.b);
-        CHECK(std::fabs(std::fabs(ang) - bodyAng) < 0.02f && bodyAng > 0.4f, "revolute angle %g vs body %g", ang, bodyAng);
+        CHECK(std::fabs(std::fabs(ang) - bodyAng) < 0.02f && bodyAng > 0.4f, "revolute angle %g vs body %g", ang,
+              bodyAng);
         CHECK(std::fabs(std::fabs(t3d_revolute_joint_get_speed(j)) - 1.0f) < 0.15f, "revolute speed %g",
               t3d_revolute_joint_get_speed(j));
         t3d_destroy_world(w);
@@ -484,7 +485,8 @@ int main()
         step(w, 180);
         q = t3d_body_get_rotation(p.b);
         const float d2 = std::fabs(q.v.x * t2.v.x + q.v.y * t2.v.y + q.v.z * t2.v.z + q.s * t2.s);
-        CHECK(d2 > 0.998f, "spherical retarget: |dot| = %g q=(%g %g %g %g) t=(%g %g %g %g)", d2, q.v.x, q.v.y, q.v.z, q.s, t2.v.x, t2.v.y, t2.v.z, t2.s);
+        CHECK(d2 > 0.998f, "spherical retarget: |dot| = %g q=(%g %g %g %g) t=(%g %g %g %g)", d2, q.v.x, q.v.y, q.v.z,
+              q.s, t2.v.x, t2.v.y, t2.v.z, t2.s);
         t3d_destroy_world(w);
     }
     {

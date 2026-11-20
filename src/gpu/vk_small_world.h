@@ -27,7 +27,8 @@ namespace avbdvk
 // Read once per process.
 inline bool smallWorldEnabled()
 {
-    static const bool on = []() {
+    static const bool on = []()
+    {
         const char *e = std::getenv("AVBD_VK_SMALL_WORLD");
         return !(e && e[0] == '0');
     }();

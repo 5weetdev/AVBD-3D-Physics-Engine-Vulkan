@@ -74,9 +74,8 @@ avbd3d_Gpu *avbd3d_CreateGpu(const avbd3d_GpuDef *def, avbd3d_Error *outErr)
         {
             avbd3d_MakeSurfaceFcn *make = def->makeSurface;
             void *ctx = def->surfaceContext;
-            g->device.enablePresentation([make, ctx](VkInstance instance) {
-                return fromU64<VkSurfaceKHR>(make((void *)instance, ctx));
-            });
+            g->device.enablePresentation([make, ctx](VkInstance instance)
+                                         { return fromU64<VkSurfaceKHR>(make((void *)instance, ctx)); });
         }
         g->device.setVerbose(def->verbose);
         g->device.init();
@@ -127,9 +126,15 @@ avbd3d_VulkanContext avbd3d_Gpu_GetVulkanContext(const avbd3d_Gpu *gpu)
     return c;
 }
 
-uint64_t avbd3d_Gpu_GetAllocatedBytes(const avbd3d_Gpu *gpu) { return gpu ? gpu->device.allocatedBytes() : 0; }
+uint64_t avbd3d_Gpu_GetAllocatedBytes(const avbd3d_Gpu *gpu)
+{
+    return gpu ? gpu->device.allocatedBytes() : 0;
+}
 
-int avbd3d_GetValidationMessageCount(void) { return (int)avbdvk::Device::validationMessageCount(); }
+int avbd3d_GetValidationMessageCount(void)
+{
+    return (int)avbdvk::Device::validationMessageCount();
+}
 
 // ---- render data --------------------------------------------------------------------------
 

@@ -21,7 +21,7 @@
 
 #define MAX_MANIFOLD_CONTACTS 8 // Contacts a single box-box manifold can produce
 #ifndef COLLISION_MARGIN
-#define COLLISION_MARGIN 0.01f  // Margin for collision detection to avoid flickering contacts
+#define COLLISION_MARGIN 0.01f // Margin for collision detection to avoid flickering contacts
 #endif
 
 // Contact constraint bounds. These live here rather than in solver.h because both the
@@ -127,7 +127,10 @@ struct BodyRef
 };
 
 // Sphere radius / capsule radius and segment half-length, from the OBB invariant above.
-AVBD_HD inline float shapeRadius(const BodyRef &b) { return b.halfExtents.x; }
+AVBD_HD inline float shapeRadius(const BodyRef &b)
+{
+    return b.halfExtents.x;
+}
 AVBD_HD inline float capsuleHalfSegment(const BodyRef &b)
 {
     float h = b.halfExtents.z - b.halfExtents.x;

@@ -57,14 +57,14 @@ struct SpawnEmitter;
 // What the command line asked for; see loadInitialScene().
 struct DemoLaunch
 {
-    int scene = -1;                   // index into the scene combo; -1 = the default
-    const char *sceneName = nullptr;  // "3" or a case-insensitive scene name; wins over scene
-    int benchFrames = 0;              // > 0: unattended run, vsync off, quit after N frames
-    float camDist = -1.0f;            // > 0 overrides the scene's camera distance
-    bool unattended = false;          // bench/smoke: step failures go to stderr
-    bool noSleep = false;             // start with "Never sleep" ticked (benchmarks)
-    bool log = false;                 // start with the session log on (--log)
-    const char *commandLine = "";     // for the log header
+    int scene = -1;                  // index into the scene combo; -1 = the default
+    const char *sceneName = nullptr; // "3" or a case-insensitive scene name; wins over scene
+    int benchFrames = 0;             // > 0: unattended run, vsync off, quit after N frames
+    float camDist = -1.0f;           // > 0 overrides the scene's camera distance
+    bool unattended = false;         // bench/smoke: step failures go to stderr
+    bool noSleep = false;            // start with "Never sleep" ticked (benchmarks)
+    bool log = false;                // start with the session log on (--log)
+    const char *commandLine = "";    // for the log header
 };
 
 struct DemoStats
@@ -133,7 +133,11 @@ public:
     bool spawnAtPixel(int px, int py);
     bool grabAtPixel(int px, int py);
     void moveGrab(int px, int py);
-    void releaseGrab() { if (m_dragging) endGrab(); }
+    void releaseGrab()
+    {
+        if (m_dragging)
+            endGrab();
+    }
     bool grabbing() const { return m_dragging; }
     // Steps that came back not ok / truncated since launch.
     int stepFailures() const { return m_stepFailures; }
@@ -167,7 +171,11 @@ private:
     // drawUI() runs while the frame's command buffer is being recorded, with draws already
     // bound to the world's instance buffer. loadScene() destroys that buffer, so the panel only
     // asks and update() loads at the top of the next frame.
-    void requestScene(int index, bool resetCamera = true) { m_pendingScene = index; m_pendingResetCamera = resetCamera; }
+    void requestScene(int index, bool resetCamera = true)
+    {
+        m_pendingScene = index;
+        m_pendingResetCamera = resetCamera;
+    }
     int m_pendingScene = -1;
     bool m_pendingResetCamera = true;
     void setPaused(bool paused);
@@ -199,8 +207,8 @@ private:
     SceneView buildSpheresCapsulesScene();
     void stats(DemoStats &out);
     void spawnBody(vec3 size, float density, float friction, vec3 position, vec3 velocity);
-    void spawnAssembly(const SpawnEmitter &emitter, vec3 origin, quat rotation, float scale,
-                       float massMultiplier, vec3 velocity);
+    void spawnAssembly(const SpawnEmitter &emitter, vec3 origin, quat rotation, float scale, float massMultiplier,
+                       vec3 velocity);
 
     SceneBuilder m_author; // scene authoring + params only
     Avbd3dGpu *m_gpu = nullptr;

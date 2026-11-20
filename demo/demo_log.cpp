@@ -46,12 +46,30 @@ namespace
 {
 // The stderr copy uses the C runtime's descriptor calls, which Windows spells with an underscore.
 #ifdef _WIN32
-int pipeOpen(int fds[2]) { return _pipe(fds, 1 << 16, _O_BINARY | _O_NOINHERIT); }
-int fdRead(int fd, void *buf, unsigned n) { return _read(fd, buf, n); }
-int fdWrite(int fd, const void *buf, unsigned n) { return _write(fd, buf, n); }
-int fdDup(int fd) { return _dup(fd); }
-int fdDup2(int from, int to) { return _dup2(from, to); }
-int fdClose(int fd) { return _close(fd); }
+int pipeOpen(int fds[2])
+{
+    return _pipe(fds, 1 << 16, _O_BINARY | _O_NOINHERIT);
+}
+int fdRead(int fd, void *buf, unsigned n)
+{
+    return _read(fd, buf, n);
+}
+int fdWrite(int fd, const void *buf, unsigned n)
+{
+    return _write(fd, buf, n);
+}
+int fdDup(int fd)
+{
+    return _dup(fd);
+}
+int fdDup2(int from, int to)
+{
+    return _dup2(from, to);
+}
+int fdClose(int fd)
+{
+    return _close(fd);
+}
 #else
 int pipeOpen(int fds[2])
 {
@@ -61,11 +79,26 @@ int pipeOpen(int fds[2])
     fcntl(fds[1], F_SETFD, FD_CLOEXEC);
     return 0;
 }
-int fdRead(int fd, void *buf, unsigned n) { return (int)read(fd, buf, n); }
-int fdWrite(int fd, const void *buf, unsigned n) { return (int)write(fd, buf, n); }
-int fdDup(int fd) { return dup(fd); }
-int fdDup2(int from, int to) { return dup2(from, to) < 0 ? -1 : 0; }
-int fdClose(int fd) { return close(fd); }
+int fdRead(int fd, void *buf, unsigned n)
+{
+    return (int)read(fd, buf, n);
+}
+int fdWrite(int fd, const void *buf, unsigned n)
+{
+    return (int)write(fd, buf, n);
+}
+int fdDup(int fd)
+{
+    return dup(fd);
+}
+int fdDup2(int from, int to)
+{
+    return dup2(from, to) < 0 ? -1 : 0;
+}
+int fdClose(int fd)
+{
+    return close(fd);
+}
 #endif
 
 FILE *g_file = nullptr;
@@ -260,8 +293,8 @@ LONG WINAPI onUnhandledException(EXCEPTION_POINTERS *ep)
     char where[512];
     describeAddress(ep->ExceptionRecord->ExceptionAddress, where, sizeof(where));
     char msg[640];
-    snprintf(msg, sizeof(msg), "unhandled exception 0x%08lX at %s",
-             (unsigned long)ep->ExceptionRecord->ExceptionCode, where);
+    snprintf(msg, sizeof(msg), "unhandled exception 0x%08lX at %s", (unsigned long)ep->ExceptionRecord->ExceptionCode,
+             where);
     fprintf(stderr, "avbd3d_demo: %s\n", msg);
     demolog::fatal(msg);
     return EXCEPTION_CONTINUE_SEARCH;
@@ -340,10 +373,22 @@ void close()
     g_file = nullptr;
 }
 
-bool active() { return g_file != nullptr; }
-const char *path() { return g_path; }
-void setFrame(int frame) { g_frame = frame; }
-void setActivity(const char *what) { g_activity = what; }
+bool active()
+{
+    return g_file != nullptr;
+}
+const char *path()
+{
+    return g_path;
+}
+void setFrame(int frame)
+{
+    g_frame = frame;
+}
+void setActivity(const char *what)
+{
+    g_activity = what;
+}
 
 void line(const char *fmt, ...)
 {

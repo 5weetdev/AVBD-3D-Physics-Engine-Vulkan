@@ -57,9 +57,15 @@ M3 rotMat(quat q)
 {
     const double x = q.x, y = q.y, z = q.z, w = q.w;
     M3 r;
-    r.m[0][0] = 1 - 2 * (y * y + z * z); r.m[0][1] = 2 * (x * y - z * w);     r.m[0][2] = 2 * (x * z + y * w);
-    r.m[1][0] = 2 * (x * y + z * w);     r.m[1][1] = 1 - 2 * (x * x + z * z); r.m[1][2] = 2 * (y * z - x * w);
-    r.m[2][0] = 2 * (x * z - y * w);     r.m[2][1] = 2 * (y * z + x * w);     r.m[2][2] = 1 - 2 * (x * x + y * y);
+    r.m[0][0] = 1 - 2 * (y * y + z * z);
+    r.m[0][1] = 2 * (x * y - z * w);
+    r.m[0][2] = 2 * (x * z + y * w);
+    r.m[1][0] = 2 * (x * y + z * w);
+    r.m[1][1] = 1 - 2 * (x * x + z * z);
+    r.m[1][2] = 2 * (y * z - x * w);
+    r.m[2][0] = 2 * (x * z - y * w);
+    r.m[2][1] = 2 * (y * z + x * w);
+    r.m[2][2] = 1 - 2 * (x * x + y * y);
     return r;
 }
 

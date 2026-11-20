@@ -15,14 +15,14 @@
 
 #include <vector>
 
-struct TowerBlock {
+struct TowerBlock
+{
     int id;
     vec3 pos;
 };
 
-static void addCircularBrickTower(SceneBuilder *s, vec3 origin, float radiusInner, float radiusOuter,
-                                  int blocksInner, int blocksOuter, int layers,
-                                  float brickLength, float brickWidth, float brickHeight)
+static void addCircularBrickTower(SceneBuilder *s, vec3 origin, float radiusInner, float radiusOuter, int blocksInner,
+                                  int blocksOuter, int layers, float brickLength, float brickWidth, float brickHeight)
 {
     const float twoPi = 6.283185307179586f;
     const float dThetaIn = twoPi / (float)blocksInner;
@@ -77,19 +77,20 @@ static SceneView sceneRoundTowers20kGpu(SceneBuilder *s)
     const float brickHeight = 0.50f;
 
     // Tower A on the left, Tower B on the right
-    addCircularBrickTower(s, {-18.0f, 0.0f, 0.0f}, radiusInner, radiusOuter,
-                          blocksInner, blocksOuter, layers, brickLength, brickWidth, brickHeight);
-    addCircularBrickTower(s, {+18.0f, 0.0f, 0.0f}, radiusInner, radiusOuter,
-                          blocksInner, blocksOuter, layers, brickLength, brickWidth, brickHeight);
+    addCircularBrickTower(s, {-18.0f, 0.0f, 0.0f}, radiusInner, radiusOuter, blocksInner, blocksOuter, layers,
+                          brickLength, brickWidth, brickHeight);
+    addCircularBrickTower(s, {+18.0f, 0.0f, 0.0f}, radiusInner, radiusOuter, blocksInner, blocksOuter, layers,
+                          brickLength, brickWidth, brickHeight);
 
     return {110.0f, 25.0f};
 }
 
-static void addSquareBrickTower(SceneBuilder *s, int ground, vec3 origin, int layers,
-                                float brickLength, float brickWidth, float brickHeight)
+static void addSquareBrickTower(SceneBuilder *s, int ground, vec3 origin, int layers, float brickLength,
+                                float brickWidth, float brickHeight)
 {
     std::vector<TowerBlock> blocks;
-    auto addBlock = [&](vec3 ext, vec3 pos) {
+    auto addBlock = [&](vec3 ext, vec3 pos)
+    {
         int id = s->addBody(ext, 1.0f, 0.5f, pos);
         blocks.push_back({id, pos});
     };
@@ -186,20 +187,20 @@ static void addSquareBrickTower(SceneBuilder *s, int ground, vec3 origin, int la
     for (size_t i = 0; i < blocks.size(); i++)
     {
         if (blocks[i].pos.z < brickHeight)
-            s->addJointWorld(ground, blocks[i].id, {blocks[i].pos.x, blocks[i].pos.y, 0.0f}, INFINITY, INFINITY, breakForce);
+            s->addJointWorld(ground, blocks[i].id, {blocks[i].pos.x, blocks[i].pos.y, 0.0f}, INFINITY, INFINITY,
+                             breakForce);
 
         size_t max_j = i + 400;
-        if (max_j > blocks.size()) max_j = blocks.size();
+        if (max_j > blocks.size())
+            max_j = blocks.size();
         for (size_t j = i + 1; j < max_j; j++)
         {
-            vec3 d = {blocks[i].pos.x - blocks[j].pos.x, 
-                      blocks[i].pos.y - blocks[j].pos.y, 
+            vec3 d = {blocks[i].pos.x - blocks[j].pos.x, blocks[i].pos.y - blocks[j].pos.y,
                       blocks[i].pos.z - blocks[j].pos.z};
-            float dist = sqrtf(d.x*d.x + d.y*d.y + d.z*d.z);
+            float dist = sqrtf(d.x * d.x + d.y * d.y + d.z * d.z);
             if (dist <= 1.05f)
             {
-                vec3 mid = {(blocks[i].pos.x + blocks[j].pos.x) * 0.5f, 
-                            (blocks[i].pos.y + blocks[j].pos.y) * 0.5f, 
+                vec3 mid = {(blocks[i].pos.x + blocks[j].pos.x) * 0.5f, (blocks[i].pos.y + blocks[j].pos.y) * 0.5f,
                             (blocks[i].pos.z + blocks[j].pos.z) * 0.5f};
                 s->addJointWorld(blocks[i].id, blocks[j].id, mid, INFINITY, panelAngStiffness, breakForce);
             }

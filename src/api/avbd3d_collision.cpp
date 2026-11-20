@@ -15,11 +15,11 @@ static_assert(sizeof(avbd3d_Vec3) == sizeof(b3Vec3), "avbd3d_Vec3 layout");
 static_assert(sizeof(avbd3d_MeshDef) == sizeof(b3MeshDef), "avbd3d_MeshDef layout");
 static_assert(sizeof(avbd3d_HeightFieldDef) == sizeof(b3HeightFieldDef), "avbd3d_HeightFieldDef layout");
 
-namespace {
+namespace
+{
 
 // Same bytes, two type names: avbd3d and Box3D structs are layout-identical (see the static_asserts above).
-template <class To, class From>
-To avbd3d_bit(const From &from)
+template <class To, class From> To avbd3d_bit(const From &from)
 {
     static_assert(sizeof(To) == sizeof(From), "avbd3d and Box3D layouts differ");
     To to;
@@ -28,7 +28,6 @@ To avbd3d_bit(const From &from)
 }
 
 } // namespace
-
 
 avbd3d_HullData *avbd3d_CreateHull(const avbd3d_Vec3 *points, int pointCount, int maxVertexCount)
 {
@@ -65,126 +64,36 @@ void avbd3d_DestroyHeightField(avbd3d_HeightFieldData *heightField)
 
 // Thin wrappers over Box3D's collision helpers (geometry, trees, shape builders, queries).
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-avbd3d_ChildShape avbd3d_GetCompoundChild(const avbd3d_CompoundData* compound, int childIndex)
+avbd3d_ChildShape avbd3d_GetCompoundChild(const avbd3d_CompoundData *compound, int childIndex)
 {
-    return avbd3d_bit<avbd3d_ChildShape>(b3GetCompoundChild(reinterpret_cast<const b3CompoundData*>(compound), childIndex));
+    return avbd3d_bit<avbd3d_ChildShape>(
+        b3GetCompoundChild(reinterpret_cast<const b3CompoundData *>(compound), childIndex));
 }
 
-
-
-
-
-
-const avbd3d_SurfaceMaterial* avbd3d_GetCompoundMaterials(const avbd3d_CompoundData* compound)
+const avbd3d_SurfaceMaterial *avbd3d_GetCompoundMaterials(const avbd3d_CompoundData *compound)
 {
-    return reinterpret_cast<const avbd3d_SurfaceMaterial*>(b3GetCompoundMaterials(reinterpret_cast<const b3CompoundData*>(compound)));
+    return reinterpret_cast<const avbd3d_SurfaceMaterial *>(
+        b3GetCompoundMaterials(reinterpret_cast<const b3CompoundData *>(compound)));
 }
 
-avbd3d_CompoundData* avbd3d_CreateCompound(const avbd3d_CompoundDef* def)
+avbd3d_CompoundData *avbd3d_CreateCompound(const avbd3d_CompoundDef *def)
 {
-    return reinterpret_cast<avbd3d_CompoundData*>(b3CreateCompound(reinterpret_cast<const b3CompoundDef*>(def)));
+    return reinterpret_cast<avbd3d_CompoundData *>(b3CreateCompound(reinterpret_cast<const b3CompoundDef *>(def)));
 }
 
-void avbd3d_DestroyCompound(avbd3d_CompoundData* compound)
+void avbd3d_DestroyCompound(avbd3d_CompoundData *compound)
 {
-    b3DestroyCompound(reinterpret_cast<b3CompoundData*>(compound));
+    b3DestroyCompound(reinterpret_cast<b3CompoundData *>(compound));
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-avbd3d_PlaneSolverResult avbd3d_SolvePlanes(avbd3d_Vec3 targetDelta, avbd3d_CollisionPlane* planes, int count)
+avbd3d_PlaneSolverResult avbd3d_SolvePlanes(avbd3d_Vec3 targetDelta, avbd3d_CollisionPlane *planes, int count)
 {
-    return avbd3d_bit<avbd3d_PlaneSolverResult>(b3SolvePlanes(avbd3d_bit<b3Vec3>(targetDelta), reinterpret_cast<b3CollisionPlane*>(planes), count));
+    return avbd3d_bit<avbd3d_PlaneSolverResult>(
+        b3SolvePlanes(avbd3d_bit<b3Vec3>(targetDelta), reinterpret_cast<b3CollisionPlane *>(planes), count));
 }
 
-avbd3d_Vec3 avbd3d_ClipVector(avbd3d_Vec3 vector, const avbd3d_CollisionPlane* planes, int count)
+avbd3d_Vec3 avbd3d_ClipVector(avbd3d_Vec3 vector, const avbd3d_CollisionPlane *planes, int count)
 {
-    return avbd3d_bit<avbd3d_Vec3>(b3ClipVector(avbd3d_bit<b3Vec3>(vector), reinterpret_cast<const b3CollisionPlane*>(planes), count));
+    return avbd3d_bit<avbd3d_Vec3>(
+        b3ClipVector(avbd3d_bit<b3Vec3>(vector), reinterpret_cast<const b3CollisionPlane *>(planes), count));
 }

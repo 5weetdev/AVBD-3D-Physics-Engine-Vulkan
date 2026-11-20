@@ -26,8 +26,8 @@ void InteractPipelines::destroy()
     dragRelease.destroy();
 }
 
-void launchDragUpdate(CommandList &cmd, HostRingBuffer &ring, InteractPipelines &pl,
-                       const DragUpdateArgsGpu &args, int count)
+void launchDragUpdate(CommandList &cmd, HostRingBuffer &ring, InteractPipelines &pl, const DragUpdateArgsGpu &args,
+                      int count)
 {
     if (count <= 0)
         return;
@@ -36,8 +36,8 @@ void launchDragUpdate(CommandList &cmd, HostRingBuffer &ring, InteractPipelines 
     cmd.dispatch(pl.dragUpdate, ((uint32_t)count + block - 1) / block, addr);
 }
 
-void launchDragRelease(CommandList &cmd, HostRingBuffer &ring, InteractPipelines &pl,
-                        const DragReleaseArgsGpu &args, int count)
+void launchDragRelease(CommandList &cmd, HostRingBuffer &ring, InteractPipelines &pl, const DragReleaseArgsGpu &args,
+                       int count)
 {
     if (count <= 0)
         return;

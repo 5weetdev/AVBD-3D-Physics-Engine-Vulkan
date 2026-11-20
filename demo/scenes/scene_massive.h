@@ -35,25 +35,39 @@ static SceneView buildPile(SceneBuilder *s, int layers, float groundSize, float 
             for (int x = 0; x < layers; x++)
                 s->addBody({1, 1, 1}, 1.0f, 0.5f,
                            {(x - layers * 0.5f) * pitch + sceneRand(-0.02f, 0.02f),
-                            (y - layers * 0.5f) * pitch + sceneRand(-0.02f, 0.02f),
-                            z * pitch + 0.6f});
+                            (y - layers * 0.5f) * pitch + sceneRand(-0.02f, 0.02f), z * pitch + 0.6f});
 
     return {camDist, layers * pitch * 0.4f};
 }
 
-static SceneView sceneMassive10kGpu(SceneBuilder *s) { return buildPile(s, 22, 120.0f, 70.0f); }
+static SceneView sceneMassive10kGpu(SceneBuilder *s)
+{
+    return buildPile(s, 22, 120.0f, 70.0f);
+}
 
 // 47^3 + 1 ground = 103,824 bodies. The target scene for the port.
-static SceneView sceneMassive100kGpu(SceneBuilder *s) { return buildPile(s, 47, 200.0f, 150.0f); }
+static SceneView sceneMassive100kGpu(SceneBuilder *s)
+{
+    return buildPile(s, 47, 200.0f, 150.0f);
+}
 
 // 59^3 + 1 ground = 205,380 bodies.
-static SceneView sceneMassive200kGpu(SceneBuilder *s) { return buildPile(s, 59, 250.0f, 200.0f); }
+static SceneView sceneMassive200kGpu(SceneBuilder *s)
+{
+    return buildPile(s, 59, 250.0f, 200.0f);
+}
 
 // 74^3 + 1 ground = 405,225 bodies.
-static SceneView sceneMassive400kGpu(SceneBuilder *s) { return buildPile(s, 74, 320.0f, 260.0f); }
+static SceneView sceneMassive400kGpu(SceneBuilder *s)
+{
+    return buildPile(s, 74, 320.0f, 260.0f);
+}
 
 // 84^3 + 1 ground = 592,705 bodies.
-static SceneView sceneMassive600kGpu(SceneBuilder *s) { return buildPile(s, 84, 380.0f, 320.0f); }
+static SceneView sceneMassive600kGpu(SceneBuilder *s)
+{
+    return buildPile(s, 84, 380.0f, 320.0f);
+}
 
 static void addPyramidWall(SceneBuilder *s, vec3 origin, int size, bool rotate90)
 {
@@ -72,21 +86,20 @@ static void addPyramidWall(SceneBuilder *s, vec3 origin, int size, bool rotate90
                 if (!rotate90)
                 {
                     // Oriented along X axis, depth along Y
-                    s->addBody({1.0f, 0.5f, 0.5f}, 1.0f, 0.5f,
-                               {origin.x + offsetAlongBase, origin.y + offsetPerp, z});
+                    s->addBody({1.0f, 0.5f, 0.5f}, 1.0f, 0.5f, {origin.x + offsetAlongBase, origin.y + offsetPerp, z});
                 }
                 else
                 {
                     // Oriented along Y axis, depth along X
-                    s->addBody({0.5f, 1.0f, 0.5f}, 1.0f, 0.5f,
-                               {origin.x + offsetPerp, origin.y + offsetAlongBase, z});
+                    s->addBody({0.5f, 1.0f, 0.5f}, 1.0f, 0.5f, {origin.x + offsetPerp, origin.y + offsetAlongBase, z});
                 }
             }
         }
     }
 }
 
-static SceneView buildPyramidField(SceneBuilder *s, int gridX, int gridY, int size, float pitch, float groundMargin, float camDist)
+static SceneView buildPyramidField(SceneBuilder *s, int gridX, int gridY, int size, float pitch, float groundMargin,
+                                   float camDist)
 {
     s->clear();
     const float extentX = (gridX - 1) * pitch + size * 1.05f;

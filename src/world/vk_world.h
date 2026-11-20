@@ -247,8 +247,15 @@ public:
     // Dispatches and compute barriers recorded into the last step's committed pass (a rerun pass
     // replaces the count; fills and copies are not included), and whether that pass ran the fused
     // small-world iteration loop. fusedIterPasses() counts every pass that did, since init.
-    struct OpStats { uint32_t dispatches = 0, barriers = 0, transfers = 0; bool fusedIter = false; };
-    OpStats lastOpStats() const { return {m_lastOps.dispatches, m_lastOps.barriers, m_lastOps.transfers, m_lastFusedIter}; }
+    struct OpStats
+    {
+        uint32_t dispatches = 0, barriers = 0, transfers = 0;
+        bool fusedIter = false;
+    };
+    OpStats lastOpStats() const
+    {
+        return {m_lastOps.dispatches, m_lastOps.barriers, m_lastOps.transfers, m_lastFusedIter};
+    }
     uint64_t fusedIterPasses() const { return m_fusedIterPasses; }
 
     // Host readback of the current body poses/velocities/awake flags, in dense body
@@ -348,8 +355,8 @@ public:
     // Mouse grab as a pool of kMaxDragJoints (256) temporary joints beyond the authored
     // ones: per-body stiffness 5000 * mass * grabStrength * weight, a fresh grab (dual state
     // cleared) whenever the held set changes size, slots past the group released.
-    void dragBodies(const int *bodies, const vec3 *targets, const vec3 *locals, int count,
-                    const float *weights, float grabStrength);
+    void dragBodies(const int *bodies, const vec3 *targets, const vec3 *locals, int count, const float *weights,
+                    float grabStrength);
     void releaseDrag();
 
     void wakeAll();
@@ -460,7 +467,7 @@ public:
     struct ContactReportView
     {
         const ContactReportRecordGpu *records = nullptr; // valid until the next stepBegin
-        int count = 0;        // records held by the last committed step (<= capacity)
+        int count = 0;                                   // records held by the last committed step (<= capacity)
         bool truncated = false; // the step reported more than the buffer held; the excess is lost
     };
     ContactReportView contactReportView() const;
@@ -495,8 +502,7 @@ private:
     void uploadJoints(const SceneDesc &scene);
     void uploadSprings(const SceneDesc &scene);
     void uploadIndexLists(const SceneDesc &scene);
-    void reserve(int bodyCap, int jointCap, int springCap, int pairCap, int contactCap, int manifoldCap,
-                 int shapeCap);
+    void reserve(int bodyCap, int jointCap, int springCap, int pairCap, int contactCap, int manifoldCap, int shapeCap);
     void grow(int neededPairs, int neededContacts);
     // Raises the constraint graph's manifold capacity to the narrowphase's slot count (pairs + mesh
     // child slots) when that has grown. Only reserves when the slot count exceeds the current capacity.
@@ -544,7 +550,7 @@ private:
     // Sticky: some shape has rolling resistance > 0. Until then the primal gets a null shapeRolling.
     bool m_anyRolling = false;
     bool m_anyShapeRestitution = false; // sticky: some shape has restitution > 0 (restitution.slang)
-    bool m_anyBullet = false; // sticky: some body has had BODY_BULLET since the scene was uploaded
+    bool m_anyBullet = false;           // sticky: some body has had BODY_BULLET since the scene was uploaded
     float m_restitutionThreshold = 1.0f;
     Buffer restSlots; // RestitutionSlotGpu per manifold slot, grown at record time
     RestitutionArgsGpu restitutionArgs(int slots, const ConstraintGraphGpu &g);
@@ -561,11 +567,14 @@ private:
     // geomStage is sized in addGeometry so the step allocates nothing.
     Buffer geomHeap;
     MappedBuffer geomStage;
-    struct GeomCopy { uint32_t stageOffset, heapOffset, bytes; };
+    struct GeomCopy
+    {
+        uint32_t stageOffset, heapOffset, bytes;
+    };
     std::vector<unsigned char> m_geomPending;
     std::vector<GeomCopy> m_geomCopies;
     std::map<std::pair<uint64_t, uint32_t>, uint32_t> m_geomIndex; // (hash, bytes) -> offset
-    std::vector<uint32_t> m_geomSceneOffset; // SceneDesc blob index -> heap offset
+    std::vector<uint32_t> m_geomSceneOffset;                       // SceneDesc blob index -> heap offset
     uint32_t m_geomCursor = 0;
     int m_hullShapes = 0; // shapes of kind AVBD_SHAPE_HULL (0: the hull kernel is never recorded)
     int m_meshShapes = 0; // shapes of kind AVBD_SHAPE_MESH (0: the mesh kernels are never recorded)
@@ -574,7 +583,7 @@ private:
     // body by body in dynamicIdx (staticIdx) order, a body's shapes ascending.
     Buffer dynShapeIdx, staticShapeIdx;
     Buffer gridIdx, oversizeIdx; // dynamic shapes split for the broadphase
-    Buffer ignorePairs; // sorted PairKeys suppressed in the broadphase
+    Buffer ignorePairs;          // sorted PairKeys suppressed in the broadphase
     int m_ignoreCount = 0;
 
     // --- Joint SoA (legacy weld, matching SceneDesc's authored fields) -------
@@ -595,18 +604,18 @@ private:
     void sizeCoarse(int bodyCap);
     Buffer touchCount, touchHash, snapCount, snapHash;
     Buffer wakeRequest, wakeSeed, wakeAny, wakeChanged;
-    DispatchGate m_gate;   // skips phases 6-8 on device when stepState flag is set
+    DispatchGate m_gate;    // skips phases 6-8 on device when stepState flag is set
     DispatchGate m_gateCap; // skips phases 4-5 on device when the capacity flag (stepState[1]) is set
-    Buffer stepState;      // device step flags; word 0 = overflow/skip flag (gate)
-    Buffer primalIndirect; // M4: a VkDispatchIndirectCommand per colour for the primal sweep
-    Buffer floodChanged; // per-round changed flags of the explicit flood (slot 0: wakeRegion's)
-    Buffer islandSeed;   // the joint-island flood's own seeds, so it cannot clobber wakeSeed
+    Buffer stepState;       // device step flags; word 0 = overflow/skip flag (gate)
+    Buffer primalIndirect;  // M4: a VkDispatchIndirectCommand per colour for the primal sweep
+    Buffer floodChanged;    // per-round changed flags of the explicit flood (slot 0: wakeRegion's)
+    Buffer islandSeed;      // the joint-island flood's own seeds, so it cannot clobber wakeSeed
     // Phase 4's one recorded readback: [0] the active count, then kFloodMaxRounds
     // explicit-flood slots, then kIslandMaxRounds island slots.
     MappedBuffer wakeReadout;
     static const int kFloodMaxRounds = 64;   // launchWakeFlood's cap (the mutation path)
     static const int kIslandMaxRounds = 256; // VkWorld::step()'s island-flood cap
-    int m_lastFloodRounds = 0;  // convergence rounds of the last flood, for the next bound
+    int m_lastFloodRounds = 0;               // convergence rounds of the last flood, for the next bound
     int m_lastIslandRounds = 0;
     // enableSnapshot(). Each slot (and snapHost) is one packed buffer of cap-based SoA
     // regions, at the offsets snapOffset() gives: pos, rot, velLin, velAng, awake, prevAwake.
@@ -619,10 +628,10 @@ private:
     uint64_t m_slotSerial[2] = {0, 0}; // what each slot holds (0: nothing usable)
     int m_slotCount[2] = {0, 0};
     uint64_t m_slotTimeline[2] = {0, 0}; // m_stepCmd's timeline value that completes it
-    int m_stepSlot = -1;               // slot the step in flight writes (-1: none)
-    uint64_t m_hostSerial = 0;         // snapshot in snapHost (landed, or pending below)
+    int m_stepSlot = -1;                 // slot the step in flight writes (-1: none)
+    uint64_t m_hostSerial = 0;           // snapshot in snapHost (landed, or pending below)
     int m_hostCount = 0;
-    int m_copySlot = -1;               // slot a pending DMA reads (-1: none pending)
+    int m_copySlot = -1; // slot a pending DMA reads (-1: none pending)
     VkQueue m_copyQueue = VK_NULL_HANDLE;
     VkCommandPool m_copyPool = VK_NULL_HANDLE;
     VkCommandBuffer m_copyCb = VK_NULL_HANDLE;
@@ -642,15 +651,15 @@ private:
     void snapshotJointGrow();
     void snapshotJointPull();
     void snapshotDestroy(bool all); // all: the copy pool and fence too (destroy())
-    MappedBuffer stepFlagReadout; // the step tail's flag word (stepState[0]), one recorded copy
+    MappedBuffer stepFlagReadout;   // the step tail's flag word (stepState[0]), one recorded copy
     // Contact report (enableContactReport). Device: a counter and the records; the host
     // reads back the counter (required) and min(required, capacity) records per step.
     bool m_reportOn = false;
     Buffer reportCounter, reportRecords;
     MappedBuffer reportCountReadout, reportRecReadout;
-    int m_reportCap = 0;     // records the device and readout buffers hold
-    int m_reportWant = 256;  // capacity the next stepBegin grows to
-    int m_reportCount = 0;   // records valid after the last committed step
+    int m_reportCap = 0;    // records the device and readout buffers hold
+    int m_reportWant = 256; // capacity the next stepBegin grows to
+    int m_reportCount = 0;  // records valid after the last committed step
     bool m_reportTruncated = false;
     void ensureReportCapacity();
     // jBroken[0, m_jointCount), copied by the step tail while a drag is active (the grab
@@ -659,7 +668,7 @@ private:
     MappedBuffer brokenReadout;
     bool m_brokenRecorded = false;
     bool m_brokenMirror = false;
-    int m_lastColors = 0;         // colour count of the last build, for the next recorded colour bound
+    int m_lastColors = 0; // colour count of the last build, for the next recorded colour bound
 
     // --- Mutation queue (solver_impl's mutBatches) ---------------------------------
     struct MutBatch
@@ -712,9 +721,9 @@ private:
         bool sleepOn = false;
         bool seedsPendingAtStart = false;
         VkNpBodyRefs npb{};
-        VkNpHullRefs nph{};   // the geometry heap, for the hull pair kernel
-        bool hasHulls = false; // any hull shape: record the hull path (else it costs nothing)
-        VkNpMeshRefs nmh{};   // the geometry heap and radix sort, for the mesh path (Phase 1.5a)
+        VkNpHullRefs nph{};     // the geometry heap, for the hull pair kernel
+        bool hasHulls = false;  // any hull shape: record the hull path (else it costs nothing)
+        VkNpMeshRefs nmh{};     // the geometry heap and radix sort, for the mesh path (Phase 1.5a)
         bool hasMeshes = false; // any mesh shape: record the mesh path (else it costs nothing)
         VkNarrowphaseParams npp{};
         int edgeCount = 0;
@@ -803,8 +812,8 @@ private:
     int m_pairCap = 0, m_contactCap = 0, m_manifoldCap = 0;
     StepResult m_stepResult;
     DebugOverrides m_dbg;
-    float m_cellSize = 1.0f;  // legacy: largest body. Overlays and the HUD read this.
-    float m_gridCell = 1.0f;  // what the broadphase grid uses
+    float m_cellSize = 1.0f; // legacy: largest body. Overlays and the HUD read this.
+    float m_gridCell = 1.0f; // what the broadphase grid uses
     int m_gridCount = 0, m_oversizeCount = 0;
     void splitOversize(const SceneDesc &scene, const std::vector<int> &dynShapes);
     SolverParams m_params; // last build()/step()

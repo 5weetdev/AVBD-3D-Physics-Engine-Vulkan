@@ -35,14 +35,16 @@ static const uint32_t kTileThreads = 256;
 static const uint32_t kKeysPerThread = 8;
 static const uint32_t kTileSize = kTileThreads * kKeysPerThread; // 2048, must match radix.slang
 
-
 SmallSortStats &smallSortStats()
 {
     static SmallSortStats s;
     return s;
 }
 
-static uint32_t divUp(uint32_t a, uint32_t b) { return (a + b - 1) / b; }
+static uint32_t divUp(uint32_t a, uint32_t b)
+{
+    return (a + b - 1) / b;
+}
 
 // ---------------------------------------------------------------------------
 // PrimitivesPipelines
@@ -66,14 +68,19 @@ void PrimitivesPipelines::init(Device &dev, PipelineLayout &layout)
     smallSortOk = dev.maxSharedMemory() >= kSmallSortSharedBytes;
     if (smallSortOk)
     {
-    sortSmallU32Pairs.init(dev, layout, sort_small_spirv, sort_small_spirv_words, "csSortSmallU32Pairs", "csSortSmallU32Pairs");
-    sortSmallU64Pairs.init(dev, layout, sort_small_spirv, sort_small_spirv_words, "csSortSmallU64Pairs", "csSortSmallU64Pairs");
-    sortSmallU64Keys.init(dev, layout, sort_small_spirv, sort_small_spirv_words, "csSortSmallU64Keys", "csSortSmallU64Keys");
+        sortSmallU32Pairs.init(dev, layout, sort_small_spirv, sort_small_spirv_words, "csSortSmallU32Pairs",
+                               "csSortSmallU32Pairs");
+        sortSmallU64Pairs.init(dev, layout, sort_small_spirv, sort_small_spirv_words, "csSortSmallU64Pairs",
+                               "csSortSmallU64Pairs");
+        sortSmallU64Keys.init(dev, layout, sort_small_spirv, sort_small_spirv_words, "csSortSmallU64Keys",
+                              "csSortSmallU64Keys");
     }
     reduceOrAndU32.init(dev, layout, radix_spirv, radix_spirv_words, "csReduceOrAndU32", "csReduceOrAndU32");
     reduceOrAndU64.init(dev, layout, radix_spirv, radix_spirv_words, "csReduceOrAndU64", "csReduceOrAndU64");
-    finalizeSkipMaskU32.init(dev, layout, radix_spirv, radix_spirv_words, "csFinalizeSkipMaskU32", "csFinalizeSkipMaskU32");
-    finalizeSkipMaskU64.init(dev, layout, radix_spirv, radix_spirv_words, "csFinalizeSkipMaskU64", "csFinalizeSkipMaskU64");
+    finalizeSkipMaskU32.init(dev, layout, radix_spirv, radix_spirv_words, "csFinalizeSkipMaskU32",
+                             "csFinalizeSkipMaskU32");
+    finalizeSkipMaskU64.init(dev, layout, radix_spirv, radix_spirv_words, "csFinalizeSkipMaskU64",
+                             "csFinalizeSkipMaskU64");
 }
 
 void PrimitivesPipelines::destroy()
@@ -91,9 +98,9 @@ void PrimitivesPipelines::destroy()
     scatterU64Keys.destroy();
     if (smallSortOk)
     {
-    sortSmallU32Pairs.destroy();
-    sortSmallU64Pairs.destroy();
-    sortSmallU64Keys.destroy();
+        sortSmallU32Pairs.destroy();
+        sortSmallU64Pairs.destroy();
+        sortSmallU64Keys.destroy();
     }
     smallSortOk = false;
     reduceOrAndU32.destroy();
@@ -160,8 +167,8 @@ size_t scanTempBytes(uint32_t n)
     return total;
 }
 
-static void recordScanLevel(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl,
-                             ScanScratch &scratch, size_t level, const Buffer &in, Buffer &out, uint32_t n)
+static void recordScanLevel(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl, ScanScratch &scratch,
+                            size_t level, const Buffer &in, Buffer &out, uint32_t n)
 {
     if (n == 0)
         return;
@@ -174,7 +181,8 @@ static void recordScanLevel(CommandList &cmd, HostRingBuffer &ring, PrimitivesPi
 
     if (numBlocks > 1)
     {
-        Buffer &scannedSums = ensureLevel(scratch.levelR, level, *scratch.m_dev, (VkDeviceSize)numBlocks * sizeof(uint32_t));
+        Buffer &scannedSums =
+            ensureLevel(scratch.levelR, level, *scratch.m_dev, (VkDeviceSize)numBlocks * sizeof(uint32_t));
         cmd.barrier();
         recordScanLevel(cmd, ring, pl, scratch, level + 1, blockSums, scannedSums, numBlocks);
         cmd.barrier();
@@ -185,8 +193,8 @@ static void recordScanLevel(CommandList &cmd, HostRingBuffer &ring, PrimitivesPi
     }
 }
 
-void scanExclusive(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl,
-                    ScanScratch &scratch, const Buffer &in, Buffer &out, uint32_t n)
+void scanExclusive(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl, ScanScratch &scratch,
+                   const Buffer &in, Buffer &out, uint32_t n)
 {
     if (n == 0)
         return;
@@ -208,9 +216,8 @@ size_t selectFlaggedTempBytes(uint32_t n)
     return (size_t)n * sizeof(uint32_t) + scanTempBytes(n);
 }
 
-void selectFlagged(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl,
-                    SelectScratch &scratch, const Buffer &items, const Buffer &flags,
-                    Buffer &out, Buffer &numSelected, uint32_t n)
+void selectFlagged(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl, SelectScratch &scratch,
+                   const Buffer &items, const Buffer &flags, Buffer &out, Buffer &numSelected, uint32_t n)
 {
     if (n == 0)
     {
@@ -265,7 +272,7 @@ size_t radixSortTempBytes(uint32_t n)
     uint32_t numBlocks = divUp(std::max(n, 1u), kTileSize);
     size_t bytes = 0;
     bytes += (size_t)kRadixBuckets * numBlocks * sizeof(uint32_t) * 2; // digitCount + scanned
-    bytes += (size_t)n * 8 * 4;                                       // ping/pong keys+vals (worst case 8B keys)
+    bytes += (size_t)n * 8 * 4;                                        // ping/pong keys+vals (worst case 8B keys)
     bytes += scanTempBytes(kRadixBuckets * numBlocks);
     return bytes;
 }
@@ -312,10 +319,9 @@ void reserveRadix(RadixScratch &scratch, uint32_t n, uint32_t keyBytes, uint32_t
 // ---------------------------------------------------------------------------
 
 template <typename KeyT>
-static void recordSkipMask(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl,
-                            RadixScratch &scratch, const Buffer &keysIn, uint32_t n, int numPasses,
-                            Pipeline &reducePipeline, Pipeline &finalizePipeline, bool isU64,
-                            VkDeviceAddress countAddr)
+static void recordSkipMask(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl, RadixScratch &scratch,
+                           const Buffer &keysIn, uint32_t n, int numPasses, Pipeline &reducePipeline,
+                           Pipeline &finalizePipeline, bool isU64, VkDeviceAddress countAddr)
 {
     Device &dev = *scratch.m_dev;
     VkDeviceSize keyWordBytes = isU64 ? 8 : 4;
@@ -331,13 +337,15 @@ static void recordSkipMask(CommandList &cmd, HostRingBuffer &ring, PrimitivesPip
         uint32_t blocks = divUp(n, kTileThreads);
         if (isU64)
         {
-            ReduceOrAndArgsU64 a{keysIn.address(), scratch.reduceOr.address(), scratch.reduceAnd.address(), n, 0, countAddr};
+            ReduceOrAndArgsU64 a{keysIn.address(), scratch.reduceOr.address(), scratch.reduceAnd.address(), n, 0,
+                                 countAddr};
             VkDeviceAddress addr = ring.write(&a, sizeof(a));
             cmd.dispatch(reducePipeline, blocks, addr);
         }
         else
         {
-            ReduceOrAndArgsU32 a{keysIn.address(), scratch.reduceOr.address(), scratch.reduceAnd.address(), n, 0, countAddr};
+            ReduceOrAndArgsU32 a{keysIn.address(), scratch.reduceOr.address(), scratch.reduceAnd.address(), n, 0,
+                                 countAddr};
             VkDeviceAddress addr = ring.write(&a, sizeof(a));
             cmd.dispatch(reducePipeline, blocks, addr);
         }
@@ -346,31 +354,32 @@ static void recordSkipMask(CommandList &cmd, HostRingBuffer &ring, PrimitivesPip
 
     if (isU64)
     {
-        FinalizeSkipMaskArgsU64 fa{scratch.reduceOr.address(), scratch.reduceAnd.address(),
-                                    scratch.skipMask.address(), (uint32_t)numPasses, 0};
+        FinalizeSkipMaskArgsU64 fa{scratch.reduceOr.address(), scratch.reduceAnd.address(), scratch.skipMask.address(),
+                                   (uint32_t)numPasses, 0};
         VkDeviceAddress addr = ring.write(&fa, sizeof(fa));
         cmd.dispatch(finalizePipeline, 1, addr);
     }
     else
     {
-        FinalizeSkipMaskArgsU32 fa{scratch.reduceOr.address(), scratch.reduceAnd.address(),
-                                    scratch.skipMask.address(), (uint32_t)numPasses, 0};
+        FinalizeSkipMaskArgsU32 fa{scratch.reduceOr.address(), scratch.reduceAnd.address(), scratch.skipMask.address(),
+                                   (uint32_t)numPasses, 0};
         VkDeviceAddress addr = ring.write(&fa, sizeof(fa));
         cmd.dispatch(finalizePipeline, 1, addr);
     }
     cmd.barrier();
 }
 
-void radixSortPairsU32(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl,
-                        RadixScratch &scratch, const Buffer &keysIn, Buffer &keysOut,
-                        const Buffer &valsIn, Buffer &valsOut, uint32_t n, VkDeviceAddress countAddr)
+void radixSortPairsU32(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl, RadixScratch &scratch,
+                       const Buffer &keysIn, Buffer &keysOut, const Buffer &valsIn, Buffer &valsOut, uint32_t n,
+                       VkDeviceAddress countAddr)
 {
     if (n == 0)
         return;
     if (smallWorldEnabled() && pl.smallSortOk && n <= kSmallSortMaxKeys)
     {
         smallSortStats().smallSorts++;
-        SortSmallArgsU32Pairs a{keysIn.address(), valsIn.address(), keysOut.address(), valsOut.address(), n, 0, countAddr};
+        SortSmallArgsU32Pairs a{keysIn.address(), valsIn.address(), keysOut.address(), valsOut.address(), n, 0,
+                                countAddr};
         cmd.dispatch(pl.sortSmallU32Pairs, 1, ring.write(&a, sizeof(a)));
         cmd.barrier();
         return;
@@ -387,8 +396,8 @@ void radixSortPairsU32(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelin
     ensureBytes(scratch.valsPong, dev, (VkDeviceSize)n * sizeof(int32_t));
 
     const int numPasses = 4;
-    recordSkipMask<uint32_t>(cmd, ring, pl, scratch, keysIn, n, numPasses, pl.reduceOrAndU32,
-                              pl.finalizeSkipMaskU32, false, countAddr);
+    recordSkipMask<uint32_t>(cmd, ring, pl, scratch, keysIn, n, numPasses, pl.reduceOrAndU32, pl.finalizeSkipMaskU32,
+                             false, countAddr);
 
     const Buffer *curKeys = &keysIn;
     const Buffer *curVals = &valsIn;
@@ -401,19 +410,33 @@ void radixSortPairsU32(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelin
         Buffer &outK = isLast ? keysOut : *pingPongKeys[pass % 2];
         Buffer &outV = isLast ? valsOut : *pingPongVals[pass % 2];
 
-        HistArgsU32Pairs ha{curKeys->address(), scratch.digitCount.address(), scratch.skipMask.address(),
-                             n, numBlocks, (uint32_t)pass, 0, countAddr};
+        HistArgsU32Pairs ha{curKeys->address(),
+                            scratch.digitCount.address(),
+                            scratch.skipMask.address(),
+                            n,
+                            numBlocks,
+                            (uint32_t)pass,
+                            0,
+                            countAddr};
         VkDeviceAddress addr = ring.write(&ha, sizeof(ha));
         cmd.dispatch(pl.histU32Pairs, numBlocks, addr);
         cmd.barrier();
 
         scanExclusive(cmd, ring, pl, scratch.scan, scratch.digitCount, scratch.digitCountScanned,
-                       kRadixBuckets * numBlocks);
+                      kRadixBuckets * numBlocks);
         cmd.barrier();
 
-        ScatterArgsU32Pairs sa{curKeys->address(), curVals->address(), scratch.digitCountScanned.address(),
-                                scratch.skipMask.address(), outK.address(), outV.address(), n, numBlocks,
-                                (uint32_t)pass, 0, countAddr};
+        ScatterArgsU32Pairs sa{curKeys->address(),
+                               curVals->address(),
+                               scratch.digitCountScanned.address(),
+                               scratch.skipMask.address(),
+                               outK.address(),
+                               outV.address(),
+                               n,
+                               numBlocks,
+                               (uint32_t)pass,
+                               0,
+                               countAddr};
         VkDeviceAddress addr2 = ring.write(&sa, sizeof(sa));
         cmd.dispatch(pl.scatterU32Pairs, numBlocks, addr2);
         cmd.barrier();
@@ -423,17 +446,17 @@ void radixSortPairsU32(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelin
     }
 }
 
-void radixSortPairsU64(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl,
-                        RadixScratch &scratch, const Buffer &keysIn, Buffer &keysOut,
-                        const Buffer &valsIn, Buffer &valsOut, uint32_t n,
-                        uint32_t profileBaseIndex, VkDeviceAddress countAddr)
+void radixSortPairsU64(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl, RadixScratch &scratch,
+                       const Buffer &keysIn, Buffer &keysOut, const Buffer &valsIn, Buffer &valsOut, uint32_t n,
+                       uint32_t profileBaseIndex, VkDeviceAddress countAddr)
 {
     if (n == 0)
         return;
     if (smallWorldEnabled() && pl.smallSortOk && n <= kSmallSortMaxKeys && profileBaseIndex == 0xFFFFFFFFu)
     {
         smallSortStats().smallSorts++;
-        SortSmallArgsU64Pairs a{keysIn.address(), valsIn.address(), keysOut.address(), valsOut.address(), n, 0, countAddr};
+        SortSmallArgsU64Pairs a{keysIn.address(), valsIn.address(), keysOut.address(), valsOut.address(), n, 0,
+                                countAddr};
         cmd.dispatch(pl.sortSmallU64Pairs, 1, ring.write(&a, sizeof(a)));
         cmd.barrier();
         return;
@@ -450,8 +473,8 @@ void radixSortPairsU64(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelin
     ensureBytes(scratch.valsPong, dev, (VkDeviceSize)n * sizeof(uint32_t));
 
     const int numPasses = 8;
-    recordSkipMask<uint64_t>(cmd, ring, pl, scratch, keysIn, n, numPasses, pl.reduceOrAndU64,
-                              pl.finalizeSkipMaskU64, true, countAddr);
+    recordSkipMask<uint64_t>(cmd, ring, pl, scratch, keysIn, n, numPasses, pl.reduceOrAndU64, pl.finalizeSkipMaskU64,
+                             true, countAddr);
 
     const Buffer *curKeys = &keysIn;
     const Buffer *curVals = &valsIn;
@@ -469,8 +492,14 @@ void radixSortPairsU64(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelin
         if (prof)
             cmd.writeTimestamp(profileBaseIndex + (uint32_t)pass * 4 + 0);
 
-        HistArgsU64Pairs ha{curKeys->address(), scratch.digitCount.address(), scratch.skipMask.address(),
-                             n, numBlocks, (uint32_t)pass, 0, countAddr};
+        HistArgsU64Pairs ha{curKeys->address(),
+                            scratch.digitCount.address(),
+                            scratch.skipMask.address(),
+                            n,
+                            numBlocks,
+                            (uint32_t)pass,
+                            0,
+                            countAddr};
         VkDeviceAddress addr = ring.write(&ha, sizeof(ha));
         cmd.dispatch(pl.histU64Pairs, numBlocks, addr);
         cmd.barrier();
@@ -479,15 +508,23 @@ void radixSortPairsU64(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelin
             cmd.writeTimestamp(profileBaseIndex + (uint32_t)pass * 4 + 1);
 
         scanExclusive(cmd, ring, pl, scratch.scan, scratch.digitCount, scratch.digitCountScanned,
-                       kRadixBuckets * numBlocks);
+                      kRadixBuckets * numBlocks);
         cmd.barrier();
 
         if (prof)
             cmd.writeTimestamp(profileBaseIndex + (uint32_t)pass * 4 + 2);
 
-        ScatterArgsU64Pairs sa{curKeys->address(), curVals->address(), scratch.digitCountScanned.address(),
-                                scratch.skipMask.address(), outK.address(), outV.address(), n, numBlocks,
-                                (uint32_t)pass, 0, countAddr};
+        ScatterArgsU64Pairs sa{curKeys->address(),
+                               curVals->address(),
+                               scratch.digitCountScanned.address(),
+                               scratch.skipMask.address(),
+                               outK.address(),
+                               outV.address(),
+                               n,
+                               numBlocks,
+                               (uint32_t)pass,
+                               0,
+                               countAddr};
         VkDeviceAddress addr2 = ring.write(&sa, sizeof(sa));
         cmd.dispatch(pl.scatterU64Pairs, numBlocks, addr2);
         cmd.barrier();
@@ -500,9 +537,8 @@ void radixSortPairsU64(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelin
     }
 }
 
-void radixSortKeysU64(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl,
-                       RadixScratch &scratch, const Buffer &keysIn, Buffer &keysOut, uint32_t n,
-                       VkDeviceAddress countAddr)
+void radixSortKeysU64(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl, RadixScratch &scratch,
+                      const Buffer &keysIn, Buffer &keysOut, uint32_t n, VkDeviceAddress countAddr)
 {
     if (n == 0)
         return;
@@ -524,8 +560,8 @@ void radixSortKeysU64(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipeline
     ensureBytes(scratch.keysPong, dev, (VkDeviceSize)n * sizeof(uint64_t));
 
     const int numPasses = 8;
-    recordSkipMask<uint64_t>(cmd, ring, pl, scratch, keysIn, n, numPasses, pl.reduceOrAndU64,
-                              pl.finalizeSkipMaskU64, true, countAddr);
+    recordSkipMask<uint64_t>(cmd, ring, pl, scratch, keysIn, n, numPasses, pl.reduceOrAndU64, pl.finalizeSkipMaskU64,
+                             true, countAddr);
 
     const Buffer *curKeys = &keysIn;
     Buffer *pingPongKeys[2] = {&scratch.keysPing, &scratch.keysPong};
@@ -535,18 +571,31 @@ void radixSortKeysU64(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipeline
         bool isLast = (pass == numPasses - 1);
         Buffer &outK = isLast ? keysOut : *pingPongKeys[pass % 2];
 
-        HistArgsU64Keys ha{curKeys->address(), scratch.digitCount.address(), scratch.skipMask.address(),
-                            n, numBlocks, (uint32_t)pass, 0, countAddr};
+        HistArgsU64Keys ha{curKeys->address(),
+                           scratch.digitCount.address(),
+                           scratch.skipMask.address(),
+                           n,
+                           numBlocks,
+                           (uint32_t)pass,
+                           0,
+                           countAddr};
         VkDeviceAddress addr = ring.write(&ha, sizeof(ha));
         cmd.dispatch(pl.histU64Keys, numBlocks, addr);
         cmd.barrier();
 
         scanExclusive(cmd, ring, pl, scratch.scan, scratch.digitCount, scratch.digitCountScanned,
-                       kRadixBuckets * numBlocks);
+                      kRadixBuckets * numBlocks);
         cmd.barrier();
 
-        ScatterArgsU64Keys sa{curKeys->address(), scratch.digitCountScanned.address(),
-                               scratch.skipMask.address(), outK.address(), n, numBlocks, (uint32_t)pass, 0, countAddr};
+        ScatterArgsU64Keys sa{curKeys->address(),
+                              scratch.digitCountScanned.address(),
+                              scratch.skipMask.address(),
+                              outK.address(),
+                              n,
+                              numBlocks,
+                              (uint32_t)pass,
+                              0,
+                              countAddr};
         VkDeviceAddress addr2 = ring.write(&sa, sizeof(sa));
         cmd.dispatch(pl.scatterU64Keys, numBlocks, addr2);
         cmd.barrier();

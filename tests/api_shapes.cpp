@@ -13,8 +13,6 @@
 //      that owns an open mesh dynamic.
 // Mass from shapes is covered by test_vk_api3d_mass.cpp.
 
-
-
 // (merged) // Gate for avbd3d_create_baked_compound_shape (src/api, Box3D-style C ABI). Y-up.
 // // A static body carries a 3-child compound: three 1 m cubes at x = -2, 0, +2 whose tops are y = 0
 // // (a gap of 1 m between neighbours). Checks:
@@ -28,9 +26,9 @@
 // //   g) friction set on the compound applies to every child (slope, non-first child in contact).
 // //   e) destroying the compound removes every child: its id goes invalid, a ray through each child
 // //      misses, and a box over x = +2 now falls.
-// 
-// 
-// 
+//
+//
+//
 #include "test_util.h"
 #include <cmath>
 #include <cstdio>
@@ -40,19 +38,22 @@
 namespace shapes
 {
 static int g_fail = 0;
-#define CHECK(cond, ...)                                                                                              \
-    do                                                                                                                \
-    {                                                                                                                 \
-        if (!(cond))                                                                                                  \
-        {                                                                                                             \
-            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                               \
-            std::printf(__VA_ARGS__);                                                                                 \
-            std::printf("\n");                                                                                        \
-            g_fail++;                                                                                                 \
-        }                                                                                                             \
+#define CHECK(cond, ...)                                                                                               \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        if (!(cond))                                                                                                   \
+        {                                                                                                              \
+            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                                \
+            std::printf(__VA_ARGS__);                                                                                  \
+            std::printf("\n");                                                                                         \
+            g_fail++;                                                                                                  \
+        }                                                                                                              \
     } while (0)
 
-static bool sameShape(Avbd3dShapeId a, Avbd3dShapeId b) { return a.index1 == b.index1 && a.generation == b.generation; }
+static bool sameShape(Avbd3dShapeId a, Avbd3dShapeId b)
+{
+    return a.index1 == b.index1 && a.generation == b.generation;
+}
 
 static Avbd3dBodyId makeBody(Avbd3dWorld *w, Avbd3dBodyType type, Avbd3dVec3 p)
 {
@@ -69,7 +70,10 @@ static Avbd3dShapeId addBox(Avbd3dBodyId b, float hx, float hy, float hz)
     return t3d_create_hull_shape(b, &sd, avbd3d_box_hull_data(&hull));
 }
 
-static float bodyY(Avbd3dBodyId b) { return t3d_body_get_position(b).y; }
+static float bodyY(Avbd3dBodyId b)
+{
+    return t3d_body_get_position(b).y;
+}
 
 static void run(Avbd3dWorld *w, float seconds)
 {
@@ -88,8 +92,8 @@ static void checkHullRest()
     Avbd3dShapeId groundShape = addBox(ground, 20.0f, 0.5f, 20.0f);
     CHECK(avbd3d_shape_is_valid(groundShape), "ground box");
 
-    const Avbd3dVec3 pts[5] = {{-0.5f, -0.5f, -0.5f}, {0.5f, -0.5f, -0.5f}, {0.5f, -0.5f, 0.5f},
-                                {-0.5f, -0.5f, 0.5f},  {0.0f, 0.5f, 0.0f}};
+    const Avbd3dVec3 pts[5] = {
+        {-0.5f, -0.5f, -0.5f}, {0.5f, -0.5f, -0.5f}, {0.5f, -0.5f, 0.5f}, {-0.5f, -0.5f, 0.5f}, {0.0f, 0.5f, 0.0f}};
     Avbd3dHullData *hull = t3d_create_hull(pts, 5, 128);
     CHECK(hull != nullptr, "pyramid hull");
 
@@ -268,8 +272,8 @@ static void checkDynamicMesh()
 
     // Tetrahedron: volume 1/6, density 6 -> mass 1, centroid (0.25, 0.25, 0.25).
     {
-        Avbd3dMeshData *tet = makeClosedMesh({{0, 0, 0}, {1, 0, 0}, {0, 1, 0}, {0, 0, 1}},
-                                              {0, 2, 1, 0, 1, 3, 0, 3, 2, 1, 2, 3});
+        Avbd3dMeshData *tet =
+            makeClosedMesh({{0, 0, 0}, {1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 2, 1, 0, 1, 3, 0, 3, 2, 1, 2, 3});
         CHECK(tet != nullptr, "tetra mesh");
         Avbd3dBodyId b = makeBody(w, AVBD3D_DYNAMIC_BODY, Avbd3dVec3{50, 5, 0});
         Avbd3dShapeDef sd = avbd3d_default_shape_def();
@@ -368,19 +372,22 @@ int run()
 namespace compound
 {
 static int g_fail = 0;
-#define CHECK(cond, ...)                                                                                              \
-    do                                                                                                                \
-    {                                                                                                                 \
-        if (!(cond))                                                                                                  \
-        {                                                                                                             \
-            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                               \
-            std::printf(__VA_ARGS__);                                                                                 \
-            std::printf("\n");                                                                                        \
-            g_fail++;                                                                                                 \
-        }                                                                                                             \
+#define CHECK(cond, ...)                                                                                               \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        if (!(cond))                                                                                                   \
+        {                                                                                                              \
+            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                                \
+            std::printf(__VA_ARGS__);                                                                                  \
+            std::printf("\n");                                                                                         \
+            g_fail++;                                                                                                  \
+        }                                                                                                              \
     } while (0)
 
-static bool sameShape(Avbd3dShapeId a, Avbd3dShapeId b) { return a.index1 == b.index1 && a.generation == b.generation; }
+static bool sameShape(Avbd3dShapeId a, Avbd3dShapeId b)
+{
+    return a.index1 == b.index1 && a.generation == b.generation;
+}
 
 static Avbd3dBodyId makeBody(Avbd3dWorld *w, Avbd3dBodyType type, Avbd3dVec3 p)
 {
@@ -408,8 +415,8 @@ static void run(Avbd3dWorld *w, float seconds)
 
 static bool rayHits(Avbd3dWorld *w, float x, Avbd3dShapeId *shape)
 {
-    Avbd3dRayResult r = t3d_world_cast_ray_closest(w, Avbd3dVec3{x, 5, 0}, Avbd3dVec3{0, -10, 0},
-                                                     avbd3d_default_query_filter());
+    Avbd3dRayResult r =
+        t3d_world_cast_ray_closest(w, Avbd3dVec3{x, 5, 0}, Avbd3dVec3{0, -10, 0}, avbd3d_default_query_filter());
     if (shape)
         *shape = r.shapeId;
     return r.hit;
@@ -483,8 +490,8 @@ static void checkDynamicCompound()
     CHECK(std::fabs(q.v.x) + std::fabs(q.v.y) + std::fabs(q.v.z) < 0.03f, "compound not tilted/spun (%.3f %.3f %.3f)",
           q.v.x, q.v.y, q.v.z);
     const Avbd3dVec3 a = t3d_body_get_angular_velocity(b);
-    CHECK(std::fabs(a.x) + std::fabs(a.y) + std::fabs(a.z) < 0.05f, "compound angular velocity %.3f %.3f %.3f", a.x, a.y,
-          a.z);
+    CHECK(std::fabs(a.x) + std::fabs(a.y) + std::fabs(a.z) < 0.05f, "compound angular velocity %.3f %.3f %.3f", a.x,
+          a.y, a.z);
     t3d_destroy_compound(compound);
     t3d_destroy_world(w);
 }
@@ -498,7 +505,7 @@ static float slopeDrift(float friction)
     Avbd3dWorld *w = t3d_create_world(&wd);
     const float th = 30.0f * 3.14159265f / 180.0f;
     const Avbd3dQuat qs = {{0, 0, std::sin(0.5f * th)}, std::cos(0.5f * th)};
-    const Avbd3dVec3 n = {-std::sin(th), std::cos(th), 0};  // slope normal
+    const Avbd3dVec3 n = {-std::sin(th), std::cos(th), 0};     // slope normal
     const Avbd3dVec3 down = {-std::cos(th), -std::sin(th), 0}; // downhill (the slope rises toward +x)
 
     Avbd3dBodyDef gd = avbd3d_default_body_def();
@@ -593,8 +600,7 @@ int run()
     // a) the box half-extent is 0.15 and the tops are y = 0.
     CHECK(std::fabs(t3d_body_get_position(last).y - 0.15f) < 0.03f, "last child rest %.4f",
           t3d_body_get_position(last).y);
-    CHECK(std::fabs(t3d_body_get_position(mid).y - 0.15f) < 0.03f, "mid child rest %.4f",
-          t3d_body_get_position(mid).y);
+    CHECK(std::fabs(t3d_body_get_position(mid).y - 0.15f) < 0.03f, "mid child rest %.4f", t3d_body_get_position(mid).y);
     CHECK(t3d_body_get_position(gap).y < -1.0f, "gap box falls through, y %.4f", t3d_body_get_position(gap).y);
 
     // b) rays return the compound id for any child.
@@ -603,13 +609,14 @@ int run()
     CHECK(rayHits(w, -2.0f, &hit) && sameShape(hit, cid), "ray on the first child returns the compound id");
     {
         Avbd3dRayResult r = t3d_world_cast_ray_closest(w, Avbd3dVec3{1.0f, 0.5f, 0}, Avbd3dVec3{0, 0.5f, 0},
-                                                         avbd3d_default_query_filter());
+                                                       avbd3d_default_query_filter());
         CHECK(!r.hit, "no hit in the gap above the compound");
     }
 
     // c) the AABB spans x from -2.5 to 2.5.
     Avbd3dAABB bb = t3d_shape_get_aabb(cid);
-    CHECK(bb.lowerBound.x < -2.4f && bb.upperBound.x > 2.4f, "compound aabb %.3f..%.3f", bb.lowerBound.x, bb.upperBound.x);
+    CHECK(bb.lowerBound.x < -2.4f && bb.upperBound.x > 2.4f, "compound aabb %.3f..%.3f", bb.lowerBound.x,
+          bb.upperBound.x);
 
     // e) destroy removes every child.
     t3d_destroy_shape(cid, true);
@@ -617,8 +624,8 @@ int run()
     CHECK(t3d_body_get_shape_count(ground) == 0, "no shapes left");
     CHECK(!rayHits(w, 2.3f, nullptr), "last child gone");
     {
-        Avbd3dRayResult r = t3d_world_cast_ray_closest(w, Avbd3dVec3{-2, 5, 0}, Avbd3dVec3{0, -10, 0},
-                                                         avbd3d_default_query_filter());
+        Avbd3dRayResult r =
+            t3d_world_cast_ray_closest(w, Avbd3dVec3{-2, 5, 0}, Avbd3dVec3{0, -10, 0}, avbd3d_default_query_filter());
         CHECK(!r.hit, "first child gone");
     }
     Avbd3dBodyId after = dropBox(w, 2.0f);

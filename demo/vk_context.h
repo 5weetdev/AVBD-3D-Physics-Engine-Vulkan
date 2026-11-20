@@ -27,23 +27,21 @@
 
 // Prints and aborts: a demo has nothing to fall back to, and the abort keeps the failing
 // stack for the device-lost recipe in docs/TESTING.md.
-#define VK_CHECK(expr)                                                                             \
-    do                                                                                             \
-    {                                                                                              \
-        VkResult demo_vk_res_ = (expr);                                                            \
-        if (demo_vk_res_ != VK_SUCCESS)                                                            \
-        {                                                                                          \
-            fprintf(stderr, "Vulkan error %d at %s:%d\n    %s\n", (int)demo_vk_res_, __FILE__,     \
-                    __LINE__, #expr);                                                              \
-            abort();                                                                               \
-        }                                                                                          \
+#define VK_CHECK(expr)                                                                                                 \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        VkResult demo_vk_res_ = (expr);                                                                                \
+        if (demo_vk_res_ != VK_SUCCESS)                                                                                \
+        {                                                                                                              \
+            fprintf(stderr, "Vulkan error %d at %s:%d\n    %s\n", (int)demo_vk_res_, __FILE__, __LINE__, #expr);       \
+            abort();                                                                                                   \
+        }                                                                                                              \
     } while (0)
 
 namespace demovk
 {
 
-inline bool tryFindMemoryType(VkPhysicalDevice phys, uint32_t typeBits, VkMemoryPropertyFlags props,
-                              uint32_t &out)
+inline bool tryFindMemoryType(VkPhysicalDevice phys, uint32_t typeBits, VkMemoryPropertyFlags props, uint32_t &out)
 {
     VkPhysicalDeviceMemoryProperties mp;
     vkGetPhysicalDeviceMemoryProperties(phys, &mp);
@@ -69,7 +67,7 @@ inline uint32_t findMemoryType(VkPhysicalDevice phys, uint32_t typeBits, VkMemor
 
 class Device
 {
-  public:
+public:
     void init(const Avbd3dGpu *gpu)
     {
         if (avbd3d_gpu_get_vulkan_context(gpu, &m_ctx) != AVBD3D_OK)
@@ -97,7 +95,7 @@ class Device
     VkCommandPool commandPool() const { return m_pool; }
     const char *deviceName() const { return m_ctx.deviceName; }
 
-  private:
+private:
     Avbd3dVulkanContext m_ctx = {};
     VkCommandPool m_pool = VK_NULL_HANDLE;
 };
@@ -106,7 +104,7 @@ class Device
 // host-visible memory (ReBAR), falling back to plain host-coherent memory.
 class MappedBuffer
 {
-  public:
+public:
     MappedBuffer() = default;
     ~MappedBuffer() { destroy(); }
     MappedBuffer(const MappedBuffer &) = delete;
@@ -127,8 +125,8 @@ class MappedBuffer
         const VkMemoryPropertyFlags coherent =
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
         uint32_t type = 0;
-        if (!tryFindMemoryType(dev.physicalDevice(), req.memoryTypeBits,
-                               coherent | VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, type))
+        if (!tryFindMemoryType(dev.physicalDevice(), req.memoryTypeBits, coherent | VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                               type))
             type = findMemoryType(dev.physicalDevice(), req.memoryTypeBits, coherent);
 
         VkMemoryAllocateFlagsInfo flags{VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO};
@@ -169,7 +167,7 @@ class MappedBuffer
     VkDeviceSize size() const { return m_size; }
     void *mapped() const { return m_mapped; }
 
-  private:
+private:
     VkDevice m_device = VK_NULL_HANDLE;
     VkBuffer m_buffer = VK_NULL_HANDLE;
     VkDeviceMemory m_memory = VK_NULL_HANDLE;

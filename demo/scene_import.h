@@ -19,7 +19,7 @@
 
 class SceneImport
 {
-  public:
+public:
     // Forget everything imported (a new world).
     void reset();
 
@@ -31,7 +31,7 @@ class SceneImport
         return descIndex >= 0 && descIndex < (int)m_bodies.size() ? m_bodies[descIndex] : Avbd3dBodyId{};
     }
 
-  private:
+private:
     std::vector<Avbd3dBodyId> m_bodies;
     int m_joints = 0, m_springs = 0;
     std::unordered_set<unsigned long long> m_pairs; // ignore pairs already applied

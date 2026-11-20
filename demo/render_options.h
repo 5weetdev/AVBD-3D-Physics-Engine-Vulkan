@@ -62,7 +62,10 @@ struct RenderOptions
 };
 
 // The light both demos use. Every frame sets it into RenderOptions::lightDir.
-inline vec3 demoLightDir() { return normalize(vec3{-0.4f, -0.75f, 0.5f}); }
+inline vec3 demoLightDir()
+{
+    return normalize(vec3{-0.4f, -0.75f, 0.5f});
+}
 
 // Clear colour for the theme, RGBA.
 void backgroundColor(BackgroundTheme theme, float out[4]);

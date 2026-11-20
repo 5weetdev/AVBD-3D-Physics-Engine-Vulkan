@@ -187,9 +187,15 @@ namespace detail
 constexpr float kTwoPi = 6.28318530717958647692f;
 constexpr int kGenericRotvec = 1, kGenericDistance = 2, kGenericSwingTwist = 3;
 
-inline float finiteOrInf(float v) { return v > 1e29f ? INFINITY : v; }
+inline float finiteOrInf(float v)
+{
+    return v > 1e29f ? INFINITY : v;
+}
 
-inline vec3 unit(int k) { return vec3{k == 0 ? 1.0f : 0.0f, k == 1 ? 1.0f : 0.0f, k == 2 ? 1.0f : 0.0f}; }
+inline vec3 unit(int k)
+{
+    return vec3{k == 0 ? 1.0f : 0.0f, k == 1 ? 1.0f : 0.0f, k == 2 ? 1.0f : 0.0f};
+}
 
 inline quat worldFrame(const SceneBuilder &sb, int body, const JointFrame &f)
 {
@@ -320,7 +326,8 @@ inline int addWeld(SceneBuilder &sb, const WeldDef &def)
     for (int k = 0; k < 3; k++)
     {
         if (def.linearHertz > 0.0f)
-            r.place(k, JointAxisSpring, 0.0f, detail::linStiffness(sb, def.base, def.linearHertz), INFINITY, def.linearDampingRatio);
+            r.place(k, JointAxisSpring, 0.0f, detail::linStiffness(sb, def.base, def.linearHertz), INFINITY,
+                    def.linearDampingRatio);
         else
             r.lock(k);
         if (def.angularHertz > 0.0f)
@@ -506,7 +513,8 @@ inline int addDistance(SceneBuilder &sb, const DistanceDef &def)
         boundLin = detail::finiteOrInf(std::fmax(0.0f, -def.lowerSpringForce));
         boundAng = detail::finiteOrInf(std::fmax(0.0f, def.upperSpringForce));
         if (def.enableMotor)
-            d.axis[2] = {JointAxisVelocityMotor, def.motorSpeed, def.maxMotorForce > 0.0f ? def.maxMotorForce : INFINITY};
+            d.axis[2] = {JointAxisVelocityMotor, def.motorSpeed,
+                         def.maxMotorForce > 0.0f ? def.maxMotorForce : INFINITY};
         if (def.enableLimit)
             d.axis[1] = {JointAxisLimited, def.minLength, def.maxLength};
     }

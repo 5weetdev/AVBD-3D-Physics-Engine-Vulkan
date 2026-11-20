@@ -34,7 +34,8 @@ static void check(bool ok, const char *what)
 
 static void testWorld()
 {
-    SceneBuilder author; author.params.gravity = vec3{0.0f, 0.0f, -10.0f};
+    SceneBuilder author;
+    author.params.gravity = vec3{0.0f, 0.0f, -10.0f};
     author.addBody({40, 40, 1}, 0.0f, 0.5f, {0, 0, -0.5f});
     for (int i = 0; i < 4; i++)
         author.addBody({1, 1, 1}, 1.0f, 0.5f, {0, 0, 1.0f + 1.2f * (float)i});
@@ -130,7 +131,8 @@ static void testApi()
     Avbd3dBodyId late;
     check(avbd3d_create_body(world, &bd, &late) == AVBD3D_ERR_DEVICE_LOST, "avbd3d: creates report the lost device");
     check(avbd3d_step(world, 1.0f / 60.0f) == AVBD3D_ERR_DEVICE_LOST, "avbd3d: steps report the lost device");
-    check(avbd3d_step_begin(world, 1.0f / 60.0f) == AVBD3D_ERR_DEVICE_LOST, "avbd3d: step_begin reports the lost device");
+    check(avbd3d_step_begin(world, 1.0f / 60.0f) == AVBD3D_ERR_DEVICE_LOST,
+          "avbd3d: step_begin reports the lost device");
     Avbd3dStats st;
     check(avbd3d_get_stats(world, &st) == AVBD3D_ERR_DEVICE_LOST, "avbd3d: get_stats reports the lost device");
     (void)lastGoodY;

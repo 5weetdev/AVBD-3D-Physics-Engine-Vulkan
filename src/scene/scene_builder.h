@@ -38,12 +38,10 @@ public:
 
     // Bodies. Return the body index. Size is full width for boxes; sphere `radius`;
     // capsule `radius` + `halfSegment` about local +z. Density 0 makes a static body.
-    int addBody(vec3 size, float density, float friction, vec3 position,
-                vec3 velocity = vec3{0, 0, 0}, vec3 angularVelocity = vec3{0, 0, 0},
-                quat rotation = quat{0, 0, 0, 1});
-    int addSphere(float radius, float density, float friction, vec3 position,
-                  vec3 velocity = vec3{0, 0, 0}, vec3 angularVelocity = vec3{0, 0, 0},
-                  quat rotation = quat{0, 0, 0, 1});
+    int addBody(vec3 size, float density, float friction, vec3 position, vec3 velocity = vec3{0, 0, 0},
+                vec3 angularVelocity = vec3{0, 0, 0}, quat rotation = quat{0, 0, 0, 1});
+    int addSphere(float radius, float density, float friction, vec3 position, vec3 velocity = vec3{0, 0, 0},
+                  vec3 angularVelocity = vec3{0, 0, 0}, quat rotation = quat{0, 0, 0, 1});
     int addCapsule(float radius, float halfSegment, float density, float friction, vec3 position,
                    vec3 velocity = vec3{0, 0, 0}, vec3 angularVelocity = vec3{0, 0, 0},
                    quat rotation = quat{0, 0, 0, 1});
@@ -71,9 +69,8 @@ public:
     //   addHullShape: an extra hull on an existing body, placed in the body frame; returns the
     //                shape index or -1 (bad body or null/invalid hull).
     // The caller keeps ownership of `hull`.
-    int addHullBody(const b3HullData *hull, float density, float friction, vec3 position,
-                    vec3 velocity = vec3{0, 0, 0}, vec3 angularVelocity = vec3{0, 0, 0},
-                    quat rotation = quat{0, 0, 0, 1});
+    int addHullBody(const b3HullData *hull, float density, float friction, vec3 position, vec3 velocity = vec3{0, 0, 0},
+                    vec3 angularVelocity = vec3{0, 0, 0}, quat rotation = quat{0, 0, 0, 1});
     int addHullShape(int body, const b3HullData *hull, vec3 localPos, quat localRot, float friction);
 
     // Static triangle mesh shapes (Phase 1.5a). The triangles are cooked by Box3D's b3CreateMesh
@@ -86,8 +83,8 @@ public:
     //   addMeshShape: an extra mesh on an existing STATIC body, in the body frame.
     // Both return -1 on bad input: empty or out-of-range arrays, a failed cook, or a dynamic body
     // (addMeshShape). The caller keeps its arrays.
-    int addMeshBody(const vec3 *vertices, int vertexCount, const int *indices, int triangleCount,
-                    float friction, vec3 position, quat rotation = quat{0, 0, 0, 1});
+    int addMeshBody(const vec3 *vertices, int vertexCount, const int *indices, int triangleCount, float friction,
+                    vec3 position, quat rotation = quat{0, 0, 0, 1});
     int addMeshShape(int body, const vec3 *vertices, int vertexCount, const int *indices, int triangleCount,
                      vec3 localPos, quat localRot, float friction);
 
@@ -103,16 +100,15 @@ public:
     bool computeMassFromShapes(int body, float density);
 
     // Joints and springs. bodyA < 0 anchors to the world. Return the index.
-    int addJoint(int bodyA, int bodyB, vec3 rA, vec3 rB, float stiffnessLin = INFINITY,
-                 float stiffnessAng = 0.0f, float fracture = INFINITY);
-    int addJointWorld(int bodyA, int bodyB, vec3 worldAnchor, float stiffnessLin = INFINITY,
-                      float stiffnessAng = 0.0f, float fracture = INFINITY);
+    int addJoint(int bodyA, int bodyB, vec3 rA, vec3 rB, float stiffnessLin = INFINITY, float stiffnessAng = 0.0f,
+                 float fracture = INFINITY);
+    int addJointWorld(int bodyA, int bodyB, vec3 worldAnchor, float stiffnessLin = INFINITY, float stiffnessAng = 0.0f,
+                      float fracture = INFINITY);
     int addJoint6(int bodyA, int bodyB, const JointDesc &desc);
-    int addJoint6World(int bodyA, int bodyB, vec3 worldAnchor, quat worldFrame,
-                       const JointAxis axes[6], float fracture = INFINITY);
+    int addJoint6World(int bodyA, int bodyB, vec3 worldAnchor, quat worldFrame, const JointAxis axes[6],
+                       float fracture = INFINITY);
     int addSpring(int bodyA, int bodyB, vec3 rA, vec3 rB, float stiffness, float rest = -1.0f);
-    int addSpringWorld(int bodyA, int bodyB, vec3 worldAnchorA, vec3 worldAnchorB,
-                       float stiffness, float rest = -1.0f);
+    int addSpringWorld(int bodyA, int bodyB, vec3 worldAnchorA, vec3 worldAnchorB, float stiffness, float rest = -1.0f);
     void ignoreCollision(int bodyA, int bodyB);
     // Undo the ignore pair addJoint staged (Box3D collideConnected = true). A joint is the
     // usual reason a pair is ignored, so this removes one occurrence; the other joints between
@@ -159,24 +155,23 @@ public:
     void setKinematic(int body, bool kinematic);
     void setBodyDamping(int body, float linear, float angular);
     void setGravityScale(int body, float scale);
-    void setMaxLinearSpeed(int body, float speed);                 // 0 = unlimited
-    void setSleepThreshold(int body, float speed);                 // 0 = the world's thresholds
+    void setMaxLinearSpeed(int body, float speed); // 0 = unlimited
+    void setSleepThreshold(int body, float speed); // 0 = the world's thresholds
     void setEnableSleep(int body, bool enable);
-    void setMotionLocks(int body, unsigned lockFlags);             // BODY_LOCK_* bits
+    void setMotionLocks(int body, unsigned lockFlags); // BODY_LOCK_* bits
     // Material (per body; a contact mixes the two bodies' values).
-    void setTangentSpeed(int body, float speed);                   // conveyor, body-local +X, m/s
-    void setRollingResistance(int body, float coefficient);        // sphere / capsule only
-    void setFrictionMix(int body, FrictionMix mix);                // the larger enum of a pair wins
+    void setTangentSpeed(int body, float speed);            // conveyor, body-local +X, m/s
+    void setRollingResistance(int body, float coefficient); // sphere / capsule only
+    void setFrictionMix(int body, FrictionMix mix);         // the larger enum of a pair wins
     void setUserMaterialId(int body, unsigned id);
-    void setRestitution(int body, float restitution);              // stored, NOT simulated
+    void setRestitution(int body, float restitution); // stored, NOT simulated
     BodyProps bodyProps(int body) const;
 
     // Runtime spawning: the same as addBody()/addJoint() with the spawn structs, so a
     // SpawnEmitter can commit into a builder as it does into a live solver. Return the
     // first new body index (-1 for an empty group).
-    int spawnBody(vec3 size, float density, float friction, vec3 position,
-                  vec3 velocity = vec3{0, 0, 0}, vec3 angularVelocity = vec3{0, 0, 0},
-                  quat rotation = quat{0, 0, 0, 1});
+    int spawnBody(vec3 size, float density, float friction, vec3 position, vec3 velocity = vec3{0, 0, 0},
+                  vec3 angularVelocity = vec3{0, 0, 0}, quat rotation = quat{0, 0, 0, 1});
     int spawnGroup(const SpawnBody *bodies, int nb, const SpawnJoint *joints, int nj);
 
     // The largest up-facing static face: where a shadow lands. False (and a +y plane
@@ -207,8 +202,8 @@ public:
     SceneDesc finalize() const;
 
 private:
-    int addShapedBody(int shape, vec3 half, float density, float friction, vec3 position,
-                      vec3 velocity, vec3 angularVelocity, quat rotation);
+    int addShapedBody(int shape, vec3 half, float density, float friction, vec3 position, vec3 velocity,
+                      vec3 angularVelocity, quat rotation);
     int pushShape(int body, int type, vec3 localPos, quat localRot, vec3 half, float friction);
     int internGeometry(const b3HullData *hull); // blob index, deduplicated by hash; -1: invalid
     int internBlob(const unsigned char *src, size_t n, unsigned long long hash); // hash 0: computed

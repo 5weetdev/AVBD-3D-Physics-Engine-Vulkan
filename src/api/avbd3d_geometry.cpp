@@ -28,7 +28,7 @@ Avbd3dResult avbd3d_create_hull(const Avbd3dVec3 *points, int32_t point_count, i
         return AVBD3D_ERR_INVALID_ARG;
     static_assert(sizeof(Avbd3dVec3) == sizeof(avbd3d_Vec3), "vec3");
     return made(avbd3d_CreateHull(reinterpret_cast<const avbd3d_Vec3 *>(points), point_count,
-                                          max_vertex_count == 0 ? AVBD3D_MAX_HULL_VERTICES : max_vertex_count),
+                                  max_vertex_count == 0 ? AVBD3D_MAX_HULL_VERTICES : max_vertex_count),
                 out_hull);
 }
 
@@ -101,8 +101,8 @@ Avbd3dResult avbd3d_create_compound(const Avbd3dCompoundDef *def, Avbd3dCompound
     // The instance arrays hold public-layout records; convert each to the internal layout.
     if (def->capsuleCount < 0 || def->hullCount < 0 || def->meshCount < 0 || def->sphereCount < 0)
         return AVBD3D_ERR_INVALID_ARG;
-    if ((def->capsuleCount && !def->capsules) || (def->hullCount && !def->hulls) ||
-        (def->meshCount && !def->meshes) || (def->sphereCount && !def->spheres))
+    if ((def->capsuleCount && !def->capsules) || (def->hullCount && !def->hulls) || (def->meshCount && !def->meshes) ||
+        (def->sphereCount && !def->spheres))
         return AVBD3D_ERR_INVALID_ARG;
     std::vector<avbd3d_CompoundCapsuleDef> capsules;
     std::vector<avbd3d_CompoundHullDef> hulls;

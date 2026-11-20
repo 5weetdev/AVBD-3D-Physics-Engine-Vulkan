@@ -19,11 +19,15 @@ size_t strideOf(BodyWrite t)
 {
     switch (t)
     {
-    case BodyWrite::Transform: return sizeof(BodyTransform);
+    case BodyWrite::Transform:
+        return sizeof(BodyTransform);
     case BodyWrite::Impulse:
-    case BodyWrite::Force: return sizeof(BodyPointVector);
-    case BodyWrite::Awake: return 1;
-    default: return sizeof(vec3);
+    case BodyWrite::Force:
+        return sizeof(BodyPointVector);
+    case BodyWrite::Awake:
+        return 1;
+    default:
+        return sizeof(vec3);
     }
 }
 
@@ -436,7 +440,9 @@ avbd3d_ShapeId World::createShape(int bodySlot, const avbd3d_ShapeDef &def, int 
     r.gen = gen;
     r.alive = true;
     r.body = bodySlot;
-    r.type = kind == AVBD_SHAPE_SPHERE ? avbd3d_sphereShape : kind == AVBD_SHAPE_CAPSULE ? avbd3d_capsuleShape : avbd3d_hullShape;
+    r.type = kind == AVBD_SHAPE_SPHERE    ? avbd3d_sphereShape
+             : kind == AVBD_SHAPE_CAPSULE ? avbd3d_capsuleShape
+                                          : avbd3d_hullShape;
     r.density = def.density > 0.0f ? def.density : 1.0f;
     r.user = def.userData;
     r.filter = def.filter;
@@ -657,7 +663,8 @@ void World::destroyShape(int s, bool updateBodyMass)
     {
         m_sensors.erase(std::lower_bound(m_sensors.begin(), m_sensors.end(), s));
         for (uint64_t k : r.overlaps)
-            m_pendingSensorEnd.push_back(avbd3d_SensorEndTouchEvent{shapeIdAt(s, r.gen), shapeIdAt((int)(k >> 16), (uint16_t)(k & 0xFFFFu))});
+            m_pendingSensorEnd.push_back(
+                avbd3d_SensorEndTouchEvent{shapeIdAt(s, r.gen), shapeIdAt((int)(k >> 16), (uint16_t)(k & 0xFFFFu))});
         r.overlaps.clear();
     }
     r.alive = false;
@@ -965,7 +972,8 @@ void World::syncShapeMaterial(int s)
     const ShapeRec &r = shapes[s];
     const int kind = desc.shapeKind[s];
     desc.shapeRestitution[s] = r.material.restitution;
-    desc.shapeRolling[s] = (kind == AVBD_SHAPE_SPHERE || kind == AVBD_SHAPE_CAPSULE) ? r.material.rollingResistance : 0.0f;
+    desc.shapeRolling[s] =
+        (kind == AVBD_SHAPE_SPHERE || kind == AVBD_SHAPE_CAPSULE) ? r.material.rollingResistance : 0.0f;
     markShape(s);
 }
 
@@ -1049,7 +1057,8 @@ int addTypedJoint(SceneBuilder &sb, const jointpresets::JointBase &base, int typ
 {
     switch (type)
     {
-    case avbd3d_weldJoint: {
+    case avbd3d_weldJoint:
+    {
         avbd3d_WeldJointDef d;
         std::memcpy(&d, bytes, sizeof d);
         jointpresets::WeldDef j;
@@ -1060,7 +1069,8 @@ int addTypedJoint(SceneBuilder &sb, const jointpresets::JointBase &base, int typ
         j.angularDampingRatio = d.angularDampingRatio;
         return jointpresets::addWeld(sb, j);
     }
-    case avbd3d_revoluteJoint: {
+    case avbd3d_revoluteJoint:
+    {
         avbd3d_RevoluteJointDef d;
         std::memcpy(&d, bytes, sizeof d);
         jointpresets::RevoluteDef j;
@@ -1077,7 +1087,8 @@ int addTypedJoint(SceneBuilder &sb, const jointpresets::JointBase &base, int typ
         j.motorSpeed = d.motorSpeed;
         return jointpresets::addRevolute(sb, j);
     }
-    case avbd3d_prismaticJoint: {
+    case avbd3d_prismaticJoint:
+    {
         avbd3d_PrismaticJointDef d;
         std::memcpy(&d, bytes, sizeof d);
         jointpresets::PrismaticDef j;
@@ -1094,7 +1105,8 @@ int addTypedJoint(SceneBuilder &sb, const jointpresets::JointBase &base, int typ
         j.motorSpeed = d.motorSpeed;
         return jointpresets::addPrismatic(sb, j);
     }
-    case avbd3d_wheelJoint: {
+    case avbd3d_wheelJoint:
+    {
         avbd3d_WheelJointDef d;
         std::memcpy(&d, bytes, sizeof d);
         jointpresets::WheelDef j;
@@ -1118,7 +1130,8 @@ int addTypedJoint(SceneBuilder &sb, const jointpresets::JointBase &base, int typ
         j.upperSteeringLimit = d.upperSteeringLimit;
         return jointpresets::addWheel(sb, j);
     }
-    case avbd3d_sphericalJoint: {
+    case avbd3d_sphericalJoint:
+    {
         avbd3d_SphericalJointDef d;
         std::memcpy(&d, bytes, sizeof d);
         jointpresets::SphericalDef j;
@@ -1137,7 +1150,8 @@ int addTypedJoint(SceneBuilder &sb, const jointpresets::JointBase &base, int typ
         j.motorVelocity = toV(d.motorVelocity);
         return jointpresets::addSpherical(sb, j);
     }
-    case avbd3d_distanceJoint: {
+    case avbd3d_distanceJoint:
+    {
         avbd3d_DistanceJointDef d;
         std::memcpy(&d, bytes, sizeof d);
         jointpresets::DistanceDef j;
@@ -1156,7 +1170,8 @@ int addTypedJoint(SceneBuilder &sb, const jointpresets::JointBase &base, int typ
         j.motorSpeed = d.motorSpeed;
         return jointpresets::addDistance(sb, j);
     }
-    case avbd3d_motorJoint: {
+    case avbd3d_motorJoint:
+    {
         avbd3d_MotorJointDef d;
         std::memcpy(&d, bytes, sizeof d);
         jointpresets::MotorDef j;
@@ -1173,7 +1188,8 @@ int addTypedJoint(SceneBuilder &sb, const jointpresets::JointBase &base, int typ
         j.maxSpringTorque = d.maxSpringTorque;
         return jointpresets::addMotor(sb, j);
     }
-    case avbd3d_parallelJoint: {
+    case avbd3d_parallelJoint:
+    {
         avbd3d_ParallelJointDef d;
         std::memcpy(&d, bytes, sizeof d);
         jointpresets::ParallelDef j;
@@ -1183,13 +1199,15 @@ int addTypedJoint(SceneBuilder &sb, const jointpresets::JointBase &base, int typ
         j.maxTorque = d.maxTorque;
         return jointpresets::addParallel(sb, j);
     }
-    case avbd3d_filterJoint: {
+    case avbd3d_filterJoint:
+    {
         jointpresets::FilterDef j;
         j.base = base;
         jointpresets::addFilter(sb, j);
         return 0; // no rows, only the ignore pair
     }
-    case avbd3d_avbdJoint: {
+    case avbd3d_avbdJoint:
+    {
         avbd3d_AvbdJointDef d;
         std::memcpy(&d, bytes, sizeof d);
         int j;
@@ -1216,11 +1234,12 @@ int addTypedJoint(SceneBuilder &sb, const jointpresets::JointBase &base, int typ
             sb.allowCollision(base.bodyA, base.bodyB);
         return j;
     }
-    case avbd3d_avbdSpring: {
+    case avbd3d_avbdSpring:
+    {
         avbd3d_AvbdSpringDef d;
         std::memcpy(&d, bytes, sizeof d);
-        const int j = sb.addSpring(base.bodyA, base.bodyB, base.localFrameA.p, base.localFrameB.p, d.stiffness,
-                                   d.restLength);
+        const int j =
+            sb.addSpring(base.bodyA, base.bodyB, base.localFrameA.p, base.localFrameB.p, d.stiffness, d.restLength);
         if (base.collideConnected)
             sb.allowCollision(base.bodyA, base.bodyB);
         return j;
@@ -1258,7 +1277,8 @@ SceneDesc World::buildJointRows(const JointRec &rec)
 
     SceneBuilder sb;
     // A body at its creation pose: the rows derive their rest orientation and arm from it.
-    auto copyBody = [&](int slot, int which) {
+    auto copyBody = [&](int slot, int which)
+    {
         const BodyRec &r = bodies[slot];
         const SceneDesc &d = desc;
         const float dens = r.type == avbd3d_dynamicBody ? (r.density > 0 ? r.density : 1.0f) : 0.0f;
@@ -1397,12 +1417,25 @@ void World::rebuildJoint(int idx)
                 continue; // not on the device yet: this flush's append uploads the new values
             JointWriteRecGpu g{};
             g.row = (uint32_t)row;
-            g.rA[0] = sd.jointRA[i].x; g.rA[1] = sd.jointRA[i].y; g.rA[2] = sd.jointRA[i].z;
-            g.rB[0] = sd.jointRB[i].x; g.rB[1] = sd.jointRB[i].y; g.rB[2] = sd.jointRB[i].z;
+            g.rA[0] = sd.jointRA[i].x;
+            g.rA[1] = sd.jointRA[i].y;
+            g.rA[2] = sd.jointRA[i].z;
+            g.rB[0] = sd.jointRB[i].x;
+            g.rB[1] = sd.jointRB[i].y;
+            g.rB[2] = sd.jointRB[i].z;
             const quat ra = sd.jointRestAng[i], fa = sd.jointFrameA[i], fb = sd.jointFrameB[i];
-            g.restAng[0] = ra.x; g.restAng[1] = ra.y; g.restAng[2] = ra.z; g.restAng[3] = ra.w;
-            g.frameA[0] = fa.x; g.frameA[1] = fa.y; g.frameA[2] = fa.z; g.frameA[3] = fa.w;
-            g.frameB[0] = fb.x; g.frameB[1] = fb.y; g.frameB[2] = fb.z; g.frameB[3] = fb.w;
+            g.restAng[0] = ra.x;
+            g.restAng[1] = ra.y;
+            g.restAng[2] = ra.z;
+            g.restAng[3] = ra.w;
+            g.frameA[0] = fa.x;
+            g.frameA[1] = fa.y;
+            g.frameA[2] = fa.z;
+            g.frameA[3] = fa.w;
+            g.frameB[0] = fb.x;
+            g.frameB[1] = fb.y;
+            g.frameB[2] = fb.z;
+            g.frameB[3] = fb.w;
             g.kLin = sd.jointKLin[i];
             g.kAng = sd.jointKAng[i];
             g.frac = sd.jointFrac[i];
@@ -1627,7 +1660,7 @@ void World::syncDeviceError()
     const VkResult r = m_vk.deviceError();
     if (r == VK_SUCCESS || m_error != avbd3d_errorNone)
         return;
-    m_error = r == VK_ERROR_DEVICE_LOST ? avbd3d_errorDeviceLost
+    m_error = r == VK_ERROR_DEVICE_LOST                                                  ? avbd3d_errorDeviceLost
               : (r == VK_ERROR_OUT_OF_DEVICE_MEMORY || r == VK_ERROR_OUT_OF_HOST_MEMORY) ? avbd3d_errorOutOfMemory
                                                                                          : avbd3d_errorDevice;
     m_errorText = m_vk.deviceErrorWhat();
@@ -1699,10 +1732,11 @@ bool World::jointForce(int rec, vec3 &force, vec3 &torque)
     if (j.a >= 0)
         syncBody(j.a);
     const SceneDesc &d = desc;
-    const JointForce f = VkWorld::jointForce(
-        d.jointGeneric[row], m_jview.lambdaLin[row], m_jview.lambdaAng[row], d.jointArm[row], d.jointFrameA[row],
-        d.jointFrameB[row], d.jointRA[row], d.jointRB[row], j.a >= 0, j.a >= 0 ? d.pos[j.a] : vec3{0, 0, 0},
-        j.a >= 0 ? d.rot[j.a] : quat{0, 0, 0, 1}, d.pos[j.b], d.rot[j.b], d.jointAxisMode[row * 6 + 3] == JointAxisCone);
+    const JointForce f =
+        VkWorld::jointForce(d.jointGeneric[row], m_jview.lambdaLin[row], m_jview.lambdaAng[row], d.jointArm[row],
+                            d.jointFrameA[row], d.jointFrameB[row], d.jointRA[row], d.jointRB[row], j.a >= 0,
+                            j.a >= 0 ? d.pos[j.a] : vec3{0, 0, 0}, j.a >= 0 ? d.rot[j.a] : quat{0, 0, 0, 1}, d.pos[j.b],
+                            d.rot[j.b], d.jointAxisMode[row * 6 + 3] == JointAxisCone);
     force = f.force;
     torque = f.torque;
     return true;
@@ -2009,8 +2043,8 @@ void World::collectContacts()
             continue;
         syncBody(k.bodyA);
         syncBody(k.bodyB);
-        const bool bothAsleep = shapes[k.shapeA].alive && shapes[k.shapeB].alive && awake[k.bodyA] == 0 &&
-                                awake[k.bodyB] == 0;
+        const bool bothAsleep =
+            shapes[k.shapeA].alive && shapes[k.shapeB].alive && awake[k.bodyA] == 0 && awake[k.bodyB] == 0;
         if (bothAsleep)
         {
             m_contacts[c].stamp = m_step;
@@ -2068,7 +2102,10 @@ avbd3d_Error errorOfCurrentException(std::string &text)
     }
 }
 
-World *settled(avbd3d_WorldId id) { return lookupWorld(id); }
+World *settled(avbd3d_WorldId id)
+{
+    return lookupWorld(id);
+}
 
 World *settledDevice(avbd3d_WorldId id)
 {

@@ -56,9 +56,8 @@ struct SpawnEmitter
         links.clear();
     }
 
-    int addBody(vec3 size, float density, float friction, vec3 position,
-                vec3 velocity = vec3{0, 0, 0}, vec3 angularVelocity = vec3{0, 0, 0},
-                quat rotation = quat{0, 0, 0, 1})
+    int addBody(vec3 size, float density, float friction, vec3 position, vec3 velocity = vec3{0, 0, 0},
+                vec3 angularVelocity = vec3{0, 0, 0}, quat rotation = quat{0, 0, 0, 1})
     {
         (void)velocity;
         (void)angularVelocity;
@@ -66,8 +65,7 @@ struct SpawnEmitter
         return (int)parts.size() - 1;
     }
 
-    int addJointWorld(int bodyA, int bodyB, vec3 worldAnchor,
-                      float stiffnessLin = INFINITY, float stiffnessAng = 0.0f,
+    int addJointWorld(int bodyA, int bodyB, vec3 worldAnchor, float stiffnessLin = INFINITY, float stiffnessAng = 0.0f,
                       float fracture = INFINITY)
     {
         links.push_back(Link{bodyA, bodyB, worldAnchor, stiffnessLin, stiffnessAng, fracture});
@@ -122,8 +120,8 @@ struct SpawnEmitter
     // massMultiplier scales the density of all parts. Since size is also scaled,
     // the total mass of the object will scale with size^3 * massMultiplier.
     template <typename Solver>
-    int commit(Solver &solver, vec3 origin, quat rotation, float scale, float massMultiplier,
-               vec3 velocity, vec3 angularVelocity = vec3{0, 0, 0}) const
+    int commit(Solver &solver, vec3 origin, quat rotation, float scale, float massMultiplier, vec3 velocity,
+               vec3 angularVelocity = vec3{0, 0, 0}) const
     {
         const vec3 c = centre();
         const float densityScale = massMultiplier;
@@ -180,18 +178,15 @@ struct SpawnEmitter
             // Anchors are body-local, so they are only scaled, never rotated: the
             // placement is a rigid transform of both body and anchor alike.
             const vec3 anchorLocalA =
-                l.a >= 0 ? rotate(conjugate(parts[l.a].rotation), l.anchor - parts[l.a].position)
-                         : l.anchor;
-            const vec3 anchorLocalB =
-                rotate(conjugate(parts[l.b].rotation), l.anchor - parts[l.b].position);
-            j.rA = l.a >= 0 ? anchorLocalA * scale
-                            : origin + rotate(rotation, (l.anchor - c) * scale);
+                l.a >= 0 ? rotate(conjugate(parts[l.a].rotation), l.anchor - parts[l.a].position) : l.anchor;
+            const vec3 anchorLocalB = rotate(conjugate(parts[l.b].rotation), l.anchor - parts[l.b].position);
+            j.rA = l.a >= 0 ? anchorLocalA * scale : origin + rotate(rotation, (l.anchor - c) * scale);
             j.rB = anchorLocalB * scale;
             joints.push_back(j);
         }
 
-        return solver.spawnGroup(bodies.data(), (int)bodies.size(),
-                                 joints.empty() ? nullptr : joints.data(), (int)joints.size());
+        return solver.spawnGroup(bodies.data(), (int)bodies.size(), joints.empty() ? nullptr : joints.data(),
+                                 (int)joints.size());
     }
 };
 
@@ -217,23 +212,22 @@ inline void buildRagdoll(SpawnEmitter &e)
     const float torsoBot = torsoZ - torsoH * 0.5f;
     const float halfWidth = 0.18f;
 
-    const int torso = e.addBody({0.22f, halfWidth * 2.0f, torsoH}, kDensity, kFriction,
-                                {0.0f, 0.0f, torsoZ});
+    const int torso = e.addBody({0.22f, halfWidth * 2.0f, torsoH}, kDensity, kFriction, {0.0f, 0.0f, torsoZ});
 
     // Head sits straight on the shoulders: no neck, so the joint is the contact line.
     const float headH = 0.24f;
-    const int head = e.addBody({0.22f, 0.22f, headH}, kDensityHead, kFriction,
-                               {0.0f, 0.0f, torsoTop + headH * 0.5f});
+    const int head = e.addBody({0.22f, 0.22f, headH}, kDensityHead, kFriction, {0.0f, 0.0f, torsoTop + headH * 0.5f});
     e.addJointWorld(torso, head, {0.0f, 0.0f, torsoTop}, INFINITY, 0.0f);
 
     // A limb segment: a box whose local +Z runs from the joint down the limb, so the
     // rotation is the one that maps +Z onto dir. dir stays in the YZ plane here, which
     // makes that a single rotation about X.
-    auto limb = [&](int parent, vec3 from, vec3 dir, float len, float thick) {
+    auto limb = [&](int parent, vec3 from, vec3 dir, float len, float thick)
+    {
         const float theta = atan2f(-dir.y, dir.z);
         const quat rot = quat{sinf(theta * 0.5f), 0.0f, 0.0f, cosf(theta * 0.5f)};
-        const int seg = e.addBody({thick, thick, len}, kDensity, kFriction,
-                                  from + dir * (len * 0.5f), {0, 0, 0}, {0, 0, 0}, rot);
+        const int seg =
+            e.addBody({thick, thick, len}, kDensity, kFriction, from + dir * (len * 0.5f), {0, 0, 0}, {0, 0, 0}, rot);
         e.addJointWorld(parent, seg, from, INFINITY, 0.0f);
         return seg;
     };

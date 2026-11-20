@@ -93,27 +93,55 @@ void VkNarrowphase::init(Device &dev)
     ring.init(dev, 1 << 22);
     cmd.init(dev, 2);
 
-    keyA.init(dev); keyB.init(dev);
-    basisA.init(dev); basisB.init(dev);
-    frictionA.init(dev); frictionB.init(dev);
-    offsetA.init(dev); offsetB.init(dev);
-    countA.init(dev); countB.init(dev);
-    bodyAA.init(dev); bodyAB.init(dev);
-    bodyBA.init(dev); bodyBB.init(dev);
-    shapeAA.init(dev); shapeAB.init(dev);
-    shapeBA.init(dev); shapeBB.init(dev);
-    featA.init(dev); featB.init(dev);
-    rAA.init(dev); rAB.init(dev); rBA.init(dev); rBB.init(dev);
-    c0A.init(dev); c0B.init(dev);
-    penA.init(dev); penB.init(dev);
-    lamA.init(dev); lamB.init(dev);
-    stickA.init(dev); stickB.init(dev);
+    keyA.init(dev);
+    keyB.init(dev);
+    basisA.init(dev);
+    basisB.init(dev);
+    frictionA.init(dev);
+    frictionB.init(dev);
+    offsetA.init(dev);
+    offsetB.init(dev);
+    countA.init(dev);
+    countB.init(dev);
+    bodyAA.init(dev);
+    bodyAB.init(dev);
+    bodyBA.init(dev);
+    bodyBB.init(dev);
+    shapeAA.init(dev);
+    shapeAB.init(dev);
+    shapeBA.init(dev);
+    shapeBB.init(dev);
+    featA.init(dev);
+    featB.init(dev);
+    rAA.init(dev);
+    rAB.init(dev);
+    rBA.init(dev);
+    rBB.init(dev);
+    c0A.init(dev);
+    c0B.init(dev);
+    penA.init(dev);
+    penB.init(dev);
+    lamA.init(dev);
+    lamB.init(dev);
+    stickA.init(dev);
+    stickB.init(dev);
     counter.init(dev);
     activeCount.init(dev);
-    hullList.init(dev); hullCounter.init(dev); hullIndirect.init(dev); hullScratch.init(dev);
-    satSepA.init(dev); satSepB.init(dev); satBitsA.init(dev); satBitsB.init(dev);
-    meshList.init(dev); meshCounter.init(dev); meshIndirect.init(dev);
-    childKeys.init(dev); childSorted.init(dev); childCounter.init(dev); childCount.init(dev);
+    hullList.init(dev);
+    hullCounter.init(dev);
+    hullIndirect.init(dev);
+    hullScratch.init(dev);
+    satSepA.init(dev);
+    satSepB.init(dev);
+    satBitsA.init(dev);
+    satBitsB.init(dev);
+    meshList.init(dev);
+    meshCounter.init(dev);
+    meshIndirect.init(dev);
+    childKeys.init(dev);
+    childSorted.init(dev);
+    childCounter.init(dev);
+    childCount.init(dev);
     meshScratch.init(dev);
     if (!m_readout.mapped())
         m_readout.init(dev, 4 * sizeof(int32_t), VK_BUFFER_USAGE_TRANSFER_DST_BIT, MappedBuffer::HostAccess::Read);
@@ -129,27 +157,55 @@ void VkNarrowphase::destroy()
 
 void VkNarrowphase::release()
 {
-    keyA.destroy(); keyB.destroy();
-    basisA.destroy(); basisB.destroy();
-    frictionA.destroy(); frictionB.destroy();
-    offsetA.destroy(); offsetB.destroy();
-    countA.destroy(); countB.destroy();
-    bodyAA.destroy(); bodyAB.destroy();
-    bodyBA.destroy(); bodyBB.destroy();
-    shapeAA.destroy(); shapeAB.destroy();
-    shapeBA.destroy(); shapeBB.destroy();
-    featA.destroy(); featB.destroy();
-    rAA.destroy(); rAB.destroy(); rBA.destroy(); rBB.destroy();
-    c0A.destroy(); c0B.destroy();
-    penA.destroy(); penB.destroy();
-    lamA.destroy(); lamB.destroy();
-    stickA.destroy(); stickB.destroy();
+    keyA.destroy();
+    keyB.destroy();
+    basisA.destroy();
+    basisB.destroy();
+    frictionA.destroy();
+    frictionB.destroy();
+    offsetA.destroy();
+    offsetB.destroy();
+    countA.destroy();
+    countB.destroy();
+    bodyAA.destroy();
+    bodyAB.destroy();
+    bodyBA.destroy();
+    bodyBB.destroy();
+    shapeAA.destroy();
+    shapeAB.destroy();
+    shapeBA.destroy();
+    shapeBB.destroy();
+    featA.destroy();
+    featB.destroy();
+    rAA.destroy();
+    rAB.destroy();
+    rBA.destroy();
+    rBB.destroy();
+    c0A.destroy();
+    c0B.destroy();
+    penA.destroy();
+    penB.destroy();
+    lamA.destroy();
+    lamB.destroy();
+    stickA.destroy();
+    stickB.destroy();
     counter.destroy();
     activeCount.destroy();
-    hullList.destroy(); hullCounter.destroy(); hullIndirect.destroy(); hullScratch.destroy();
-    satSepA.destroy(); satSepB.destroy(); satBitsA.destroy(); satBitsB.destroy();
-    meshList.destroy(); meshCounter.destroy(); meshIndirect.destroy();
-    childKeys.destroy(); childSorted.destroy(); childCounter.destroy(); childCount.destroy();
+    hullList.destroy();
+    hullCounter.destroy();
+    hullIndirect.destroy();
+    hullScratch.destroy();
+    satSepA.destroy();
+    satSepB.destroy();
+    satBitsA.destroy();
+    satBitsB.destroy();
+    meshList.destroy();
+    meshCounter.destroy();
+    meshIndirect.destroy();
+    childKeys.destroy();
+    childSorted.destroy();
+    childCounter.destroy();
+    childCount.destroy();
     meshScratch.destroy();
     hullCap = 0;
     m_hullPairs = 0;
@@ -181,7 +237,8 @@ void VkNarrowphase::reserve(int maxPairs_, int maxContacts_)
     offsetB.resize(slotN * sizeof(int32_t));
     countA.resize(slotN * sizeof(int32_t));
     countB.resize(slotN * sizeof(int32_t));
-    countA.zero(); countB.zero(); // matches the reference resizeZeroed on countA/countB
+    countA.zero();
+    countB.zero(); // matches the reference resizeZeroed on countA/countB
     bodyAA.resize(slotN * sizeof(int32_t));
     bodyAB.resize(slotN * sizeof(int32_t));
     bodyBA.resize(slotN * sizeof(int32_t));
@@ -211,7 +268,10 @@ void VkNarrowphase::reserve(int maxPairs_, int maxContacts_)
     // A fresh reserve drops the cache; rebuild the hull arrays at the new size (lazily if never used).
     if (satSepA.size() > 0)
     {
-        satSepA.destroy(); satSepB.destroy(); satBitsA.destroy(); satBitsB.destroy();
+        satSepA.destroy();
+        satSepB.destroy();
+        satBitsA.destroy();
+        satBitsB.destroy();
         ensureHull();
     }
     // The mesh pair list is per-record scratch sized by the pair capacity; rebuilt lazily otherwise.
@@ -242,33 +302,52 @@ void VkNarrowphase::grow(int maxPairs_, int maxContacts_)
 
     // Per-slot arrays (pair slots then child slots) keep their contents across the resize, so the
     // previous step's child region survives a growth rerun the same way the pair region does.
-    auto pb = [&](Buffer &buf, VkDeviceSize elemBytes) { buf.resizePreserve((VkDeviceSize)slotCapacity() * elemBytes); };
+    auto pb = [&](Buffer &buf, VkDeviceSize elemBytes)
+    { buf.resizePreserve((VkDeviceSize)slotCapacity() * elemBytes); };
     auto cb = [&](Buffer &buf, VkDeviceSize elemBytes) { buf.resizePreserve((VkDeviceSize)maxContacts * elemBytes); };
 
-    pb(keyA, sizeof(uint64_t)); pb(keyB, sizeof(uint64_t));
-    pb(basisA, sizeof(float) * 9); pb(basisB, sizeof(float) * 9);
-    pb(frictionA, sizeof(float)); pb(frictionB, sizeof(float));
-    pb(offsetA, sizeof(int32_t)); pb(offsetB, sizeof(int32_t));
-    pb(countA, sizeof(int32_t)); pb(countB, sizeof(int32_t));
-    pb(bodyAA, sizeof(int32_t)); pb(bodyAB, sizeof(int32_t));
-    pb(bodyBA, sizeof(int32_t)); pb(bodyBB, sizeof(int32_t));
-    pb(shapeAA, sizeof(int32_t)); pb(shapeAB, sizeof(int32_t));
-    pb(shapeBA, sizeof(int32_t)); pb(shapeBB, sizeof(int32_t));
+    pb(keyA, sizeof(uint64_t));
+    pb(keyB, sizeof(uint64_t));
+    pb(basisA, sizeof(float) * 9);
+    pb(basisB, sizeof(float) * 9);
+    pb(frictionA, sizeof(float));
+    pb(frictionB, sizeof(float));
+    pb(offsetA, sizeof(int32_t));
+    pb(offsetB, sizeof(int32_t));
+    pb(countA, sizeof(int32_t));
+    pb(countB, sizeof(int32_t));
+    pb(bodyAA, sizeof(int32_t));
+    pb(bodyAB, sizeof(int32_t));
+    pb(bodyBA, sizeof(int32_t));
+    pb(bodyBB, sizeof(int32_t));
+    pb(shapeAA, sizeof(int32_t));
+    pb(shapeAB, sizeof(int32_t));
+    pb(shapeBA, sizeof(int32_t));
+    pb(shapeBB, sizeof(int32_t));
 
-    cb(featA, sizeof(int32_t)); cb(featB, sizeof(int32_t));
-    cb(rAA, sizeof(float) * 3); cb(rAB, sizeof(float) * 3);
-    cb(rBA, sizeof(float) * 3); cb(rBB, sizeof(float) * 3);
-    cb(c0A, sizeof(float) * 3); cb(c0B, sizeof(float) * 3);
-    cb(penA, sizeof(float) * 3); cb(penB, sizeof(float) * 3);
-    cb(lamA, sizeof(float) * 3); cb(lamB, sizeof(float) * 3);
-    cb(stickA, sizeof(uint8_t)); cb(stickB, sizeof(uint8_t));
+    cb(featA, sizeof(int32_t));
+    cb(featB, sizeof(int32_t));
+    cb(rAA, sizeof(float) * 3);
+    cb(rAB, sizeof(float) * 3);
+    cb(rBA, sizeof(float) * 3);
+    cb(rBB, sizeof(float) * 3);
+    cb(c0A, sizeof(float) * 3);
+    cb(c0B, sizeof(float) * 3);
+    cb(penA, sizeof(float) * 3);
+    cb(penB, sizeof(float) * 3);
+    cb(lamA, sizeof(float) * 3);
+    cb(lamB, sizeof(float) * 3);
+    cb(stickA, sizeof(uint8_t));
+    cb(stickB, sizeof(uint8_t));
 
     // The b3SATCache rides the same A/B ping-pong as the manifolds, so it survives a growth
     // rerun with them (allocated only once a hull shape has been recorded).
     if (satSepA.size() > 0)
     {
-        pb(satSepA, sizeof(float)); pb(satSepB, sizeof(float));
-        pb(satBitsA, sizeof(uint32_t)); pb(satBitsB, sizeof(uint32_t));
+        pb(satSepA, sizeof(float));
+        pb(satSepB, sizeof(float));
+        pb(satBitsA, sizeof(uint32_t));
+        pb(satBitsB, sizeof(uint32_t));
         hullList.resize((VkDeviceSize)maxPairs * sizeof(int32_t));
     }
     if (meshCounter.size() > 0)
@@ -287,9 +366,14 @@ void VkNarrowphase::ensureHull()
     if (satSepA.size() == 0)
     {
         const VkDeviceSize n = (VkDeviceSize)std::max(maxPairs, 1);
-        satSepA.resize(n * sizeof(float)); satSepB.resize(n * sizeof(float));
-        satBitsA.resize(n * sizeof(uint32_t)); satBitsB.resize(n * sizeof(uint32_t));
-        satSepA.zero(); satSepB.zero(); satBitsA.zero(); satBitsB.zero();
+        satSepA.resize(n * sizeof(float));
+        satSepB.resize(n * sizeof(float));
+        satBitsA.resize(n * sizeof(uint32_t));
+        satBitsB.resize(n * sizeof(uint32_t));
+        satSepA.zero();
+        satSepB.zero();
+        satBitsA.zero();
+        satBitsB.zero();
         hullCounter.resize(sizeof(int32_t));
         hullIndirect.resize(3 * sizeof(uint32_t));
         hullList.resize(n * sizeof(int32_t));
@@ -352,26 +436,46 @@ void VkNarrowphase::reset()
 void VkNarrowphase::sets(VkManifoldSet &curSet, VkManifoldSet &prevSet) const
 {
     VkManifoldSet a{}, bSet{};
-    a.key = keyA.address(); a.basis = basisA.address(); a.friction = frictionA.address();
-    a.contactOffset = offsetA.address(); a.contactCount = countA.address();
-    a.feature = featA.address(); a.rA = rAA.address(); a.rB = rBA.address(); a.C0 = c0A.address();
-    a.penalty = penA.address(); a.lambda = lamA.address(); a.stick = stickA.address();
-    a.bodyA = bodyAA.address(); a.bodyB = bodyBA.address();
-    a.shapeA = shapeAA.address(); a.shapeB = shapeBA.address();
+    a.key = keyA.address();
+    a.basis = basisA.address();
+    a.friction = frictionA.address();
+    a.contactOffset = offsetA.address();
+    a.contactCount = countA.address();
+    a.feature = featA.address();
+    a.rA = rAA.address();
+    a.rB = rBA.address();
+    a.C0 = c0A.address();
+    a.penalty = penA.address();
+    a.lambda = lamA.address();
+    a.stick = stickA.address();
+    a.bodyA = bodyAA.address();
+    a.bodyB = bodyBA.address();
+    a.shapeA = shapeAA.address();
+    a.shapeB = shapeBA.address();
 
-    bSet.key = keyB.address(); bSet.basis = basisB.address(); bSet.friction = frictionB.address();
-    bSet.contactOffset = offsetB.address(); bSet.contactCount = countB.address();
-    bSet.feature = featB.address(); bSet.rA = rAB.address(); bSet.rB = rBB.address(); bSet.C0 = c0B.address();
-    bSet.penalty = penB.address(); bSet.lambda = lamB.address(); bSet.stick = stickB.address();
-    bSet.bodyA = bodyAB.address(); bSet.bodyB = bodyBB.address();
-    bSet.shapeA = shapeAB.address(); bSet.shapeB = shapeBB.address();
+    bSet.key = keyB.address();
+    bSet.basis = basisB.address();
+    bSet.friction = frictionB.address();
+    bSet.contactOffset = offsetB.address();
+    bSet.contactCount = countB.address();
+    bSet.feature = featB.address();
+    bSet.rA = rAB.address();
+    bSet.rB = rBB.address();
+    bSet.C0 = c0B.address();
+    bSet.penalty = penB.address();
+    bSet.lambda = lamB.address();
+    bSet.stick = stickB.address();
+    bSet.bodyA = bodyAB.address();
+    bSet.bodyB = bodyBB.address();
+    bSet.shapeA = shapeAB.address();
+    bSet.shapeB = shapeBB.address();
 
     curSet = flip ? bSet : a;
     prevSet = flip ? a : bSet;
 }
 
-void VkNarrowphase::build(NarrowphasePipelines &pl, const VkNpBodyRefs &bodies,
-                           const Buffer &pairs, int pairCount, const VkNarrowphaseParams &params)
+void VkNarrowphase::build(NarrowphasePipelines &pl, const VkNpBodyRefs &bodies, const Buffer &pairs, int pairCount,
+                          const VkNarrowphaseParams &params)
 {
     ring.reset();
     cmd.begin();
@@ -381,10 +485,9 @@ void VkNarrowphase::build(NarrowphasePipelines &pl, const VkNpBodyRefs &bodies,
     finish(pairCount);
 }
 
-void VkNarrowphase::record(CommandList &cmd, HostRingBuffer &ring, NarrowphasePipelines &pl,
-                           const VkNpBodyRefs &bodies, const Buffer &pairs, int pairCapacity,
-                           const Buffer *livePairs, const VkNarrowphaseParams &params,
-                           const VkNpHullRefs *hulls, const VkNpMeshRefs *meshes)
+void VkNarrowphase::record(CommandList &cmd, HostRingBuffer &ring, NarrowphasePipelines &pl, const VkNpBodyRefs &bodies,
+                           const Buffer &pairs, int pairCapacity, const Buffer *livePairs,
+                           const VkNarrowphaseParams &params, const VkNpHullRefs *hulls, const VkNpMeshRefs *meshes)
 {
     m_readoutRecorded = false;
     m_hullRecorded = false;
@@ -422,12 +525,23 @@ void VkNarrowphase::record(CommandList &cmd, HostRingBuffer &ring, NarrowphasePi
     sets(curSet, prevSet);
 
     NpBodySoAGpu b;
-    b.pos = bodies.pos; b.rot = bodies.rot;
-    b.shapeBody = bodies.shapeBody; b.localPos = bodies.localPos; b.localRot = bodies.localRot;
-    b.halfExtents = bodies.halfExtents; b.shapeType = bodies.shapeType; b.flags = bodies.flags;
-    b.friction = bodies.friction; b.mass = bodies.mass; b.moment = bodies.moment;
-    b.velLin = bodies.velLin; b.velAng = bodies.velAng; b.props = bodies.props;
-    b.category = bodies.category; b.mask = bodies.mask; b.group = bodies.group;
+    b.pos = bodies.pos;
+    b.rot = bodies.rot;
+    b.shapeBody = bodies.shapeBody;
+    b.localPos = bodies.localPos;
+    b.localRot = bodies.localRot;
+    b.halfExtents = bodies.halfExtents;
+    b.shapeType = bodies.shapeType;
+    b.flags = bodies.flags;
+    b.friction = bodies.friction;
+    b.mass = bodies.mass;
+    b.moment = bodies.moment;
+    b.velLin = bodies.velLin;
+    b.velAng = bodies.velAng;
+    b.props = bodies.props;
+    b.category = bodies.category;
+    b.mask = bodies.mask;
+    b.group = bodies.group;
 
     NarrowphaseArgsGpu args;
     args.b = b;
@@ -535,8 +649,8 @@ void VkNarrowphase::record(CommandList &cmd, HostRingBuffer &ring, NarrowphasePi
         cmd.barrier();
 
         // 4. Sort the child keys: sorted child i is then manifold slot childBase + i.
-        radixSortKeysU64(cmd, ring, *meshes->prim, *meshes->radix, childKeys, childSorted,
-                         (uint32_t)childCap, childCount.address());
+        radixSortKeysU64(cmd, ring, *meshes->prim, *meshes->radix, childKeys, childSorted, (uint32_t)childCap,
+                         childCount.address());
         cmd.barrier();
 
         // 5. Per-child triangle narrowphase, kMeshWorkers lanes striding over the sorted list.

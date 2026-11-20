@@ -11,7 +11,6 @@
 
 #include "vk_renderer.h"
 
-
 #include "scene_types.h" // BodyInstance layout
 
 #include "demo_app.h"    // DemoApp::matMul, kNear / kFar
@@ -32,22 +31,19 @@ namespace
 {
 
 // Unit cube, vertices at +/-1.
-const float kCubeVerts[] = {
-    -1, -1, 1, 0, 0, 1, 1, -1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, -1, 1, 1, 0, 0, 1,
-    -1, -1, -1, 0, 0, -1, -1, 1, -1, 0, 0, -1, 1, 1, -1, 0, 0, -1, 1, -1, -1, 0, 0, -1,
-    -1, 1, -1, 0, 1, 0, -1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, -1, 0, 1, 0,
-    -1, -1, -1, 0, -1, 0, 1, -1, -1, 0, -1, 0, 1, -1, 1, 0, -1, 0, -1, -1, 1, 0, -1, 0,
-    1, -1, -1, 1, 0, 0, 1, 1, -1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, -1, 1, 1, 0, 0,
-    -1, -1, -1, -1, 0, 0, -1, -1, 1, -1, 0, 0, -1, 1, 1, -1, 0, 0, -1, 1, -1, -1, 0, 0};
+const float kCubeVerts[] = {-1, -1, 1,  0, 0,  1,  1, -1, 1, 0, 0,  1, 1, 1,  1, 0,  0,  1, -1, 1,  1,  0,  0,  1,  -1,
+                            -1, -1, 0,  0, -1, -1, 1, -1, 0, 0, -1, 1, 1, -1, 0, 0,  -1, 1, -1, -1, 0,  0,  -1, -1, 1,
+                            -1, 0,  1,  0, -1, 1,  1, 0,  1, 0, 1,  1, 1, 0,  1, 0,  1,  1, -1, 0,  1,  0,  -1, -1, -1,
+                            0,  -1, 0,  1, -1, -1, 0, -1, 0, 1, -1, 1, 0, -1, 0, -1, -1, 1, 0,  -1, 0,  1,  -1, -1, 1,
+                            0,  0,  1,  1, -1, 1,  0, 0,  1, 1, 1,  1, 0, 0,  1, -1, 1,  1, 0,  0,  -1, -1, -1, -1, 0,
+                            0,  -1, -1, 1, -1, 0,  0, -1, 1, 1, -1, 0, 0, -1, 1, -1, -1, 0, 0};
 
-const uint16_t kCubeIndices[] = {
-    0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11,
-    12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23};
+const uint16_t kCubeIndices[] = {0,  1,  2,  0,  2,  3,  4,  5,  6,  4,  6,  7,  8,  9,  10, 8,  10, 11,
+                                 12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23};
 
 // Unit UV-sphere (pos == normal, radius 1), drawn through scene.slang's vsMesh for
 // rendering addSphere() bodies (uniform half-extent -> elementwise scale is exact).
-void buildSphereMesh(std::vector<float> &verts, std::vector<uint32_t> &indices,
-                     int stacks = 10, int slices = 16)
+void buildSphereMesh(std::vector<float> &verts, std::vector<uint32_t> &indices, int stacks = 10, int slices = 16)
 {
     for (int i = 0; i <= stacks; ++i)
     {
@@ -58,9 +54,13 @@ void buildSphereMesh(std::vector<float> &verts, std::vector<uint32_t> &indices,
             float theta = 2.0f * (float)M_PI * (float)j / slices;
             float x = r * cosf(theta), z = r * sinf(theta);
             // pos
-            verts.push_back(x); verts.push_back(z); verts.push_back(y);
+            verts.push_back(x);
+            verts.push_back(z);
+            verts.push_back(y);
             // normal (== pos on a unit sphere)
-            verts.push_back(x); verts.push_back(z); verts.push_back(y);
+            verts.push_back(x);
+            verts.push_back(z);
+            verts.push_back(y);
         }
     }
     int stride = slices + 1;
@@ -70,8 +70,12 @@ void buildSphereMesh(std::vector<float> &verts, std::vector<uint32_t> &indices,
         {
             uint32_t a = i * stride + j, b = a + 1;
             uint32_t c = (i + 1) * stride + j, d = c + 1;
-            indices.push_back(a); indices.push_back(c); indices.push_back(b);
-            indices.push_back(b); indices.push_back(c); indices.push_back(d);
+            indices.push_back(a);
+            indices.push_back(c);
+            indices.push_back(b);
+            indices.push_back(b);
+            indices.push_back(c);
+            indices.push_back(d);
         }
     }
 }
@@ -81,21 +85,24 @@ void buildSphereMesh(std::vector<float> &verts, std::vector<uint32_t> &indices,
 // a real capsule via localPos = aDir*radius + (0,0,aSign*halfSegment). Built as a UV
 // sphere with an extra duplicated equator ring (sign flips there) to open up the
 // cylindrical band.
-void buildCapsuleMesh(std::vector<float> &verts, std::vector<uint32_t> &indices,
-                      int halfStacks = 5, int slices = 16)
+void buildCapsuleMesh(std::vector<float> &verts, std::vector<uint32_t> &indices, int halfStacks = 5, int slices = 16)
 {
     int stacks = halfStacks * 2; // even, so i == stacks/2 lands exactly on the equator
     int stride = slices + 1;
     std::vector<int> ringStart;
 
-    auto pushRing = [&](float phi, float sign) {
+    auto pushRing = [&](float phi, float sign)
+    {
         ringStart.push_back((int)(verts.size() / 4));
         float y = sinf(phi), r = cosf(phi);
         for (int j = 0; j <= slices; ++j)
         {
             float theta = 2.0f * (float)M_PI * (float)j / slices;
             float x = r * cosf(theta), z = r * sinf(theta);
-            verts.push_back(x); verts.push_back(z); verts.push_back(y); verts.push_back(sign);
+            verts.push_back(x);
+            verts.push_back(z);
+            verts.push_back(y);
+            verts.push_back(sign);
         }
     };
 
@@ -125,15 +132,19 @@ void buildCapsuleMesh(std::vector<float> &verts, std::vector<uint32_t> &indices,
         {
             uint32_t a = a0 + j, b = a + 1;
             uint32_t c = b0 + j, d = c + 1;
-            indices.push_back(a); indices.push_back(c); indices.push_back(b);
-            indices.push_back(b); indices.push_back(c); indices.push_back(d);
+            indices.push_back(a);
+            indices.push_back(c);
+            indices.push_back(b);
+            indices.push_back(b);
+            indices.push_back(c);
+            indices.push_back(d);
         }
     }
     (void)stride;
 }
 
-VkBuffer createDeviceLocalBuffer(Device &dev, VkDeviceSize bytes, VkBufferUsageFlags usage,
-                                  VkDeviceMemory &outMem, const void *initialData)
+VkBuffer createDeviceLocalBuffer(Device &dev, VkDeviceSize bytes, VkBufferUsageFlags usage, VkDeviceMemory &outMem,
+                                 const void *initialData)
 {
     VkBuffer buf = VK_NULL_HANDLE;
     VkBufferCreateInfo bci{VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO};
@@ -146,8 +157,7 @@ VkBuffer createDeviceLocalBuffer(Device &dev, VkDeviceSize bytes, VkBufferUsageF
     vkGetBufferMemoryRequirements(dev.device(), buf, &req);
     VkMemoryAllocateInfo mai{VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
     mai.allocationSize = req.size;
-    mai.memoryTypeIndex = findMemoryType(dev.physicalDevice(), req.memoryTypeBits,
-                                        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    mai.memoryTypeIndex = findMemoryType(dev.physicalDevice(), req.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
     VK_CHECK(vkAllocateMemory(dev.device(), &mai, nullptr, &outMem));
     VK_CHECK(vkBindBufferMemory(dev.device(), buf, outMem, 0));
 
@@ -167,8 +177,9 @@ VkBuffer createDeviceLocalBuffer(Device &dev, VkDeviceSize bytes, VkBufferUsageF
         vkGetBufferMemoryRequirements(dev.device(), staging, &sreq);
         VkMemoryAllocateInfo smai{VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
         smai.allocationSize = sreq.size;
-        smai.memoryTypeIndex = findMemoryType(dev.physicalDevice(), sreq.memoryTypeBits,
-                                              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        smai.memoryTypeIndex =
+            findMemoryType(dev.physicalDevice(), sreq.memoryTypeBits,
+                           VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
         VK_CHECK(vkAllocateMemory(dev.device(), &smai, nullptr, &stagingMem));
         VK_CHECK(vkBindBufferMemory(dev.device(), staging, stagingMem, 0));
 
@@ -358,8 +369,8 @@ VkPipeline createPipeline(Device &dev, VkRenderPass pass, VkPipelineLayout layou
     }
 
     VkPipelineColorBlendAttachmentState cba{};
-    cba.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
-                         VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+    cba.colorWriteMask =
+        VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
     if (kind == PipeKind::Planar)
     {
         cba.blendEnable = VK_TRUE;
@@ -418,10 +429,10 @@ void VkRenderer::init(Device &dev, VkRenderPass mainPass, uint32_t width, uint32
 
 void VkRenderer::createMeshBuffers()
 {
-    m_box.vbo = createDeviceLocalBuffer(*m_dev, sizeof(kCubeVerts), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                                        m_box.vboMem, kCubeVerts);
-    m_box.ibo = createDeviceLocalBuffer(*m_dev, sizeof(kCubeIndices), VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                                        m_box.iboMem, kCubeIndices);
+    m_box.vbo = createDeviceLocalBuffer(*m_dev, sizeof(kCubeVerts), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, m_box.vboMem,
+                                        kCubeVerts);
+    m_box.ibo = createDeviceLocalBuffer(*m_dev, sizeof(kCubeIndices), VK_BUFFER_USAGE_INDEX_BUFFER_BIT, m_box.iboMem,
+                                        kCubeIndices);
     m_box.indexCount = (uint32_t)(sizeof(kCubeIndices) / sizeof(kCubeIndices[0]));
     m_box.indexType = VK_INDEX_TYPE_UINT16;
 
@@ -514,8 +525,8 @@ void VkRenderer::createDepthTarget(DepthTarget &t, uint32_t w, uint32_t h)
     vkGetImageMemoryRequirements(d, t.image, &req);
     VkMemoryAllocateInfo mai{VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
     mai.allocationSize = req.size;
-    mai.memoryTypeIndex = findMemoryType(m_dev->physicalDevice(), req.memoryTypeBits,
-                                         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    mai.memoryTypeIndex =
+        findMemoryType(m_dev->physicalDevice(), req.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
     VK_CHECK(vkAllocateMemory(d, &mai, nullptr, &t.mem));
     VK_CHECK(vkBindImageMemory(d, t.image, t.mem, 0));
 
@@ -538,19 +549,25 @@ void VkRenderer::createDepthTarget(DepthTarget &t, uint32_t w, uint32_t h)
     // Clear it once now, so the image is in SHADER_READ_ONLY with defined contents from
     // the first frame: the descriptor set always points at both targets, whether or not
     // the options that fill them are on.
-    submitNow(*m_dev, [&](VkCommandBuffer cmd) {
-        beginDepthPass(cmd, t);
-        vkCmdEndRenderPass(cmd);
-    });
+    submitNow(*m_dev,
+              [&](VkCommandBuffer cmd)
+              {
+                  beginDepthPass(cmd, t);
+                  vkCmdEndRenderPass(cmd);
+              });
 }
 
 void VkRenderer::destroyDepthTarget(DepthTarget &t)
 {
     VkDevice d = m_dev->device();
-    if (t.fb) vkDestroyFramebuffer(d, t.fb, nullptr);
-    if (t.view) vkDestroyImageView(d, t.view, nullptr);
-    if (t.image) vkDestroyImage(d, t.image, nullptr);
-    if (t.mem) vkFreeMemory(d, t.mem, nullptr);
+    if (t.fb)
+        vkDestroyFramebuffer(d, t.fb, nullptr);
+    if (t.view)
+        vkDestroyImageView(d, t.view, nullptr);
+    if (t.image)
+        vkDestroyImage(d, t.image, nullptr);
+    if (t.mem)
+        vkFreeMemory(d, t.mem, nullptr);
     t = DepthTarget{};
 }
 
@@ -667,9 +684,9 @@ void VkRenderer::createPipelines(VkRenderPass mainPass)
     const char *vsNames[2] = {"vsMesh", "vsCapsule"};
     for (int f = 0; f < 2; f++)
     {
-        auto make = [&](VkRenderPass pass, PipeKind kind) {
-            return createPipeline(*m_dev, pass, m_pipelineLayout, m_module, vsNames[f], bindings[f],
-                                  attrs[f], 6, kind);
+        auto make = [&](VkRenderPass pass, PipeKind kind)
+        {
+            return createPipeline(*m_dev, pass, m_pipelineLayout, m_module, vsNames[f], bindings[f], attrs[f], 6, kind);
         };
         m_pipelines[f][PASS_MAIN] = make(mainPass, PipeKind::Main);
         m_pipelines[f][PASS_LIGHT_DEPTH] = make(m_depthPass, PipeKind::LightDepth);
@@ -760,7 +777,8 @@ void VkRenderer::prepare(VkCommandBuffer cmd, int frameSlot, const VkDrawItem *i
 
     m_drawPlanar = opts.shadowMode == SHADOW_GROUND_PLANAR && opts.shadowStrength > 0.001f;
 
-    auto depthPass = [&](const DepthTarget &t, Pass pass) {
+    auto depthPass = [&](const DepthTarget &t, Pass pass)
+    {
         beginDepthPass(cmd, t);
         VkViewport viewport{0, 0, (float)t.width, (float)t.height, 0.0f, 1.0f};
         VkRect2D scissor{{0, 0}, {t.width, t.height}};
@@ -795,25 +813,37 @@ void VkRenderer::destroy()
         for (auto &row : m_pipelines)
             for (VkPipeline &p : row)
             {
-                if (p) vkDestroyPipeline(d, p, nullptr);
+                if (p)
+                    vkDestroyPipeline(d, p, nullptr);
                 p = VK_NULL_HANDLE;
             }
-        if (m_pipelineLayout) vkDestroyPipelineLayout(d, m_pipelineLayout, nullptr);
-        if (m_module) vkDestroyShaderModule(d, m_module, nullptr);
-        if (m_descPool) vkDestroyDescriptorPool(d, m_descPool, nullptr);
-        if (m_setLayout) vkDestroyDescriptorSetLayout(d, m_setLayout, nullptr);
-        if (m_shadowSampler) vkDestroySampler(d, m_shadowSampler, nullptr);
-        if (m_pointSampler) vkDestroySampler(d, m_pointSampler, nullptr);
+        if (m_pipelineLayout)
+            vkDestroyPipelineLayout(d, m_pipelineLayout, nullptr);
+        if (m_module)
+            vkDestroyShaderModule(d, m_module, nullptr);
+        if (m_descPool)
+            vkDestroyDescriptorPool(d, m_descPool, nullptr);
+        if (m_setLayout)
+            vkDestroyDescriptorSetLayout(d, m_setLayout, nullptr);
+        if (m_shadowSampler)
+            vkDestroySampler(d, m_shadowSampler, nullptr);
+        if (m_pointSampler)
+            vkDestroySampler(d, m_pointSampler, nullptr);
         destroyDepthTarget(m_shadowMap);
         destroyDepthTarget(m_cameraDepth);
-        if (m_depthPass) vkDestroyRenderPass(d, m_depthPass, nullptr);
+        if (m_depthPass)
+            vkDestroyRenderPass(d, m_depthPass, nullptr);
         m_frameParams.destroy();
         for (Mesh *m : {&m_box, &m_sphere, &m_capsule})
         {
-            if (m->vbo) vkDestroyBuffer(d, m->vbo, nullptr);
-            if (m->vboMem) vkFreeMemory(d, m->vboMem, nullptr);
-            if (m->ibo) vkDestroyBuffer(d, m->ibo, nullptr);
-            if (m->iboMem) vkFreeMemory(d, m->iboMem, nullptr);
+            if (m->vbo)
+                vkDestroyBuffer(d, m->vbo, nullptr);
+            if (m->vboMem)
+                vkFreeMemory(d, m->vboMem, nullptr);
+            if (m->ibo)
+                vkDestroyBuffer(d, m->ibo, nullptr);
+            if (m->iboMem)
+                vkFreeMemory(d, m->iboMem, nullptr);
         }
     }
     m_pipelineLayout = VK_NULL_HANDLE;

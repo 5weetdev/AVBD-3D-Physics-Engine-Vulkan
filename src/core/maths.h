@@ -194,9 +194,8 @@ AVBD_HD inline float2x2 operator/(float2x2 a, float b)
 
 AVBD_HD inline float2x2 operator*(float2x2 a, float2x2 b)
 {
-    return {
-        vec2{dot(a.row[0], b.col(0)), dot(a.row[0], b.col(1))},
-        vec2{dot(a.row[1], b.col(0)), dot(a.row[1], b.col(1))}};
+    return {vec2{dot(a.row[0], b.col(0)), dot(a.row[0], b.col(1))},
+            vec2{dot(a.row[1], b.col(0)), dot(a.row[1], b.col(1))}};
 }
 
 // float3x3 operators
@@ -236,10 +235,9 @@ AVBD_HD inline float3x3 operator-(float3x3 a)
 
 AVBD_HD inline float3x3 operator*(float3x3 a, float3x3 b)
 {
-    return {
-        vec3{dot(a.row[0], b.col(0)), dot(a.row[0], b.col(1)), dot(a.row[0], b.col(2))},
-        vec3{dot(a.row[1], b.col(0)), dot(a.row[1], b.col(1)), dot(a.row[1], b.col(2))},
-        vec3{dot(a.row[2], b.col(0)), dot(a.row[2], b.col(1)), dot(a.row[2], b.col(2))}};
+    return {vec3{dot(a.row[0], b.col(0)), dot(a.row[0], b.col(1)), dot(a.row[0], b.col(2))},
+            vec3{dot(a.row[1], b.col(0)), dot(a.row[1], b.col(1)), dot(a.row[1], b.col(2))},
+            vec3{dot(a.row[2], b.col(0)), dot(a.row[2], b.col(1)), dot(a.row[2], b.col(2))}};
 }
 
 // quat operators
@@ -260,11 +258,8 @@ AVBD_HD inline quat operator/(quat a, float b)
 
 AVBD_HD inline quat operator*(quat a, quat b)
 {
-    return {
-        a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
-        a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x,
-        a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w,
-        a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z};
+    return {a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y, a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x,
+            a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w, a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z};
 }
 
 AVBD_HD inline quat operator+(quat a, quat b)
@@ -291,8 +286,7 @@ AVBD_HD inline float rad(float deg)
 
 AVBD_HD inline float sign(float x)
 {
-    return x < 0 ? -1.0f : x > 0 ? 1.0f
-                                 : 0.0f;
+    return x < 0 ? -1.0f : x > 0 ? 1.0f : 0.0f;
 }
 
 inline float min(float a, float b)
@@ -377,18 +371,12 @@ AVBD_HD inline float cross(vec2 a, vec2 b)
 
 AVBD_HD inline vec3 cross(vec3 a, vec3 b)
 {
-    return {
-        a.y * b.z - a.z * b.y,
-        a.z * b.x - a.x * b.z,
-        a.x * b.y - a.y * b.x};
+    return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
 }
 
 AVBD_HD inline float3x3 skew(vec3 r)
 {
-    return float3x3{
-        0, -r.z, r.y,
-        r.z, 0, -r.x,
-        -r.y, r.x, 0};
+    return float3x3{0, -r.z, r.y, r.z, 0, -r.x, -r.y, r.x, 0};
 }
 
 AVBD_HD inline float2x2 outer(vec2 a, vec2 b)
@@ -434,17 +422,13 @@ AVBD_HD inline float3x3 transpose(float3x3 a)
 // the one surviving term.
 AVBD_HD inline float3x3 mulDiag(const float3x3 &a, vec3 d)
 {
-    return {vec3{a[0][0] * d.x, a[0][1] * d.y, a[0][2] * d.z},
-            vec3{a[1][0] * d.x, a[1][1] * d.y, a[1][2] * d.z},
+    return {vec3{a[0][0] * d.x, a[0][1] * d.y, a[0][2] * d.z}, vec3{a[1][0] * d.x, a[1][1] * d.y, a[1][2] * d.z},
             vec3{a[2][0] * d.x, a[2][1] * d.y, a[2][2] * d.z}};
 }
 
 AVBD_HD inline float3x3 diagonal(float m00, float m11, float m22)
 {
-    return float3x3{
-        m00, 0, 0,
-        0, m11, 0,
-        0, 0, m22};
+    return float3x3{m00, 0, 0, 0, m11, 0, 0, 0, m22};
 }
 
 AVBD_HD inline quat conjugate(quat q)
@@ -478,10 +462,9 @@ AVBD_HD inline float3x3 rotation(quat q)
     const float wx = w * x, wy = w * y, wz = w * z;
 
     // Row-major 3x3
-    return float3x3{
-        1.0f - 2.0f * (yy + zz), 2.0f * (xy + wz), 2.0f * (xz - wy),
-        2.0f * (xy - wz), 1.0f - 2.0f * (xx + zz), 2.0f * (yz + wx),
-        2.0f * (xz + wy), 2.0f * (yz - wx), 1.0f - 2.0f * (xx + yy)};
+    return float3x3{1.0f - 2.0f * (yy + zz), 2.0f * (xy + wz),        2.0f * (xz - wy),
+                    2.0f * (xy - wz),        1.0f - 2.0f * (xx + zz), 2.0f * (yz + wx),
+                    2.0f * (xz + wy),        2.0f * (yz - wx),        1.0f - 2.0f * (xx + yy)};
 }
 
 AVBD_HD inline float3x3 orthonormal(vec3 normal)
@@ -514,7 +497,8 @@ AVBD_HD inline void solve(float3x3 aLin, float3x3 aAng, float3x3 aCross, vec3 bL
     float A31 = aLin[2][0], A32 = aLin[2][1], A33 = aLin[2][2];
     float A41 = aCross[0][0], A42 = aCross[0][1], A43 = aCross[0][2], A44 = aAng[0][0];
     float A51 = aCross[1][0], A52 = aCross[1][1], A53 = aCross[1][2], A54 = aAng[1][0], A55 = aAng[1][1];
-    float A61 = aCross[2][0], A62 = aCross[2][1], A63 = aCross[2][2], A64 = aAng[2][0], A65 = aAng[2][1], A66 = aAng[2][2];
+    float A61 = aCross[2][0], A62 = aCross[2][1], A63 = aCross[2][2], A64 = aAng[2][0], A65 = aAng[2][1],
+          A66 = aAng[2][2];
 
     // Scale-aware relative regularization floor for single-precision float32.
     // Preserves strict positive-definiteness and bounds L entries under ill-conditioning.

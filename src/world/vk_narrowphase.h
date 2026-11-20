@@ -72,7 +72,7 @@ struct VkNarrowphaseParams
     bool autoKStart = false;
     float dualDamping = 0.0f;
     float dualDampVel = 0.0f;
-    int contactCap = 0;               // 0 = no cap
+    int contactCap = 0; // 0 = no cap
 };
 
 // Device addresses for the body and shape SoA fields narrowphase.slang reads (NpBodySoA).
@@ -85,7 +85,7 @@ struct VkNpBodyRefs
     VkDeviceAddress halfExtents = 0, shapeType = 0, friction = 0, flags = 0;
     VkDeviceAddress mass = 0, moment = 0;
     VkDeviceAddress velLin = 0, velAng = 0;
-    VkDeviceAddress props = 0; // may be 0: no body has a non-default BodyProps
+    VkDeviceAddress props = 0;                         // may be 0: no body has a non-default BodyProps
     VkDeviceAddress category = 0, mask = 0, group = 0; // per shape collision filter, may be 0
 };
 
@@ -121,8 +121,8 @@ public:
     void grow(int maxPairs, int maxContacts);
     void reset();
 
-    void build(NarrowphasePipelines &pl, const VkNpBodyRefs &bodies,
-               const Buffer &pairs, int pairCount, const VkNarrowphaseParams &params);
+    void build(NarrowphasePipelines &pl, const VkNpBodyRefs &bodies, const Buffer &pairs, int pairCount,
+               const VkNarrowphaseParams &params);
 
     // record() appends the build to a caller's command buffer. With livePairs set,
     // pairCapacity is a capacity: the dispatch covers it, the live count is
@@ -132,9 +132,8 @@ public:
     // ping-pong flip -- skipping it (a failed attempt to be rerun) leaves the warm-start
     // cache exactly as it was. build() is record + submit + finish.
     void record(CommandList &cmd, HostRingBuffer &ring, NarrowphasePipelines &pl, const VkNpBodyRefs &bodies,
-                const Buffer &pairs, int pairCapacity, const Buffer *livePairs,
-                const VkNarrowphaseParams &params, const VkNpHullRefs *hulls = nullptr,
-                const VkNpMeshRefs *meshes = nullptr);
+                const Buffer &pairs, int pairCapacity, const Buffer *livePairs, const VkNarrowphaseParams &params,
+                const VkNpHullRefs *hulls = nullptr, const VkNpMeshRefs *meshes = nullptr);
     // commit == false reads only the counters (contactTotal/requiredContacts/overflowed): a
     // failed attempt that will be rerun, which must not flip the ping-pong or advance
     // prevSlots. The set a pending record() writes is pendingOutput(), valid before finish().
@@ -215,13 +214,13 @@ public:
     uint64_t bytesAllocated() const
     {
         const Buffer *all[] = {
-            &keyA, &keyB, &basisA, &basisB, &frictionA, &frictionB,
-            &offsetA, &offsetB, &countA, &countB, &bodyAA, &bodyAB, &bodyBA, &bodyBB, &shapeAA, &shapeAB, &shapeBA, &shapeBB,
-            &featA, &featB, &rAA, &rAB, &rBA, &rBB, &c0A, &c0B, &penA, &penB, &lamA, &lamB,
-            &stickA, &stickB, &counter, &activeCount,
-            &hullList, &hullCounter, &hullIndirect, &hullScratch, &satSepA, &satSepB, &satBitsA, &satBitsB,
-            &meshList, &meshCounter, &meshIndirect, &childCount, &childKeys, &childSorted, &childCounter,
-            &meshScratch,
+            &keyA,         &keyB,        &basisA,   &basisB,      &frictionA,    &frictionB,   &offsetA,   &offsetB,
+            &countA,       &countB,      &bodyAA,   &bodyAB,      &bodyBA,       &bodyBB,      &shapeAA,   &shapeAB,
+            &shapeBA,      &shapeBB,     &featA,    &featB,       &rAA,          &rAB,         &rBA,       &rBB,
+            &c0A,          &c0B,         &penA,     &penB,        &lamA,         &lamB,        &stickA,    &stickB,
+            &counter,      &activeCount, &hullList, &hullCounter, &hullIndirect, &hullScratch, &satSepA,   &satSepB,
+            &satBitsA,     &satBitsB,    &meshList, &meshCounter, &meshIndirect, &childCount,  &childKeys, &childSorted,
+            &childCounter, &meshScratch,
         };
         uint64_t total = 0;
         for (const Buffer *b : all)
@@ -273,7 +272,8 @@ private:
     void ensureMesh();
     void readChildRaw();
 
-    MappedBuffer m_readout; // [0] = contact counter, [1] = active manifold count, [2] = hull pairs, [3] = raw child count
+    MappedBuffer
+        m_readout; // [0] = contact counter, [1] = active manifold count, [2] = hull pairs, [3] = raw child count
     bool m_readoutRecorded = false;
     int m_pendingSlots = 0;
 

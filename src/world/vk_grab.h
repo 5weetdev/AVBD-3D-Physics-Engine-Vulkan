@@ -59,7 +59,8 @@ inline void grabGroup(VkWorld &world, const SceneDesc &scene, int seed, vec3 cen
         return;
 
     std::vector<std::vector<int>> adj(n);
-    auto link = [&](int a, int b) {
+    auto link = [&](int a, int b)
+    {
         if (a < 0 || b < 0 || a >= n || b >= n)
             return;
         adj[a].push_back(b);
@@ -96,8 +97,8 @@ inline void grabGroup(VkWorld &world, const SceneDesc &scene, int seed, vec3 cen
 
 // Which entries of `group` are still attached to `seed` through unbroken joints and
 // springs. Writes keep[i] per entry and returns how many survived.
-inline int grabSurvivors(VkWorld &world, const SceneDesc &scene, int seed,
-                         const std::vector<int> &group, std::vector<unsigned char> &keep)
+inline int grabSurvivors(VkWorld &world, const SceneDesc &scene, int seed, const std::vector<int> &group,
+                         std::vector<unsigned char> &keep)
 {
     keep.assign(group.size(), 0);
     if (group.empty())
@@ -117,7 +118,8 @@ inline int grabSurvivors(VkWorld &world, const SceneDesc &scene, int seed,
     world.downloadJointBroken(broken);
 
     std::vector<std::vector<int>> adj(group.size());
-    auto link = [&](int a, int b) {
+    auto link = [&](int a, int b)
+    {
         auto ia = slotOf.find(a), ib = slotOf.find(b);
         if (ia == slotOf.end() || ib == slotOf.end())
             return;
@@ -154,9 +156,9 @@ inline int grabSurvivors(VkWorld &world, const SceneDesc &scene, int seed,
 // spring) so the per-frame survivor test touches only the group's own edges.
 struct GrabTopology
 {
-    std::vector<int> a, b;          // slots in the group
-    std::vector<int> joint;         // authored joint index, or -1 for a spring
-    std::vector<int> breakable;     // indices into the edge arrays whose joint can fracture
+    std::vector<int> a, b;      // slots in the group
+    std::vector<int> joint;     // authored joint index, or -1 for a spring
+    std::vector<int> breakable; // indices into the edge arrays whose joint can fracture
     int slotCount = 0;
 };
 
@@ -170,7 +172,8 @@ inline void buildGrabTopology(const SceneDesc &scene, const std::vector<int> &gr
     slotOf.reserve(group.size() * 2);
     for (size_t i = 0; i < group.size(); i++)
         slotOf[group[i]] = (int)i;
-    auto edge = [&](int a, int b, int joint) {
+    auto edge = [&](int a, int b, int joint)
+    {
         auto ia = slotOf.find(a), ib = slotOf.find(b);
         if (ia == slotOf.end() || ib == slotOf.end())
             return;

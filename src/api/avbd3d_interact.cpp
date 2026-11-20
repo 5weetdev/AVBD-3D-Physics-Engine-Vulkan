@@ -14,7 +14,10 @@ using namespace avbd3d_impl;
 namespace
 {
 
-vec3 posToV(avbd3d_Pos p) { return vec3{(float)p.x, (float)p.y, (float)p.z}; }
+vec3 posToV(avbd3d_Pos p)
+{
+    return vec3{(float)p.x, (float)p.y, (float)p.z};
+}
 
 } // namespace
 
@@ -30,7 +33,8 @@ int World::grabGroup(int seed, vec3 center, float radius, bool follow, avbd3d_Bo
     if (!out || cap <= 0)
         return 0;
     const SceneDesc &d = desc;
-    auto holdable = [&](int b) {
+    auto holdable = [&](int b)
+    {
         const BodyRec &r = bodies[b];
         return r.alive && r.enabled && r.type == avbd3d_dynamicBody && d.mass[b] > 0.0f;
     };
@@ -44,7 +48,8 @@ int World::grabGroup(int seed, vec3 center, float radius, bool follow, avbd3d_Bo
     // Adjacency over live joints and springs.
     const int count = d.count;
     std::vector<std::vector<int>> adj(count);
-    auto link = [&](int a, int b) {
+    auto link = [&](int a, int b)
+    {
         if (a <= 0 || b <= 0 || a >= count || b >= count || !bodies[a].alive || !bodies[b].alive)
             return;
         adj[a].push_back(b);
@@ -107,7 +112,8 @@ int World::grabSurvivors(int seed, const avbd3d_BodyId *group, int count, uint8_
         }
     }
     std::vector<std::vector<int>> adj((size_t)count);
-    auto link = [&](int a, int b) {
+    auto link = [&](int a, int b)
+    {
         auto ia = slotOf.find(a), ib = slotOf.find(b);
         if (ia == slotOf.end() || ib == slotOf.end())
             return;
@@ -204,38 +210,38 @@ void World::grabRelease()
 extern "C"
 {
 
-int avbd3d_World_GrabGroup(avbd3d_WorldId id, avbd3d_BodyId seed, avbd3d_Pos center, float radius,
-                           bool followConnections, avbd3d_BodyId *outBodies, int maxCount)
-{
-    World *w = settled(id);
-    if (!w || !w->bodyValid(seed))
-        return 0;
-    return w->grabGroup(seed.index1, posToV(center), radius, followConnections, outBodies, maxCount);
-}
-
-int avbd3d_World_GrabSurvivors(avbd3d_WorldId id, avbd3d_BodyId seed, const avbd3d_BodyId *group, int groupCount,
-                               uint8_t *outKeep)
-{
-    World *w = settled(id);
-    if (!w || !w->bodyValid(seed))
+    int avbd3d_World_GrabGroup(avbd3d_WorldId id, avbd3d_BodyId seed, avbd3d_Pos center, float radius,
+                               bool followConnections, avbd3d_BodyId *outBodies, int maxCount)
     {
-        if (outKeep && groupCount > 0)
-            std::memset(outKeep, 0, (size_t)groupCount);
-        return 0;
+        World *w = settled(id);
+        if (!w || !w->bodyValid(seed))
+            return 0;
+        return w->grabGroup(seed.index1, posToV(center), radius, followConnections, outBodies, maxCount);
     }
-    return w->grabSurvivors(seed.index1, group, groupCount, outKeep);
-}
 
-void avbd3d_World_GrabDrag(avbd3d_WorldId id, const avbd3d_GrabHandle *handles, int count)
-{
-    if (World *w = settled(id))
-        w->grabDrag(handles, count);
-}
+    int avbd3d_World_GrabSurvivors(avbd3d_WorldId id, avbd3d_BodyId seed, const avbd3d_BodyId *group, int groupCount,
+                                   uint8_t *outKeep)
+    {
+        World *w = settled(id);
+        if (!w || !w->bodyValid(seed))
+        {
+            if (outKeep && groupCount > 0)
+                std::memset(outKeep, 0, (size_t)groupCount);
+            return 0;
+        }
+        return w->grabSurvivors(seed.index1, group, groupCount, outKeep);
+    }
 
-void avbd3d_World_GrabRelease(avbd3d_WorldId id)
-{
-    if (World *w = settled(id))
-        w->grabRelease();
-}
+    void avbd3d_World_GrabDrag(avbd3d_WorldId id, const avbd3d_GrabHandle *handles, int count)
+    {
+        if (World *w = settled(id))
+            w->grabDrag(handles, count);
+    }
+
+    void avbd3d_World_GrabRelease(avbd3d_WorldId id)
+    {
+        if (World *w = settled(id))
+            w->grabRelease();
+    }
 
 } // extern "C"

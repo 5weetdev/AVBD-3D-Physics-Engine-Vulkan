@@ -99,8 +99,8 @@ size_t scanTempBytes(uint32_t n);
 // Exclusive scan of `in[0..n)` into `out[0..n)` (may alias: `in` and `out` may be the
 // same buffer, since each block's input is consumed into shared memory before any
 // output write). Records into `cmd` (already begin()'d); does not submit or wait.
-void scanExclusive(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl,
-                    ScanScratch &scratch, const Buffer &in, Buffer &out, uint32_t n);
+void scanExclusive(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl, ScanScratch &scratch,
+                   const Buffer &in, Buffer &out, uint32_t n);
 
 // ---------------------------------------------------------------------------
 // Stream compaction: cub::DeviceSelect::Flagged(int items, uint8 flags) equivalent.
@@ -125,9 +125,8 @@ size_t selectFlaggedTempBytes(uint32_t n);
 // out[] receives the `items[i]` for which `flags[i] != 0`, in original order;
 // `numSelected` (a 1-int Buffer) receives the count. `out` must have room for `n`
 // elements (the worst case, all flagged).
-void selectFlagged(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl,
-                    SelectScratch &scratch, const Buffer &items, const Buffer &flags,
-                    Buffer &out, Buffer &numSelected, uint32_t n);
+void selectFlagged(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl, SelectScratch &scratch,
+                   const Buffer &items, const Buffer &flags, Buffer &out, Buffer &numSelected, uint32_t n);
 
 // ---------------------------------------------------------------------------
 // Radix sort: stable LSD, 8-bit digits, TILE_SIZE (2048) elements/block -- see
@@ -158,12 +157,12 @@ struct RadixScratch
     Buffer digitCount, digitCountScanned; // RADIX_BUCKETS(256) * numBlocks entries
     Buffer keysPing, keysPong, valsPing, valsPong;
     Buffer reduceOr, reduceAnd; // 1-element OR/AND-of-all-keys, used to skip constant-digit passes
-    Buffer skipMask; // numPasses uint32 (0/1), computed entirely on device -- see radix.slang
-                      // csFinalizeSkipMaskU32/U64 and vk_primitives.cpp recordSkipMask(). Every
-                      // hist/scatter kernel reads this on-device and no-ops/identity-copies for a
-                      // skipped pass; nothing here ever does a host readback or its own submit/wait,
-                      // so the sort call stays record-only and safe to chain after an unsubmitted
-                      // producer dispatch in the same command buffer.
+    Buffer skipMask;            // numPasses uint32 (0/1), computed entirely on device -- see radix.slang
+                                // csFinalizeSkipMaskU32/U64 and vk_primitives.cpp recordSkipMask(). Every
+                                // hist/scatter kernel reads this on-device and no-ops/identity-copies for a
+                                // skipped pass; nothing here ever does a host readback or its own submit/wait,
+                                // so the sort call stays record-only and safe to chain after an unsubmitted
+                                // producer dispatch in the same command buffer.
 
     // Transitive byte total (point 3): every fixed buffer here plus ScanScratch's own
     // lazily-grown levels. VkWorld owns one RadixScratch shared by broadphase and
@@ -171,15 +170,14 @@ struct RadixScratch
     // per-VkWorld-member buffer list.
     uint64_t bytesAllocated() const
     {
-        const Buffer *fixed[] = {&digitCount, &digitCountScanned, &keysPing, &keysPong,
-                                  &valsPing, &valsPong, &reduceOr, &reduceAnd, &skipMask};
+        const Buffer *fixed[] = {&digitCount, &digitCountScanned, &keysPing,  &keysPong, &valsPing,
+                                 &valsPong,   &reduceOr,          &reduceAnd, &skipMask};
         uint64_t total = scan.bytesAllocated();
         for (const Buffer *b : fixed)
             total += (uint64_t)b->size();
         return total;
     }
 };
-
 
 // A sort whose capacity n is at most kSmallSortMaxKeys (vk_small_world.h) runs as ONE workgroup
 // (bitonic over (key, original index): the same order as the stable radix sort) when the device
@@ -211,10 +209,9 @@ void reserveRadix(RadixScratch &scratch, uint32_t n, uint32_t keyBytes, uint32_t
 
 // uint32 keys + int32 values (cub::DeviceRadixSort::SortPairs<unsigned int, int>) --
 // the broadphase's body-bucket sort.
-void radixSortPairsU32(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl,
-                        RadixScratch &scratch, const Buffer &keysIn, Buffer &keysOut,
-                        const Buffer &valsIn, Buffer &valsOut, uint32_t n,
-                        VkDeviceAddress countAddr = 0);
+void radixSortPairsU32(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl, RadixScratch &scratch,
+                       const Buffer &keysIn, Buffer &keysOut, const Buffer &valsIn, Buffer &valsOut, uint32_t n,
+                       VkDeviceAddress countAddr = 0);
 
 // uint64 keys + uint32 values (cub::DeviceRadixSort::SortPairs<unsigned long long,
 // unsigned int>) -- the constraint builder's CSR entry sort.
@@ -225,15 +222,13 @@ void radixSortPairsU32(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelin
 // pass, so the caller can recover a per-pass hist/scan/scatter breakdown with
 // cmd.timestampDeltaNs() once the submission has completed. The CommandList must have
 // been init()'d with enough timestamp slots (profileBaseIndex + numPasses*4).
-void radixSortPairsU64(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl,
-                        RadixScratch &scratch, const Buffer &keysIn, Buffer &keysOut,
-                        const Buffer &valsIn, Buffer &valsOut, uint32_t n,
-                        uint32_t profileBaseIndex = 0xFFFFFFFFu, VkDeviceAddress countAddr = 0);
+void radixSortPairsU64(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl, RadixScratch &scratch,
+                       const Buffer &keysIn, Buffer &keysOut, const Buffer &valsIn, Buffer &valsOut, uint32_t n,
+                       uint32_t profileBaseIndex = 0xFFFFFFFFu, VkDeviceAddress countAddr = 0);
 
 // uint64 keys only (cub::DeviceRadixSort::SortKeys<unsigned long long>) --
 // the broadphase's pair-key canonicalization.
-void radixSortKeysU64(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl,
-                       RadixScratch &scratch, const Buffer &keysIn, Buffer &keysOut, uint32_t n,
-                       VkDeviceAddress countAddr = 0);
+void radixSortKeysU64(CommandList &cmd, HostRingBuffer &ring, PrimitivesPipelines &pl, RadixScratch &scratch,
+                      const Buffer &keysIn, Buffer &keysOut, uint32_t n, VkDeviceAddress countAddr = 0);
 
 } // namespace avbdvk

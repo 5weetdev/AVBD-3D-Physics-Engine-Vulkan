@@ -43,7 +43,8 @@ static int findScene(const char *name)
 // cursor, which proves the queued update lands in the step.
 static int multiGrabFrames(VkWorld &vk, int warmup, int steps)
 {
-    SceneBuilder author; author.params.gravity = vec3{0.0f, 0.0f, -10.0f};
+    SceneBuilder author;
+    author.params.gravity = vec3{0.0f, 0.0f, -10.0f};
     gpuScenes[findScene("Bridge")](&author);
     author.params.sleepEnabled = false;
     const SceneDesc desc = author.finalize();
@@ -69,7 +70,8 @@ static int multiGrabFrames(VkWorld &vk, int warmup, int steps)
 
     std::vector<unsigned char> keep;
     int badSubmit = 0, badAlloc = 0, dropped = 0;
-    auto hold = [&] {
+    auto hold = [&]
+    {
         dropped += (int)group.size() - grabSurvivorsCached(vk, topo, keep);
         vk.dragBodies(group.data(), targets.data(), locals.data(), (int)group.size(), nullptr, 1.0f);
     };
@@ -123,7 +125,8 @@ int main(int argc, char **argv)
         }
         for (int sleep = 0; sleep < 2; sleep++)
         {
-            SceneBuilder author; author.params.gravity = vec3{0.0f, 0.0f, -10.0f};
+            SceneBuilder author;
+            author.params.gravity = vec3{0.0f, 0.0f, -10.0f};
             gpuScenes[s](&author);
             author.params.sleepEnabled = sleep != 0;
             const SceneDesc desc = author.finalize();
@@ -132,8 +135,8 @@ int main(int argc, char **argv)
             for (int i = 0; i < warmup; i++)
                 vk.step(desc.params);
 
-            int rerunSteps = 0, badSubmit = 0, badAlloc = 0, capReruns = 0, flood = 0, island = 0, jp = 0,
-                color = 0, allocAfterWarm = 0;
+            int rerunSteps = 0, badSubmit = 0, badAlloc = 0, capReruns = 0, flood = 0, island = 0, jp = 0, color = 0,
+                allocAfterWarm = 0;
             int hist[8] = {};
             for (int i = 0; i < steps; i++)
             {
@@ -173,8 +176,8 @@ int main(int argc, char **argv)
             const bool ok = badSubmit == 0 && badAlloc == 0 && rare;
             printf("%-12s sleep %d  %s  rerun steps %3d/%d (cap %d flood %d island %d jp %d color %d)  "
                    "submits{1:%d 2:%d 3+:%d}  allocs after warmup %d\n",
-                   name, sleep, ok ? "ok  " : "FAIL", rerunSteps, steps, capReruns, flood, island, jp, color,
-                   hist[1], hist[2], hist[3] + hist[4] + hist[5] + hist[6] + hist[7], allocAfterWarm);
+                   name, sleep, ok ? "ok  " : "FAIL", rerunSteps, steps, capReruns, flood, island, jp, color, hist[1],
+                   hist[2], hist[3] + hist[4] + hist[5] + hist[6] + hist[7], allocAfterWarm);
             fflush(stdout);
             if (!ok)
                 failures++;

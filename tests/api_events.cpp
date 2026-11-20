@@ -16,8 +16,6 @@
 //   g) destroy: destroying a touching body emits its end event at the next step, and its
 //      contact id goes invalid.
 
-
-
 // (merged) // Gate for the avbd3d sensor overlap events and the explosion (src/api, Phase 4b-2). Y-up,
 // // the same convention as test_vk_api3d_events.cpp. Checks:
 // //   a) a static sensor box above static ground, and a dynamic box dropped through it: exactly one
@@ -30,9 +28,9 @@
 // //   d) explosion with three resting boxes at 1, 2 and 10 m, radius 5: the two inside move
 // //      radially outward, the far one is untouched, and the sleeping inside boxes are woken.
 // //   e) a world with no sensors produces no sensor events.
-// 
-// 
-// 
+//
+//
+//
 #include "test_util.h"
 #include <cmath>
 #include <cstdio>
@@ -41,25 +39,31 @@
 namespace events
 {
 static int g_fail = 0;
-#define CHECK(cond, ...)                                                                                              \
-    do                                                                                                                \
-    {                                                                                                                 \
-        if (!(cond))                                                                                                  \
-        {                                                                                                             \
-            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                               \
-            std::printf(__VA_ARGS__);                                                                                 \
-            std::printf("\n");                                                                                        \
-            g_fail++;                                                                                                 \
-        }                                                                                                             \
+#define CHECK(cond, ...)                                                                                               \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        if (!(cond))                                                                                                   \
+        {                                                                                                              \
+            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                                \
+            std::printf(__VA_ARGS__);                                                                                  \
+            std::printf("\n");                                                                                         \
+            g_fail++;                                                                                                  \
+        }                                                                                                              \
     } while (0)
 
-static bool sameShape(Avbd3dShapeId a, Avbd3dShapeId b) { return a.index1 == b.index1 && a.generation == b.generation; }
+static bool sameShape(Avbd3dShapeId a, Avbd3dShapeId b)
+{
+    return a.index1 == b.index1 && a.generation == b.generation;
+}
 
-static Avbd3dQuat identityQuat() { return Avbd3dQuat{Avbd3dVec3{0, 0, 0}, 1.0f}; }
+static Avbd3dQuat identityQuat()
+{
+    return Avbd3dQuat{Avbd3dVec3{0, 0, 0}, 1.0f};
+}
 
 // A box body with one hull shape. `flagged` turns on contact and hit events for the shape.
 static Avbd3dBodyId makeBox(Avbd3dWorld *w, Avbd3dBodyType type, Avbd3dVec3 p, float hx, float hy, float hz,
-                             bool flagged, Avbd3dShapeId *shapeOut = nullptr)
+                            bool flagged, Avbd3dShapeId *shapeOut = nullptr)
 {
     Avbd3dBodyDef bd = avbd3d_default_body_def();
     bd.type = type;
@@ -152,7 +156,8 @@ int run()
     CHECK(t.hitNormalAlongY, "hit normal not along y (|ny| %g)", t.hitNy);
 
     // ---- e: contact data getters -------------------------------------------------------------
-    CHECK(t3d_shape_get_contact_capacity(s1) == 1, "box1 contact capacity %d (want 1)", t3d_shape_get_contact_capacity(s1));
+    CHECK(t3d_shape_get_contact_capacity(s1) == 1, "box1 contact capacity %d (want 1)",
+          t3d_shape_get_contact_capacity(s1));
     Avbd3dContactData sd1[2];
     const int n1 = t3d_shape_get_contact_data(s1, sd1, 2);
     CHECK(n1 == 1, "box1 contact data count %d (want 1)", n1);
@@ -292,19 +297,22 @@ int run()
 namespace sensors
 {
 static int g_fail = 0;
-#define CHECK(cond, ...)                                                                                              \
-    do                                                                                                                \
-    {                                                                                                                 \
-        if (!(cond))                                                                                                  \
-        {                                                                                                             \
-            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                               \
-            std::printf(__VA_ARGS__);                                                                                 \
-            std::printf("\n");                                                                                        \
-            g_fail++;                                                                                                 \
-        }                                                                                                             \
+#define CHECK(cond, ...)                                                                                               \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        if (!(cond))                                                                                                   \
+        {                                                                                                              \
+            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                                \
+            std::printf(__VA_ARGS__);                                                                                  \
+            std::printf("\n");                                                                                         \
+            g_fail++;                                                                                                  \
+        }                                                                                                              \
     } while (0)
 
-static bool sameShape(Avbd3dShapeId a, Avbd3dShapeId b) { return a.index1 == b.index1 && a.generation == b.generation; }
+static bool sameShape(Avbd3dShapeId a, Avbd3dShapeId b)
+{
+    return a.index1 == b.index1 && a.generation == b.generation;
+}
 
 static Avbd3dBodyId makeBody(Avbd3dWorld *w, Avbd3dBodyType type, Avbd3dVec3 p)
 {
@@ -462,8 +470,8 @@ static void checkNoEventsCases()
         if (c)
             listed++;
     }
-    CHECK(log.begins.empty() && log.ends.empty(), "no events for the events-off visitor or the sensor pair, got %zu/%zu",
-          log.begins.size(), log.ends.size());
+    CHECK(log.begins.empty() && log.ends.empty(),
+          "no events for the events-off visitor or the sensor pair, got %zu/%zu", log.begins.size(), log.ends.size());
     CHECK(listed == 0, "the events-off visitor is never listed by the sensor");
     bool sensorSees = false;
     overlapCount(s2, s3, sensorSees);

@@ -32,8 +32,7 @@ static SceneView sceneDynamicFrictionGpu(SceneBuilder *s)
     s->clear();
     s->addBody({10000.0f, 10000.0f, 1.0f}, 0.0f, 0.5f, {0, 0, 0});
     for (int x = 0; x < 10; x++)
-        s->addBody({1, 1, 0.5f}, 1.0f, 5.0f - (x / 10.0f * 5.0f),
-                   {0, -30.0f + x * 2.0f, 0.75f}, {10.0f, 0, 0});
+        s->addBody({1, 1, 0.5f}, 1.0f, 5.0f - (x / 10.0f * 5.0f), {0, -30.0f + x * 2.0f, 0.75f}, {10.0f, 0, 0});
     return {50.0f, 2.0f};
 }
 
@@ -67,8 +66,7 @@ static SceneView scenePyramidGpu(SceneBuilder *s)
     s->addBody({10000.0f, 10000.0f, 1.0f}, 0.0f, 0.5f, {0.0f, 0.0f, -0.5f});
     for (int y = 0; y < SIZE; y++)
         for (int x = 0; x < SIZE - y; x++)
-            s->addBody({1, 0.5f, 0.5f}, 1.0f, 0.5f,
-                       {x * 1.01f + y * 0.5f - SIZE / 2.0f, 0.0f, y * 0.85f + 0.5f});
+            s->addBody({1, 0.5f, 0.5f}, 1.0f, 0.5f, {x * 1.01f + y * 0.5f - SIZE / 2.0f, 0.0f, y * 0.85f + 0.5f});
     return {40.0f, 6.0f};
 }
 
@@ -80,7 +78,6 @@ static SceneView sceneStackGpu(SceneBuilder *s)
         s->addBody({1, 1, 1}, 1.0f, 0.5f, {0, 0, i * 1.5f + 1.0f});
     return {30.0f, 7.0f};
 }
-
 
 // Fix 2 needs contacts that have no warm start to inherit, and every settled scene is
 // the opposite of that: gpu_narrowphase matches contacts by feature key and carries

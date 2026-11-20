@@ -132,11 +132,11 @@ struct IntegratePipelines
 
 // All four kernels are numthreads(256,1,1), one thread per list entry (body index for
 // integrate/velocity, dynamic-list slot for killFallen/explosionGuard).
-void launchIntegrate(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl,
-                     const IntegrateArgsGpu &args, int bodyCount);
+void launchIntegrate(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl, const IntegrateArgsGpu &args,
+                     int bodyCount);
 
-void launchVelocity(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl,
-                    const VelocityArgsGpu &args, int bodyCount);
+void launchVelocity(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl, const VelocityArgsGpu &args,
+                    int bodyCount);
 
 void launchIntegrateProps(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl,
                           const IntegratePropsArgsGpu &args, int bodyCount);
@@ -144,8 +144,8 @@ void launchIntegrateProps(CommandList &cmd, HostRingBuffer &ring, IntegratePipel
 void launchVelocityProps(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl,
                          const VelocityPropsArgsGpu &args, int bodyCount);
 
-void launchKillFallen(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl,
-                      const KillFallenArgsGpu &args, int dynCount);
+void launchKillFallen(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl, const KillFallenArgsGpu &args,
+                      int dynCount);
 
 void launchExplosionGuard(CommandList &cmd, HostRingBuffer &ring, IntegratePipelines &pl,
                           const ExplosionGuardArgsGpu &args, int dynCount);

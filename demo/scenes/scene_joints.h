@@ -39,8 +39,7 @@ static SceneView sceneHeavyRopeGpu(SceneBuilder *s)
     int prev = -1;
     for (int i = 0; i < N; i++)
     {
-        int curr = s->addBody(i == N - 1 ? vec3{SIZE, SIZE, SIZE} : vec3{1, 0.5f, 0.5f},
-                              i == 0 ? 0.0f : 1.0f, 0.5f,
+        int curr = s->addBody(i == N - 1 ? vec3{SIZE, SIZE, SIZE} : vec3{1, 0.5f, 0.5f}, i == 0 ? 0.0f : 1.0f, 0.5f,
                               {(float)i + (i == N - 1 ? SIZE / 2 : 0), 0.0f, 10.0f});
         if (prev >= 0)
             s->addJoint(prev, curr, {0.5f, 0, 0}, i == N - 1 ? vec3{-SIZE / 2, 0, 0} : vec3{-0.5f, 0, 0});
@@ -48,7 +47,6 @@ static SceneView sceneHeavyRopeGpu(SceneBuilder *s)
     }
     return {50.0f, 0.0f};
 }
-
 
 // AVBD Figure 7a, reproduced so our parameter study can be compared against the
 // published one. 50 rigid links form a chain holding a heavy ball, initialized in the
@@ -71,7 +69,7 @@ static SceneView sceneChainRatioGpu(SceneBuilder *s)
     const float TOP = 60.0f;   // anchor height, chosen so the chain hangs clear
     const float RATIO = 50000.0f;
 
-    const float linkMass = THICK * THICK * LEN;             // density 1
+    const float linkMass = THICK * THICK * LEN; // density 1
     const float ballDensity = linkMass * RATIO / (BALL * BALL * BALL);
 
     s->clear();
@@ -93,8 +91,8 @@ static SceneView sceneChainRatioGpu(SceneBuilder *s)
     // chain's lower end so the joint lands exactly on its top face, leaving zero
     // initial constraint error -- the profiler checks for that and would report it.
     float ballZ = TOP - LEN * N - BALL * 0.5f;
-    s->addJoint(prev, s->addBody({BALL, BALL, BALL}, ballDensity, 0.5f, {0, 0, ballZ}),
-                {0, 0, -LEN * 0.5f}, {0, 0, BALL * 0.5f});
+    s->addJoint(prev, s->addBody({BALL, BALL, BALL}, ballDensity, 0.5f, {0, 0, ballZ}), {0, 0, -LEN * 0.5f},
+                {0, 0, BALL * 0.5f});
 
     return {90.0f, 20.0f};
 }
@@ -218,8 +216,7 @@ static SceneView sceneBridgeGpu(SceneBuilder *s)
     int prev = -1;
     for (int i = 0; i < N; i++)
     {
-        int curr = s->addBody({plankLength, plankWidth, plankHeight},
-                              i == 0 || i == N - 1 ? 0.0f : 1.0f, 0.5f,
+        int curr = s->addBody({plankLength, plankWidth, plankHeight}, i == 0 || i == N - 1 ? 0.0f : 1.0f, 0.5f,
                               {(float)i - N / 2.0f, 0.0f, 10.0f});
         if (prev >= 0)
         {
@@ -235,4 +232,3 @@ static SceneView sceneBridgeGpu(SceneBuilder *s)
 
     return {60.0f, 8.0f};
 }
-

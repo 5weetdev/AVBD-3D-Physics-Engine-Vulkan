@@ -10,16 +10,16 @@
 #include <cstdio>
 
 static int g_fail = 0;
-#define CHECK(cond, ...)                                                                                              \
-    do                                                                                                                \
-    {                                                                                                                 \
-        if (!(cond))                                                                                                  \
-        {                                                                                                             \
-            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                               \
-            std::printf(__VA_ARGS__);                                                                                 \
-            std::printf("\n");                                                                                        \
-            g_fail++;                                                                                                 \
-        }                                                                                                             \
+#define CHECK(cond, ...)                                                                                               \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        if (!(cond))                                                                                                   \
+        {                                                                                                              \
+            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                                \
+            std::printf(__VA_ARGS__);                                                                                  \
+            std::printf("\n");                                                                                         \
+            g_fail++;                                                                                                  \
+        }                                                                                                              \
     } while (0)
 
 static Avbd3dBodyDef bodyDef(Avbd3dBodyType type, Avbd3dVec3 p)
@@ -51,7 +51,10 @@ static void step(Avbd3dWorld *w, int n = 1)
         t3d_step(w, 1.0f / 60.0f);
 }
 
-static bool near(float a, float b, float tol) { return std::fabs(a - b) <= tol; }
+static bool near(float a, float b, float tol)
+{
+    return std::fabs(a - b) <= tol;
+}
 
 // Angle (rad) of the rotation taking b to a, from the relative quaternion (well conditioned near 0, unlike acos(dot)).
 static double angleBetween(Avbd3dQuat a, Avbd3dQuat b)
@@ -102,7 +105,10 @@ static int32_t planeFcn(Avbd3dShapeId, const Avbd3dPlaneResult *planes, int coun
 static float g_moverFraction = -1.0f;
 
 static int g_drawShapes = 0;
-static void drawShape(void *, Avbd3dTransform, Avbd3dHexColor, void *) { g_drawShapes++; }
+static void drawShape(void *, Avbd3dTransform, Avbd3dHexColor, void *)
+{
+    g_drawShapes++;
+}
 
 int main()
 {
@@ -272,7 +278,8 @@ int main()
         Avbd3dVec3 sc[1] = {{0, 0, 0}};
         Avbd3dShapeProxy sp{sc, 1, 0.5f};
         Avbd3dBodyCastResult cs = t3d_body_cast_shape(A, {0, 1, -10}, &sp, {0, 0, 20}, qf, 1.0f, false, idA);
-        CHECK(cs.hit && near(cs.fraction, 8.5f / 20.0f, 2e-3f), "body shape cast fraction %g (want 0.425)", cs.fraction);
+        CHECK(cs.hit && near(cs.fraction, 8.5f / 20.0f, 2e-3f), "body shape cast fraction %g (want 0.425)",
+              cs.fraction);
 
         // Overlap: a sphere at A's centre overlaps A and not B; at x = 3 it misses, unless A is moved there.
         Avbd3dVec3 pc[1] = {{0, 0, 0}};
@@ -318,7 +325,7 @@ int main()
         {
             const float t = i * dt;
             Avbd3dTransform target{{R * std::cos(om * t), 10, R * std::sin(om * t)},
-                                         t3d_quat_axis_angle({0, 1, 0}, 0.5f * om * t)};
+                                   t3d_quat_axis_angle({0, 1, 0}, 0.5f * om * t)};
             t3d_body_set_target_transform(plat, target, dt, true);
             step(w2);
             const Avbd3dTransform got = t3d_body_get_transform(plat);
@@ -331,8 +338,8 @@ int main()
         const Avbd3dVec3 pp = t3d_body_get_position(plat);
         const Avbd3dVec3 rp = t3d_body_get_position(rider);
         const double ddx = rp.x - pp.x, ddz = rp.z - pp.z;
-        CHECK(std::sqrt(ddx * ddx + ddz * ddz) < 1.5 && near(rp.y, 10.35f, 0.1f),
-              "rider carried: offset (%g %g) y %g", ddx, ddz, rp.y);
+        CHECK(std::sqrt(ddx * ddx + ddz * ddz) < 1.5 && near(rp.y, 10.35f, 0.1f), "rider carried: offset (%g %g) y %g",
+              ddx, ddz, rp.y);
 
         // A kinematic body lands on a target that rotates about a general axis.
         Avbd3dBodyId spin = makeBodyBox(w2, bodyDef(AVBD3D_KINEMATIC_BODY, {-20, 30, 0}), 1, 1, 1);

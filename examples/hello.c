@@ -5,15 +5,15 @@
 #include <math.h>
 #include <stdio.h>
 
-#define CHECK(call)                                                                    \
-    do                                                                                 \
-    {                                                                                  \
-        Avbd3dResult r_ = (call);                                                      \
-        if (r_ != AVBD3D_OK)                                                           \
-        {                                                                              \
-            printf("FAIL: %s -> %s\n", #call, avbd3d_result_string(r_));               \
-            return 1;                                                                  \
-        }                                                                              \
+#define CHECK(call)                                                                                                    \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        Avbd3dResult r_ = (call);                                                                                      \
+        if (r_ != AVBD3D_OK)                                                                                           \
+        {                                                                                                              \
+            printf("FAIL: %s -> %s\n", #call, avbd3d_result_string(r_));                                               \
+            return 1;                                                                                                  \
+        }                                                                                                              \
     } while (0)
 
 static int addBox(Avbd3dWorld *world, int dynamic, Avbd3dVec3 p, float half, Avbd3dBodyId *out)

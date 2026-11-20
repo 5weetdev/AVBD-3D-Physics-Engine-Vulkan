@@ -37,7 +37,7 @@ void RenderPipelines::destroy()
 }
 
 void launchWriteInstances(CommandList &cmd, HostRingBuffer &ring, RenderPipelines &pl,
-                           const WriteInstancesArgsGpu &args, int shapeCount)
+                          const WriteInstancesArgsGpu &args, int shapeCount)
 {
     if (shapeCount <= 0)
         return;
@@ -47,7 +47,7 @@ void launchWriteInstances(CommandList &cmd, HostRingBuffer &ring, RenderPipeline
 }
 
 void launchOverlayStatsClear(CommandList &cmd, HostRingBuffer &ring, RenderPipelines &pl,
-                              const OverlayStatsClearArgsGpu &args, int n)
+                             const OverlayStatsClearArgsGpu &args, int n)
 {
     if (n <= 0)
         return;
@@ -57,7 +57,7 @@ void launchOverlayStatsClear(CommandList &cmd, HostRingBuffer &ring, RenderPipel
 }
 
 void launchOverlayStatsContacts(CommandList &cmd, HostRingBuffer &ring, RenderPipelines &pl,
-                                 const OverlayStatsContactsArgsGpu &args, int slots)
+                                const OverlayStatsContactsArgsGpu &args, int slots)
 {
     if (slots <= 0)
         return;
@@ -67,7 +67,7 @@ void launchOverlayStatsContacts(CommandList &cmd, HostRingBuffer &ring, RenderPi
 }
 
 void launchOverlayStatsForces(CommandList &cmd, HostRingBuffer &ring, RenderPipelines &pl,
-                               const OverlayStatsForcesArgsGpu &args, int jointsAndSprings)
+                              const OverlayStatsForcesArgsGpu &args, int jointsAndSprings)
 {
     if (jointsAndSprings <= 0)
         return;
@@ -77,7 +77,7 @@ void launchOverlayStatsForces(CommandList &cmd, HostRingBuffer &ring, RenderPipe
 }
 
 void launchOverlayLoadClear(CommandList &cmd, HostRingBuffer &ring, RenderPipelines &pl,
-                             const OverlayLoadClearArgsGpu &args, int n)
+                            const OverlayLoadClearArgsGpu &args, int n)
 {
     if (n <= 0)
         return;
@@ -87,7 +87,7 @@ void launchOverlayLoadClear(CommandList &cmd, HostRingBuffer &ring, RenderPipeli
 }
 
 void launchOverlayLoadAccum(CommandList &cmd, HostRingBuffer &ring, RenderPipelines &pl,
-                             const OverlayLoadAccumArgsGpu &args, int slots)
+                            const OverlayLoadAccumArgsGpu &args, int slots)
 {
     if (slots <= 0)
         return;
@@ -97,7 +97,7 @@ void launchOverlayLoadAccum(CommandList &cmd, HostRingBuffer &ring, RenderPipeli
 }
 
 void launchWriteDebugInstances(CommandList &cmd, HostRingBuffer &ring, RenderPipelines &pl,
-                                const WriteDebugInstancesArgsGpu &args, int slots)
+                               const WriteDebugInstancesArgsGpu &args, int slots)
 {
     if (slots <= 0)
         return;

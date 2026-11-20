@@ -9,7 +9,10 @@
 
 // ---- version and result text --------------------------------------------------------------
 
-uint32_t avbd3d_abi_version(void) { return ((uint32_t)AVBD3D_ABI_VERSION_MAJOR << 16) | (uint32_t)AVBD3D_ABI_VERSION_MINOR; }
+uint32_t avbd3d_abi_version(void)
+{
+    return ((uint32_t)AVBD3D_ABI_VERSION_MAJOR << 16) | (uint32_t)AVBD3D_ABI_VERSION_MINOR;
+}
 
 const char *avbd3d_result_string(Avbd3dResult result)
 {
@@ -81,10 +84,13 @@ Avbd3dResult avbd3d_step(Avbd3dWorld *world, float dt)
 {
     World *w;
     avbd3d_WorldId lw;
-    if (Avbd3dResult r_ = enterWorld(world, w, lw)) return r_;
-    if (!(dt >= 0.0f) || !std::isfinite(dt)) return AVBD3D_ERR_INVALID_ARG;
+    if (Avbd3dResult r_ = enterWorld(world, w, lw))
+        return r_;
+    if (!(dt >= 0.0f) || !std::isfinite(dt))
+        return AVBD3D_ERR_INVALID_ARG;
     avbd3d_World_Step(lw, dt);
-    if (Avbd3dResult r_ = leave(w)) return r_;
+    if (Avbd3dResult r_ = leave(w))
+        return r_;
     return w->stepResult().ok ? AVBD3D_OK : AVBD3D_ERR_CAPACITY;
 }
 
@@ -92,8 +98,10 @@ Avbd3dResult avbd3d_step_begin(Avbd3dWorld *world, float dt)
 {
     World *w;
     avbd3d_WorldId lw;
-    if (Avbd3dResult r_ = enterWorld(world, w, lw)) return r_;
-    if (!(dt >= 0.0f) || !std::isfinite(dt)) return AVBD3D_ERR_INVALID_ARG;
+    if (Avbd3dResult r_ = enterWorld(world, w, lw))
+        return r_;
+    if (!(dt >= 0.0f) || !std::isfinite(dt))
+        return AVBD3D_ERR_INVALID_ARG;
     avbd3d_World_StepBegin(lw, dt);
     return leave(w);
 }
@@ -102,10 +110,12 @@ Avbd3dResult avbd3d_step_end(Avbd3dWorld *world)
 {
     World *w;
     avbd3d_WorldId lw;
-    if (Avbd3dResult r_ = enterWorld(world, w, lw)) return r_;
+    if (Avbd3dResult r_ = enterWorld(world, w, lw))
+        return r_;
     const bool wasInFlight = w->inFlight();
     w->stepEnd();
-    if (Avbd3dResult r_ = leave(w)) return r_;
+    if (Avbd3dResult r_ = leave(w))
+        return r_;
     return wasInFlight && !w->stepResult().ok ? AVBD3D_ERR_CAPACITY : AVBD3D_OK;
 }
 
@@ -115,10 +125,13 @@ Avbd3dResult avbd3d_get_stats(Avbd3dWorld *world, Avbd3dStats *out)
 {
     World *w;
     avbd3d_WorldId lw;
-    if (Avbd3dResult r_ = enterWorld(world, w, lw)) return r_;
-    if (!out) return AVBD3D_ERR_INVALID_ARG;
+    if (Avbd3dResult r_ = enterWorld(world, w, lw))
+        return r_;
+    if (!out)
+        return AVBD3D_ERR_INVALID_ARG;
     w->settle();
-    if (Avbd3dResult r_ = leave(w)) return r_;
+    if (Avbd3dResult r_ = leave(w))
+        return r_;
     const avbdvk::VkWorld &v = w->vk();
     Avbd3dStats s;
     std::memset(&s, 0, sizeof s);
@@ -171,8 +184,10 @@ Avbd3dResult avbd3d_get_capabilities(Avbd3dWorld *world, Avbd3dCapabilities *out
 {
     World *w;
     avbd3d_WorldId lw;
-    if (Avbd3dResult r_ = enterWorld(world, w, lw)) return r_;
-    if (!out || out->struct_size != sizeof(Avbd3dCapabilities)) return AVBD3D_ERR_INVALID_ARG;
+    if (Avbd3dResult r_ = enterWorld(world, w, lw))
+        return r_;
+    if (!out || out->struct_size != sizeof(Avbd3dCapabilities))
+        return AVBD3D_ERR_INVALID_ARG;
     const avbdvk::Device &d = w->vk().device();
     Avbd3dCapabilities c;
     std::memset(&c, 0, sizeof c);
@@ -217,8 +232,10 @@ Avbd3dResult avbd3d_world_draw(Avbd3dWorld *world, const Avbd3dDebugDraw *draw, 
 {
     World *w;
     avbd3d_WorldId lw;
-    if (Avbd3dResult r_ = enterWorld(world, w, lw)) return r_;
-    if (!draw) return AVBD3D_ERR_INVALID_ARG;
+    if (Avbd3dResult r_ = enterWorld(world, w, lw))
+        return r_;
+    if (!draw)
+        return AVBD3D_ERR_INVALID_ARG;
     DrawCtx ctx{draw};
     avbd3d_DebugDraw ld = avbd3d_DefaultDebugDraw();
     ld.DrawShapeFcn = draw->DrawShapeFcn ? drawShapeTramp : nullptr;
@@ -292,8 +309,10 @@ Avbd3dResult avbd3d_world_overlap_aabb(Avbd3dWorld *world, Avbd3dAABB aabb, Avbd
 {
     World *w;
     avbd3d_WorldId lw;
-    if (Avbd3dResult r_ = enterWorld(world, w, lw)) return r_;
-    if (!fcn) return AVBD3D_ERR_INVALID_ARG;
+    if (Avbd3dResult r_ = enterWorld(world, w, lw))
+        return r_;
+    if (!fcn)
+        return AVBD3D_ERR_INVALID_ARG;
     OverlapCtx ctx{fcn, context};
     avbd3d_World_OverlapAABB(lw, lg(aabb), lg(filter), overlapTramp, &ctx);
     return leave(w);
@@ -304,8 +323,10 @@ Avbd3dResult avbd3d_world_overlap_shape(Avbd3dWorld *world, Avbd3dVec3 origin, c
 {
     World *w;
     avbd3d_WorldId lw;
-    if (Avbd3dResult r_ = enterWorld(world, w, lw)) return r_;
-    if (!fcn || !proxyOk(proxy)) return AVBD3D_ERR_INVALID_ARG;
+    if (Avbd3dResult r_ = enterWorld(world, w, lw))
+        return r_;
+    if (!fcn || !proxyOk(proxy))
+        return AVBD3D_ERR_INVALID_ARG;
     OverlapCtx ctx{fcn, context};
     const avbd3d_ShapeProxy lp = lg(*proxy);
     avbd3d_World_OverlapShape(lw, lg(origin), &lp, lg(filter), overlapTramp, &ctx);
@@ -317,8 +338,10 @@ Avbd3dResult avbd3d_world_cast_ray(Avbd3dWorld *world, Avbd3dVec3 origin, Avbd3d
 {
     World *w;
     avbd3d_WorldId lw;
-    if (Avbd3dResult r_ = enterWorld(world, w, lw)) return r_;
-    if (!fcn) return AVBD3D_ERR_INVALID_ARG;
+    if (Avbd3dResult r_ = enterWorld(world, w, lw))
+        return r_;
+    if (!fcn)
+        return AVBD3D_ERR_INVALID_ARG;
     CastCtx ctx{fcn, context};
     avbd3d_World_CastRay(lw, lg(origin), lg(translation), lg(filter), castTramp, &ctx);
     return leave(w);
@@ -330,8 +353,10 @@ Avbd3dResult avbd3d_world_cast_shape(Avbd3dWorld *world, Avbd3dVec3 origin, cons
 {
     World *w;
     avbd3d_WorldId lw;
-    if (Avbd3dResult r_ = enterWorld(world, w, lw)) return r_;
-    if (!fcn || !proxyOk(proxy)) return AVBD3D_ERR_INVALID_ARG;
+    if (Avbd3dResult r_ = enterWorld(world, w, lw))
+        return r_;
+    if (!fcn || !proxyOk(proxy))
+        return AVBD3D_ERR_INVALID_ARG;
     CastCtx ctx{fcn, context};
     const avbd3d_ShapeProxy lp = lg(*proxy);
     avbd3d_World_CastShape(lw, lg(origin), &lp, lg(translation), lg(filter), castTramp, &ctx);
@@ -344,12 +369,16 @@ Avbd3dResult avbd3d_world_cast_mover(Avbd3dWorld *world, Avbd3dVec3 origin, cons
 {
     World *w;
     avbd3d_WorldId lw;
-    if (Avbd3dResult r_ = enterWorld(world, w, lw)) return r_;
-    if (!mover || !out_fraction) return AVBD3D_ERR_INVALID_ARG;
+    if (Avbd3dResult r_ = enterWorld(world, w, lw))
+        return r_;
+    if (!mover || !out_fraction)
+        return AVBD3D_ERR_INVALID_ARG;
     MoverCtx ctx{fcn, context};
     const avbd3d_Capsule lc = lg(*mover);
-    const float f = avbd3d_World_CastMover(lw, lg(origin), &lc, lg(translation), lg(filter), fcn ? moverTramp : nullptr, &ctx);
-    if (Avbd3dResult r_ = leave(w)) return r_;
+    const float f =
+        avbd3d_World_CastMover(lw, lg(origin), &lc, lg(translation), lg(filter), fcn ? moverTramp : nullptr, &ctx);
+    if (Avbd3dResult r_ = leave(w))
+        return r_;
     *out_fraction = f;
     return AVBD3D_OK;
 }
@@ -359,8 +388,10 @@ Avbd3dResult avbd3d_world_collide_mover(Avbd3dWorld *world, Avbd3dVec3 origin, c
 {
     World *w;
     avbd3d_WorldId lw;
-    if (Avbd3dResult r_ = enterWorld(world, w, lw)) return r_;
-    if (!mover || !fcn) return AVBD3D_ERR_INVALID_ARG;
+    if (Avbd3dResult r_ = enterWorld(world, w, lw))
+        return r_;
+    if (!mover || !fcn)
+        return AVBD3D_ERR_INVALID_ARG;
     PlaneCtx ctx{fcn, context};
     const avbd3d_Capsule lc = lg(*mover);
     avbd3d_World_CollideMover(lw, lg(origin), &lc, lg(filter), planeTramp, &ctx);
@@ -397,15 +428,19 @@ int32_t avbd3d_contact_is_valid(Avbd3dContactId id)
     return enterContact(id, w, lid) == AVBD3D_OK ? 1 : 0;
 }
 
-Avbd3dResult avbd3d_body_get_closest_point(Avbd3dBodyId id, Avbd3dVec3 target, Avbd3dVec3 *out_point, float *out_distance)
+Avbd3dResult avbd3d_body_get_closest_point(Avbd3dBodyId id, Avbd3dVec3 target, Avbd3dVec3 *out_point,
+                                           float *out_distance)
 {
     World *w;
     avbd3d_BodyId lid;
-    if (Avbd3dResult r_ = enterBody(id, w, lid)) return r_;
-    if (!out_point || !out_distance) return AVBD3D_ERR_INVALID_ARG;
+    if (Avbd3dResult r_ = enterBody(id, w, lid))
+        return r_;
+    if (!out_point || !out_distance)
+        return AVBD3D_ERR_INVALID_ARG;
     avbd3d_Vec3 p{};
     const float d = avbd3d_Body_GetClosestPoint(lid, &p, lg(target));
-    if (Avbd3dResult r_ = leave(w)) return r_;
+    if (Avbd3dResult r_ = leave(w))
+        return r_;
     *out_point = pb(p);
     *out_distance = d;
     return AVBD3D_OK;
@@ -415,7 +450,8 @@ Avbd3dResult avbd3d_destroy_joint(Avbd3dJointId id, int32_t wake_bodies)
 {
     World *w;
     avbd3d_JointId lid;
-    if (Avbd3dResult r_ = enterJoint(id, w, lid)) return r_;
+    if (Avbd3dResult r_ = enterJoint(id, w, lid))
+        return r_;
     avbd3d_DestroyJoint(lid, wake_bodies != 0);
     return leave(w);
 }

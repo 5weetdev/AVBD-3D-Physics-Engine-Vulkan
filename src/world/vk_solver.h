@@ -42,17 +42,16 @@ struct SolverPipelines
     Pipeline jointInit, jointDual, dual;
     Pipeline iterateSmall; // csIterateSmall: the whole iteration loop in one workgroup (primal.slang)
     Pipeline primalDispatchArgs;
-    Pipeline gateDispatchArgs; // csGateDispatchArgs (primal.slang), see vk_gate.h
+    Pipeline gateDispatchArgs;  // csGateDispatchArgs (primal.slang), see vk_gate.h
     Pipeline stepFlagIfGreater; // csStepFlagIfGreater: flag words 0 and 1 if *count > cap
-    Pipeline stepFlagIfSet;    // csStepFlagIfSet: flag word |= (src[0] != 0)
-    Pipeline stepColorBound;   // csStepColorBound: flag word |= any colour in [bound, max) non-empty
+    Pipeline stepFlagIfSet;     // csStepFlagIfSet: flag word |= (src[0] != 0)
+    Pipeline stepColorBound;    // csStepColorBound: flag word |= any colour in [bound, max) non-empty
     // Two-level AVBD coarse correction (primal.slang csCoarse*).
     Pipeline coarseReset, coarseAssign, coarseAssemble, coarseSolve, coarseApply;
 
     // primalSpirv/primalWords: src/shaders/primal.slang's embedded SPIR-V.
     // dualSpirv/dualWords: src/shaders/dual.slang's embedded SPIR-V.
-    void init(Device &dev, PipelineLayout &layout,
-              const uint32_t *primalSpirv, size_t primalWords,
+    void init(Device &dev, PipelineLayout &layout, const uint32_t *primalSpirv, size_t primalWords,
               const uint32_t *dualSpirv, size_t dualWords);
     void destroy();
 };
@@ -62,24 +61,23 @@ struct SolverPipelines
 // VkWorld::step()'s per-color launchPrimal* loop). `warp4` selects the LANES=4 cooperative
 // variant (csPrimalWarp4*) over thread-per-body (csPrimalThread*); `withForces` selects
 // whether joints/springs are stamped (matches the reference WITH_FORCES template parameter).
-void launchPrimalColor(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl,
-                        const PrimalArgsGpu &args, bool warp4, bool withForces);
+void launchPrimalColor(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, const PrimalArgsGpu &args,
+                       bool warp4, bool withForces);
 
 // M4: the same sweep with the colour's range and group count on device. Record
 // launchPrimalDispatchArgs once per step (after the colouring, fenced with
 // barrierIndirect), then one launchPrimalColorIndirect per colour: args.colorStart/
 // colorEnd/color select the range, and `indirect` holds a VkDispatchIndirectCommand per
 // colour. `warp4` must match between the two, since it sets the bodies per group.
-void launchPrimalDispatchArgs(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl,
-                              VkDeviceAddress colorStart, VkDeviceAddress colorEnd, Buffer &indirect,
-                              int colorCount, bool warp4);
-void launchPrimalColorIndirect(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl,
-                               const PrimalArgsGpu &args, bool warp4, bool withForces, const Buffer &indirect);
+void launchPrimalDispatchArgs(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, VkDeviceAddress colorStart,
+                              VkDeviceAddress colorEnd, Buffer &indirect, int colorCount, bool warp4);
+void launchPrimalColorIndirect(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, const PrimalArgsGpu &args,
+                               bool warp4, bool withForces, const Buffer &indirect);
 // The wide pass for one colour: args.heavyDegree > 0, `indirect` built at 256 list
 // entries per group (launchPrimalDispatchArgs with warp4 = false). Records alongside the
 // colour's normal launch, no barrier between: they touch disjoint bodies.
-void launchPrimalWideIndirect(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl,
-                              const PrimalArgsGpu &args, bool withForces, const Buffer &indirect);
+void launchPrimalWideIndirect(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, const PrimalArgsGpu &args,
+                              bool withForces, const Buffer &indirect);
 
 // The fused small-world iteration loop: one single-workgroup dispatch that runs every iteration
 // (each colour's primal, then the contact dual, then the joint dual). `pa`, `da` and `jd` are
@@ -101,21 +99,19 @@ void launchStepColorBound(CommandList &cmd, HostRingBuffer &ring, SolverPipeline
 // jointCount bodies of thread-per-joint work; args.j.count is NOT read on the host side
 // (the kernel itself bounds-checks against j.count), so jointCount here only sizes the
 // dispatch's group count -- pass the same value used to size args.j.count upload.
-void launchJointInit(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl,
-                      const JointInitArgsGpu &args, int jointCount);
+void launchJointInit(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, const JointInitArgsGpu &args,
+                     int jointCount);
 
-void launchJointDual(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl,
-                      const JointDualArgsGpu &args, int jointCount);
+void launchJointDual(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, const JointDualArgsGpu &args,
+                     int jointCount);
 
 // `slots` is the manifold slot count (args.slots is also uploaded in the args struct;
 // duplicated here purely to size the dispatch, same convention as jointCount above).
-void launchDual(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl,
-                const DualArgsGpu &args, int slots);
-
+void launchDual(CommandList &cmd, HostRingBuffer &ring, SolverPipelines &pl, const DualArgsGpu &args, int slots);
 
 // One csCoarse* dispatch over `threads` invocations; groupSize must match the kernel's
 // numthreads (256 for reset/assign/apply, 128 for assemble/solve).
-void launchCoarse(CommandList &cmd, HostRingBuffer &ring, Pipeline &pipeline, const CoarseArgsGpu &args,
-                  int threads, int groupSize);
+void launchCoarse(CommandList &cmd, HostRingBuffer &ring, Pipeline &pipeline, const CoarseArgsGpu &args, int threads,
+                  int groupSize);
 
 } // namespace avbdvk

@@ -44,11 +44,20 @@ static void itemTooltip(const char *tip)
     ImGui::EndTooltip();
 }
 
-static Avbd3dVec3 toApi(vec3 v) { return Avbd3dVec3{v.x, v.y, v.z}; }
-static vec3 fromApi(Avbd3dVec3 v) { return vec3{v.x, v.y, v.z}; }
+static Avbd3dVec3 toApi(vec3 v)
+{
+    return Avbd3dVec3{v.x, v.y, v.z};
+}
+static vec3 fromApi(Avbd3dVec3 v)
+{
+    return vec3{v.x, v.y, v.z};
+}
 
 // An id is null when it was never filled in.
-template <class Id> static bool isNull(Id id) { return id.index1 == 0; }
+template <class Id> static bool isNull(Id id)
+{
+    return id.index1 == 0;
+}
 
 // The demo reports a failed call and carries on; a lost device shows up as a failed step.
 static void must(Avbd3dResult r, const char *what)
@@ -128,10 +137,22 @@ void DemoApp::viewMatrix(float out[16]) const
     vec3 s = normalize(cross(f, vec3{0, 1, 0}));
     vec3 u = cross(s, f);
 
-    out[0] = s.x;  out[4] = s.y;  out[8] = s.z;   out[12] = -dot(s, eye);
-    out[1] = u.x;  out[5] = u.y;  out[9] = u.z;   out[13] = -dot(u, eye);
-    out[2] = -f.x; out[6] = -f.y; out[10] = -f.z; out[14] = dot(f, eye);
-    out[3] = 0;    out[7] = 0;    out[11] = 0;    out[15] = 1;
+    out[0] = s.x;
+    out[4] = s.y;
+    out[8] = s.z;
+    out[12] = -dot(s, eye);
+    out[1] = u.x;
+    out[5] = u.y;
+    out[9] = u.z;
+    out[13] = -dot(u, eye);
+    out[2] = -f.x;
+    out[6] = -f.y;
+    out[10] = -f.z;
+    out[14] = dot(f, eye);
+    out[3] = 0;
+    out[7] = 0;
+    out[11] = 0;
+    out[15] = 1;
 }
 
 void DemoApp::perspective(float out[16], float aspect, bool vulkanClip)
@@ -248,8 +269,7 @@ void DemoApp::loadScene(int index, bool resetCamera)
         must(avbd3d_grab_end(m_world), "grab_end");
     demolog::setActivity("loadScene");
     demolog::line("load scene %d '%s'", index,
-                  index < gpuSceneCount ? gpuSceneNames[index]
-                                        : m_host.extraSceneNames[index - gpuSceneCount]);
+                  index < gpuSceneCount ? gpuSceneNames[index] : m_host.extraSceneNames[index - gpuSceneCount]);
 
     // The world's buffers may still be referenced by a submitted command buffer from the
     // frame in flight, and destroying the world frees them. Scene switches are rare; drain first.
@@ -296,12 +316,12 @@ SceneView DemoApp::buildSpheresCapsulesScene()
     for (int i = 0; i < n; i++)
         for (int j = 0; j < n; j++)
         {
-            vec3 pos{(i - n * 0.5f + 0.5f) * gap, 3.0f + (float)((i + j) % 3),
-                     (j - n * 0.5f + 0.5f) * gap};
+            vec3 pos{(i - n * 0.5f + 0.5f) * gap, 3.0f + (float)((i + j) % 3), (j - n * 0.5f + 0.5f) * gap};
             if ((i + j) % 2 == 0)
                 m_author.addSphere(0.75f, 1.0f, 0.6f, pos);
             else
-                m_author.addCapsule(0.5f, 0.6f, 1.0f, 0.6f, pos, vec3{0, 0, 0}, vec3{0, 0, 0}, kZUpToYUp); // axis +z, stood up
+                m_author.addCapsule(0.5f, 0.6f, 1.0f, 0.6f, pos, vec3{0, 0, 0}, vec3{0, 0, 0},
+                                    kZUpToYUp); // axis +z, stood up
         }
     return SceneView{30.0f, 3.0f};
 }
@@ -377,8 +397,7 @@ bool DemoApp::loadInitialScene(const DemoLaunch &launch)
         {
             for (int i = 0; i < sceneTotal; i++)
             {
-                const char *name = i < gpuSceneCount ? gpuSceneNames[i]
-                                                     : m_host.extraSceneNames[i - gpuSceneCount];
+                const char *name = i < gpuSceneCount ? gpuSceneNames[i] : m_host.extraSceneNames[i - gpuSceneCount];
                 if (SDL_strcasecmp(name, launch.sceneName) == 0)
                 {
                     found = i;
@@ -482,12 +501,12 @@ void DemoApp::beginGrab(Avbd3dBodyId hit, vec3 worldHit, vec3 localHit)
     // The seed comes back in slot 0.
     m_dragGroup.resize(AVBD3D_MAX_GRAB_BODIES);
     int32_t n = 0;
-    must(avbd3d_grab_begin(m_world, hit, toApi(worldHit), m_grabConnected ? m_grabRadius : 0.0f,
-                           m_grabConnected, m_dragGroup.data(), AVBD3D_MAX_GRAB_BODIES, &n),
+    must(avbd3d_grab_begin(m_world, hit, toApi(worldHit), m_grabConnected ? m_grabRadius : 0.0f, m_grabConnected,
+                           m_dragGroup.data(), AVBD3D_MAX_GRAB_BODIES, &n),
          "grab_begin");
     m_dragGroup.resize(n);
-    demolog::line("grab body %d at (%.3f %.3f %.3f): group %d (connected %d, radius %.2f)", hit.index1 - 1,
-                  worldHit.x, worldHit.y, worldHit.z, n, m_grabConnected ? 1 : 0, m_grabRadius);
+    demolog::line("grab body %d at (%.3f %.3f %.3f): group %d (connected %d, radius %.2f)", hit.index1 - 1, worldHit.x,
+                  worldHit.y, worldHit.z, n, m_grabConnected ? 1 : 0, m_grabRadius);
     if (m_dragGroup.empty())
         return;
 
@@ -538,8 +557,8 @@ void DemoApp::dropDetached()
 
     m_dragKeep.resize(m_dragGroup.size());
     int32_t survivors = 0;
-    must(avbd3d_grab_survivors(m_world, m_dragSeed, m_dragGroup.data(), (int)m_dragGroup.size(),
-                               m_dragKeep.data(), &survivors),
+    must(avbd3d_grab_survivors(m_world, m_dragSeed, m_dragGroup.data(), (int)m_dragGroup.size(), m_dragKeep.data(),
+                               &survivors),
          "grab_survivors");
     if (survivors == (int)m_dragGroup.size())
         return;
@@ -573,7 +592,7 @@ void DemoApp::updateGrab(vec3 cursorPoint)
     m_dragHandles.resize(m_dragGroup.size());
     for (size_t i = 0; i < m_dragGroup.size(); i++)
         m_dragHandles[i] = Avbd3dGrabHandle{m_dragGroup[i], toApi(m_dragLocals[i]),
-                                             toApi(cursorPoint + m_dragOffsets[i]), m_dragWeights[i]};
+                                            toApi(cursorPoint + m_dragOffsets[i]), m_dragWeights[i]};
     must(avbd3d_grab_move(m_world, m_dragHandles.data(), (int)m_dragHandles.size()), "grab_move");
 }
 
@@ -609,22 +628,22 @@ void DemoApp::spawnBody(vec3 size, float density, float friction, vec3 position,
     m_author.spawnBody(size, density, friction, position, velocity);
     const SceneDesc desc = m_author.finalize();
     m_import.importTail(m_world, desc);
-    demolog::line("spawn box size %.2f density %.2f at (%.2f %.2f %.2f) vel (%.2f %.2f %.2f): bodies %d",
-                  size.x, density, position.x, position.y, position.z, velocity.x, velocity.y, velocity.z,
+    demolog::line("spawn box size %.2f density %.2f at (%.2f %.2f %.2f) vel (%.2f %.2f %.2f): bodies %d", size.x,
+                  density, position.x, position.y, position.z, velocity.x, velocity.y, velocity.z,
                   (int)desc.pos.size());
     demolog::setActivity("frame");
 }
 
-void DemoApp::spawnAssembly(const SpawnEmitter &emitter, vec3 origin, quat rotation, float scale,
-                            float massMultiplier, vec3 velocity)
+void DemoApp::spawnAssembly(const SpawnEmitter &emitter, vec3 origin, quat rotation, float scale, float massMultiplier,
+                            vec3 velocity)
 {
     demolog::setActivity("spawn");
     emitter.commit(m_author, origin, rotation, scale, massMultiplier, velocity);
     const SceneDesc desc = m_author.finalize();
     m_import.importTail(m_world, desc);
     demolog::line("spawn %s scale %.2f mass x%.2f at (%.2f %.2f %.2f) vel (%.2f %.2f %.2f): bodies %d joints %d",
-                  spawnKindNames[m_spawnKind], scale, massMultiplier, origin.x, origin.y, origin.z,
-                  velocity.x, velocity.y, velocity.z, (int)desc.pos.size(), desc.jointCount);
+                  spawnKindNames[m_spawnKind], scale, massMultiplier, origin.x, origin.y, origin.z, velocity.x,
+                  velocity.y, velocity.z, (int)desc.pos.size(), desc.jointCount);
     demolog::setActivity("frame");
 }
 
@@ -642,8 +661,7 @@ void DemoApp::spawnAlongRay(vec3 rayOrigin, vec3 rayDir)
         if (depth < kSpawnMinDepth + m_spawnSize)
             depth = kSpawnMinDepth + m_spawnSize;
         const vec3 at = rayOrigin + rayDir * depth;
-        spawnBody(vec3{m_spawnSize, m_spawnSize, m_spawnSize}, m_spawnMass, 0.5f, at,
-                  rayDir * m_spawnSpeed);
+        spawnBody(vec3{m_spawnSize, m_spawnSize, m_spawnSize}, m_spawnMass, 0.5f, at, rayDir * m_spawnSpeed);
         return;
     }
 
@@ -700,8 +718,8 @@ bool DemoApp::grabAtPixel(int px, int py)
         Avbd3dShapeId shape;
         float fraction;
     } pick{{}, 1.0f};
-    auto onHit = [](Avbd3dShapeId shape, Avbd3dVec3, Avbd3dVec3, float fraction, uint64_t, int, int,
-                    void *ctx) -> float {
+    auto onHit = [](Avbd3dShapeId shape, Avbd3dVec3, Avbd3dVec3, float fraction, uint64_t, int, int, void *ctx) -> float
+    {
         Avbd3dBodyId owner{};
         Avbd3dBodyType type = AVBD3D_STATIC_BODY;
         if (avbd3d_shape_get_body(shape, &owner) != AVBD3D_OK || avbd3d_body_get_type(owner, &type) != AVBD3D_OK ||
@@ -876,9 +894,10 @@ void DemoApp::endFrame(float frameMs)
     {
         DemoStats s;
         stats(s);
-        printf("frame %5d cull %d bodies %7d drawn %7d | physics %7.3f render %7.3f ui %6.3f | frame %7.3f (%5.1f fps)\n",
-               m_frameNo, m_cull ? 1 : 0, s.bodies, m_lastDrawn, m_avgStepMs, m_avgDrawMs, m_avgUiMs,
-               m_avgFrameMs, m_avgFrameMs > 0 ? 1000.0f / m_avgFrameMs : 0.0f);
+        printf(
+            "frame %5d cull %d bodies %7d drawn %7d | physics %7.3f render %7.3f ui %6.3f | frame %7.3f (%5.1f fps)\n",
+            m_frameNo, m_cull ? 1 : 0, s.bodies, m_lastDrawn, m_avgStepMs, m_avgDrawMs, m_avgUiMs, m_avgFrameMs,
+            m_avgFrameMs > 0 ? 1000.0f / m_avgFrameMs : 0.0f);
         fflush(stdout);
         m_cull = !m_cull;
     }
@@ -895,14 +914,14 @@ void DemoApp::endFrame(float frameMs)
 // was rerun or failed, and a stats line every 60 steps -- or every step, when asked.
 // ---------------------------------------------------------------------------
 
-#define AVBD_LOG_PARAMS(X)                                                                         \
-    X(dt, "%g", double) X(gravity.y, "%g", double) X(iterations, "%d", int) X(primalLanes, "%d", int)  \
-    X(alpha, "%g", double) X(betaLin, "%g", double) X(betaAng, "%g", double) X(gamma, "%g", double)  \
-    X(sleepEnabled, "%d", int) X(sleepFrames, "%d", int) X(sleepLinVel, "%g", double)                \
-    X(sleepAngVel, "%g", double) X(sleepDisp, "%g", double) X(sleepFracture, "%g", double)           \
-    X(autoKStart, "%d", int) X(dualDamping, "%g", double) X(dualDampVel, "%g", double)               \
-    X(killFallenEnabled, "%d", int) X(killHeight, "%g", double) X(grabStrength, "%g", double)             \
-    X(sleepLeak, "%g", double)
+#define AVBD_LOG_PARAMS(X)                                                                                             \
+    X(dt, "%g", double)                                                                                                \
+    X(gravity.y, "%g", double) X(iterations, "%d", int) X(primalLanes, "%d", int) X(alpha, "%g", double)               \
+        X(betaLin, "%g", double) X(betaAng, "%g", double) X(gamma, "%g", double) X(sleepEnabled, "%d", int)            \
+            X(sleepFrames, "%d", int) X(sleepLinVel, "%g", double) X(sleepAngVel, "%g", double)                        \
+                X(sleepDisp, "%g", double) X(sleepFracture, "%g", double) X(autoKStart, "%d", int)                     \
+                    X(dualDamping, "%g", double) X(dualDampVel, "%g", double) X(killFallenEnabled, "%d", int)          \
+                        X(killHeight, "%g", double) X(grabStrength, "%g", double) X(sleepLeak, "%g", double)
 
 void DemoApp::setLogging(bool on)
 {
@@ -928,8 +947,7 @@ void DemoApp::logParams()
     const SolverParams &p = m_author.params;
     char buf[1024];
     int n = 0;
-#define X(f, fmt, T) \
-    n += snprintf(buf + n, n < (int)sizeof(buf) ? sizeof(buf) - n : 0, " " #f "=" fmt, (T)p.f);
+#define X(f, fmt, T) n += snprintf(buf + n, n < (int)sizeof(buf) ? sizeof(buf) - n : 0, " " #f "=" fmt, (T)p.f);
     AVBD_LOG_PARAMS(X)
 #undef X
     demolog::line("  params:%s", buf);
@@ -944,8 +962,8 @@ void DemoApp::logSettingChanges()
     if (!demolog::active())
         return;
     const SolverParams &p = m_author.params;
-#define X(f, fmt, T)                                                                            \
-    if (p.f != m_loggedParams.f)                                                               \
+#define X(f, fmt, T)                                                                                                   \
+    if (p.f != m_loggedParams.f)                                                                                       \
         demolog::line("set " #f ": " fmt " -> " fmt, (T)m_loggedParams.f, (T)p.f);
     AVBD_LOG_PARAMS(X)
 #undef X
@@ -957,8 +975,8 @@ void DemoApp::logSettingChanges()
 
     const DebugDrawOptions &d = m_debug, &o = m_loggedDebug;
     if (d.contactPoints != o.contactPoints || d.contactNormals != o.contactNormals ||
-        d.manifoldLinks != o.manifoldLinks || d.jointLoadRods != o.jointLoadRods ||
-        d.contactTint != o.contactTint || d.maxMarkers != o.maxMarkers)
+        d.manifoldLinks != o.manifoldLinks || d.jointLoadRods != o.jointLoadRods || d.contactTint != o.contactTint ||
+        d.maxMarkers != o.maxMarkers)
         demolog::line("set contact markers: points %d normals %d links %d jointRods %d tint %d budget %d",
                       d.contactPoints, d.contactNormals, d.manifoldLinks, d.jointLoadRods, (int)d.contactTint,
                       d.maxMarkers);
@@ -977,18 +995,17 @@ void DemoApp::logStep(Avbd3dResult res, const Avbd3dStats &r)
     if (res != AVBD3D_OK || !r.ok || r.truncated || reruns > 0 || r.submits != 1)
         demolog::line("step %d: ok %d truncated %d submits %d reruns capacity %d flood %d island %d jp %d "
                       "color %d (%s)",
-                      m_stepCount, r.ok ? 1 : 0, r.truncated ? 1 : 0, r.submits, r.capacity_reruns,
-                      r.flood_reruns, r.island_reruns, r.jp_reruns, r.color_reruns,
-                      avbd3d_result_string(res));
+                      m_stepCount, r.ok ? 1 : 0, r.truncated ? 1 : 0, r.submits, r.capacity_reruns, r.flood_reruns,
+                      r.island_reruns, r.jp_reruns, r.color_reruns, avbd3d_result_string(res));
     if (m_logEveryStep || m_stepCount % 60 == 0)
     {
         DemoStats s;
         stats(s);
         demolog::line("step %d: bodies %d awake %d joints %d springs %d pairs %d/%d manifolds %d/%d "
                       "contacts %d/%d colors %d jp %d | step %.3f gpu %.3f ms | dev %.1f MB",
-                      m_stepCount, s.bodies, s.awake, s.joints, s.springs, s.pairs, s.pairCapacity,
-                      s.manifolds, s.manifoldCapacity, s.contacts, s.contactCapacity, s.colors, s.jpRounds,
-                      s.stepMs, s.gpuMs, s.deviceMB);
+                      m_stepCount, s.bodies, s.awake, s.joints, s.springs, s.pairs, s.pairCapacity, s.manifolds,
+                      s.manifoldCapacity, s.contacts, s.contactCapacity, s.colors, s.jpRounds, s.stepMs, s.gpuMs,
+                      s.deviceMB);
     }
 }
 
@@ -1079,8 +1096,7 @@ void DemoApp::drawUI()
                     "0.99. Note lambda is also scaled by alpha, so warm starting cannot "
                     "feed energy back in to correct old error.");
 
-        ImGui::SliderFloat("Beta linear", &params.betaLin, 1.0f, 100000.0f, "%.0f",
-                           ImGuiSliderFlags_Logarithmic);
+        ImGui::SliderFloat("Beta linear", &params.betaLin, 1.0f, 100000.0f, "%.0f", ImGuiSliderFlags_Logarithmic);
         itemTooltip("Penalty ramp rate for linear (contact/attachment) constraints, "
                     "paper Eq. 12: k <- k + beta*|C(x)| after each iteration, so a "
                     "constraint that is still violated gets stiffer as the step "
@@ -1116,8 +1132,7 @@ void DemoApp::drawUI()
         ImGui::SliderInt("Sleep frames", &params.sleepFrames, 0, 120);
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("Settled steps before a body may freeze. 0 disables sleeping.");
-        ImGui::SliderFloat("Sleep travel", &params.sleepDisp, 0.0001f, 0.05f, "%.4f m",
-                           ImGuiSliderFlags_Logarithmic);
+        ImGui::SliderFloat("Sleep travel", &params.sleepDisp, 0.0001f, 0.05f, "%.4f m", ImGuiSliderFlags_Logarithmic);
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("Net movement allowed across the whole window. This is the\n"
                               "rest test; the velocity thresholds are only a fast reject.");
@@ -1125,8 +1140,7 @@ void DemoApp::drawUI()
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("0: any velocity spike restarts the rest window. Above 0: a spike\n"
                               "only drains progress in proportion to its size (leaky streak).");
-        ImGui::SliderFloat("Sleep speed", &params.sleepLinVel, 0.01f, 2.0f, "%.2f m/s",
-                           ImGuiSliderFlags_Logarithmic);
+        ImGui::SliderFloat("Sleep speed", &params.sleepLinVel, 0.01f, 2.0f, "%.2f m/s", ImGuiSliderFlags_Logarithmic);
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("Fast reject, applied at 2x, and the wake hysteresis.");
         ImGui::EndDisabled();
@@ -1142,16 +1156,14 @@ void DemoApp::drawUI()
 
     if (ImGui::CollapsingHeader("Grab"))
     {
-        ImGui::SliderFloat("Grab strength", &params.grabStrength, 0.05f, 2.0f, "%.2f",
-                           ImGuiSliderFlags_Logarithmic);
+        ImGui::SliderFloat("Grab strength", &params.grabStrength, 0.05f, 2.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("Multiplier on the mouse-drag spring stiffness.\n"
                               "Lower it if a heavy structure feels glued to the cursor.");
         ImGui::Checkbox("Grab connected bodies", &m_grabConnected);
         if (m_grabConnected)
         {
-            ImGui::SliderFloat("Grab radius", &m_grabRadius, 0.0f, 100.0f, "%.1f m",
-                               ImGuiSliderFlags_Logarithmic);
+            ImGui::SliderFloat("Grab radius", &m_grabRadius, 0.0f, 100.0f, "%.1f m", ImGuiSliderFlags_Logarithmic);
             ImGui::TextUnformatted("Follows joints and springs out from the");
             ImGui::TextUnformatted("body you clicked, within the radius.");
             ImGui::SliderFloat("Falloff", &m_grabFalloff, 0.0f, 8.0f, "%.2f");
@@ -1165,8 +1177,7 @@ void DemoApp::drawUI()
             float curve[48];
             for (int i = 0; i < 48; i++)
                 curve[i] = grabWeight(m_grabRadius * (float)i / 47.0f, m_grabRadius);
-            ImGui::PlotLines("##grabfalloff", curve, 48, 0, "strength vs distance", 0.0f, 1.0f,
-                             ImVec2(0, 45));
+            ImGui::PlotLines("##grabfalloff", curve, 48, 0, "strength vs distance", 0.0f, 1.0f, ImVec2(0, 45));
         }
         else
         {
@@ -1189,19 +1200,16 @@ void DemoApp::drawUI()
         if (!sizeApplies)
             ImGui::EndDisabled();
 
-        ImGui::SliderFloat("Mass multiplier", &m_spawnMass, 0.05f, 200000.0f, "%.2f",
-                           ImGuiSliderFlags_Logarithmic);
+        ImGui::SliderFloat("Mass multiplier", &m_spawnMass, 0.05f, 200000.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
         ImGui::TextUnformatted("Multiplier for the spawned object's density;");
         ImGui::TextUnformatted("mass scales with the object's volume.");
         ImGui::SliderFloat("Spawn speed", &m_spawnSpeed, 0.0f, 60.0f);
-        ImGui::SliderFloat("Spawn dist", &m_spawnDist, 0.5f, 200.0f, "%.1f",
-                           ImGuiSliderFlags_Logarithmic);
+        ImGui::SliderFloat("Spawn dist", &m_spawnDist, 0.5f, 200.0f, "%.1f", ImGuiSliderFlags_Logarithmic);
     }
 
     if (ImGui::CollapsingHeader("Camera & controls"))
     {
-        ImGui::SliderFloat("Fly speed", &m_camMoveSpeed, 1.0f, 300.0f, "%.0f",
-                           ImGuiSliderFlags_Logarithmic);
+        ImGui::SliderFloat("Fly speed", &m_camMoveSpeed, 1.0f, 300.0f, "%.0f", ImGuiSliderFlags_Logarithmic);
         ImGui::TextUnformatted("LMB drag  RMB look  MMB spawn  wheel dolly");
         ImGui::TextUnformatted("WASD fly  Q/E down/up  shift fast");
     }
@@ -1223,31 +1231,45 @@ void DemoApp::drawUI()
         // renderer, inside the same kernel, so all of them survive 100k bodies and none
         // of them changes a number the solver computes.
         overlayToggle("Sleeping bodies", OVERLAY_SLEEP,
-                      "Blue: frozen, and dropped from the constraint graph entirely. Amber to pale: awake, cooling as its rest timer fills.");
+                      "Blue: frozen, and dropped from the constraint graph entirely. Amber to pale: awake, cooling as "
+                      "its rest timer fills.");
         overlayToggle("Broadphase grid", OVERLAY_GRID,
-                      "One hue per occupied hash-grid cell. Bodies are binned by centre and tested against the 27-cell neighbourhood, so this is the partition that decides which pairs are considered at all.");
+                      "One hue per occupied hash-grid cell. Bodies are binned by centre and tested against the 27-cell "
+                      "neighbourhood, so this is the partition that decides which pairs are considered at all.");
         overlayToggle("Graph colors", OVERLAY_GRAPH_COLOR,
-                      "Jones-Plassmann coloring of the constraint graph. Bodies sharing a hue share no constraint and are solved in the same dispatch -- one dispatch per hue, per iteration.");
+                      "Jones-Plassmann coloring of the constraint graph. Bodies sharing a hue share no constraint and "
+                      "are solved in the same dispatch -- one dispatch per hue, per iteration.");
         overlayToggle("Contact load", OVERLAY_LOAD,
-                      "Peak contact normal force on the body. This is where the force chains through an arch, a tower or a pile become visible.");
-        overlayToggle("Speed", OVERLAY_SPEED,
-                      "Linear speed. Shows the creep a settled-looking pile is hiding.");
+                      "Peak contact normal force on the body. This is where the force chains through an arch, a tower "
+                      "or a pile become visible.");
+        overlayToggle("Speed", OVERLAY_SPEED, "Linear speed. Shows the creep a settled-looking pile is hiding.");
         overlayToggle("Contact degree", OVERLAY_DEGREE,
-                      "How many bodies this one is touching. Needs sleeping enabled: the count is maintained as the sleep logic's contact fingerprint.");
+                      "How many bodies this one is touching. Needs sleeping enabled: the count is maintained as the "
+                      "sleep logic's contact fingerprint.");
 
         ImGui::SeparatorText("Structure");
         overlayToggle("Joint count", OVERLAY_JOINT_DEGREE,
-                      "How many unbroken joints and springs are attached to this body. Grey means none at all, which is a different thing from zero load. A structure's articulation points are its high counts.");
+                      "How many unbroken joints and springs are attached to this body. Grey means none at all, which "
+                      "is a different thing from zero load. A structure's articulation points are its high counts.");
         overlayToggle("Joint load", OVERLAY_JOINT_LOAD,
-                      "Axial force in the connected joints and springs, signed: blue is compression (being squeezed), red is tension (being pulled apart), pale grey is unloaded. Only the axial component counts -- a strut is judged by what it carries along its length.");
+                      "Axial force in the connected joints and springs, signed: blue is compression (being squeezed), "
+                      "red is tension (being pulled apart), pale grey is unloaded. Only the axial component counts -- "
+                      "a strut is judged by what it carries along its length.");
         overlayToggle("Structural load", OVERLAY_AXIAL_LOAD,
-                      "The same diverging scale, but contacts count as well as joints. Every contact can only push, so this reads a masonry pile as solidly blue and shows tension only where something is actually holding it together.");
-        overlayToggle("Joint stress", OVERLAY_JOINT_STRESS,
-                      "Worst connected joint as a fraction of its own fracture limit, so 1.0 is the frame it snaps on. This is the weak-point view: whatever is white is what breaks next. Grey means no connected joint is breakable.");
+                      "The same diverging scale, but contacts count as well as joints. Every contact can only push, so "
+                      "this reads a masonry pile as solidly blue and shows tension only where something is actually "
+                      "holding it together.");
+        overlayToggle(
+            "Joint stress", OVERLAY_JOINT_STRESS,
+            "Worst connected joint as a fraction of its own fracture limit, so 1.0 is the frame it snaps on. This is "
+            "the weak-point view: whatever is white is what breaks next. Grey means no connected joint is breakable.");
         overlayToggle("Friction cone", OVERLAY_FRICTION,
-                      "How much of the available friction each contact has spent. White is a contact that has run out and is sliding -- a structure shears along whatever is white here before it visibly moves.");
-        overlayToggle("Penetration", OVERLAY_PENETRATION,
-                      "Deepest overlap the last step left behind, measured where the narrowphase picked it up. Bright means the solve is not holding that contact, which is where a stack starts sinking into itself.");
+                      "How much of the available friction each contact has spent. White is a contact that has run out "
+                      "and is sliding -- a structure shears along whatever is white here before it visibly moves.");
+        overlayToggle(
+            "Penetration", OVERLAY_PENETRATION,
+            "Deepest overlap the last step left behind, measured where the narrowphase picked it up. Bright means the "
+            "solve is not holding that contact, which is where a stack starts sinking into itself.");
 
         switch (m_overlay.mode)
         {
@@ -1256,8 +1278,7 @@ void DemoApp::drawUI()
                                ImGuiSliderFlags_Logarithmic);
             break;
         case OVERLAY_LOAD:
-            ImGui::SliderFloat("Load range", &m_overlay.loadMax, 1.0f, 100000.0f, "%.0f",
-                               ImGuiSliderFlags_Logarithmic);
+            ImGui::SliderFloat("Load range", &m_overlay.loadMax, 1.0f, 100000.0f, "%.0f", ImGuiSliderFlags_Logarithmic);
             break;
         case OVERLAY_DEGREE:
             ImGui::SliderInt("Degree range", &m_overlay.degreeMax, 1, 32);
@@ -1301,7 +1322,9 @@ void DemoApp::drawUI()
         if (m_overlay.mode != OVERLAY_NONE)
         {
             ImGui::Checkbox("Include statics", &m_overlay.colorStatics);
-            itemTooltip("Statics are in none of these data sets -- not binned in the grid, not in the constraint graph, never asleep -- so by default they stay neutral grey rather than say something untrue about themselves.");
+            itemTooltip(
+                "Statics are in none of these data sets -- not binned in the grid, not in the constraint graph, never "
+                "asleep -- so by default they stay neutral grey rather than say something untrue about themselves.");
         }
     }
 
@@ -1311,13 +1334,18 @@ void DemoApp::drawUI()
         // what is already there, so they are the one debug view with a cost worth
         // mentioning in the UI -- hence the budget and the truncation notice.
         ImGui::Checkbox("Contact points", &m_debug.contactPoints);
-        itemTooltip("A small plate at each contact point, lying in the contact plane. A box-box face contact is a four-point polygon clip, so a flat landing shows four plates, not one.");
+        itemTooltip("A small plate at each contact point, lying in the contact plane. A box-box face contact is a "
+                    "four-point polygon clip, so a flat landing shows four plates, not one.");
         ImGui::Checkbox("Contact normals", &m_debug.contactNormals);
-        itemTooltip("A needle along each contact normal, its length scaled by the normal force. Together these are a force diagram: the direction each contact is pushing, and how hard.");
+        itemTooltip("A needle along each contact normal, its length scaled by the normal force. Together these are a "
+                    "force diagram: the direction each contact is pushing, and how hard.");
         ImGui::Checkbox("Manifold links", &m_debug.manifoldLinks);
-        itemTooltip("One rod per touching pair, centre to centre, coloured by the total force the pair carries. This is the force network -- the load path down through an arch or a tower is the bright chain running through it.");
+        itemTooltip(
+            "One rod per touching pair, centre to centre, coloured by the total force the pair carries. This is the "
+            "force network -- the load path down through an arch or a tower is the bright chain running through it.");
         ImGui::Checkbox("Joint load on rods", &m_debug.jointLoadRods);
-        itemTooltip("Colour the joint rods by signed axial load -- blue compression, red tension -- instead of by how close they are to fracturing.");
+        itemTooltip("Colour the joint rods by signed axial load -- blue compression, red tension -- instead of by how "
+                    "close they are to fracturing.");
 
         if (m_debug.jointLoadRods && !m_debug.any())
             ImGui::SliderFloat("Force range", &m_debug.forceMax, 1.0f, 100000.0f, "%.0f N",
@@ -1329,7 +1357,9 @@ void DemoApp::drawUI()
             int tintIdx = (int)m_debug.contactTint;
             if (ImGui::Combo("Marker color", &tintIdx, tints, 4))
                 m_debug.contactTint = (ContactTint)tintIdx;
-            itemTooltip("Normal force: how hard the contact is pressing. Friction cone: how much of its friction it has spent, white where it is sliding. Stick / slip: green where static friction is holding the anchor, orange where it has let go.");
+            itemTooltip("Normal force: how hard the contact is pressing. Friction cone: how much of its friction it "
+                        "has spent, white where it is sliding. Stick / slip: green where static friction is holding "
+                        "the anchor, orange where it has let go.");
 
             ImGui::SliderFloat("Marker size", &m_debug.contactPointSize, 0.005f, 0.5f, "%.3f m",
                                ImGuiSliderFlags_Logarithmic);
@@ -1341,7 +1371,8 @@ void DemoApp::drawUI()
                                    ImGuiSliderFlags_Logarithmic);
 
             ImGui::SliderInt("Marker budget", &m_debug.maxMarkers, 1000, 1000000);
-            itemTooltip("Hard ceiling on marker instances. Past it the extra markers are dropped rather than the set being thinned, so what you are looking at stays put between frames instead of reshuffling.");
+            itemTooltip("Hard ceiling on marker instances. Past it the extra markers are dropped rather than the set "
+                        "being thinned, so what you are looking at stays put between frames instead of reshuffling.");
 
             if (st.debugRequested > m_debug.maxMarkers)
                 ImGui::TextColored(ImVec4(1.0f, 0.6f, 0.2f, 1.0f), "showing %d of %d (raise the budget)",
@@ -1371,7 +1402,8 @@ void DemoApp::drawUI()
         if (st.gpuMs > 0.0f)
         {
             ImGui::Text("GPU total %.3f ms", st.gpuMs);
-            auto row = [&](const char *name, float ms) {
+            auto row = [&](const char *name, float ms)
+            {
                 char label[64];
                 snprintf(label, sizeof(label), "%.3f ms", ms);
                 ImGui::ProgressBar(std::min(std::max(ms / st.gpuMs, 0.0f), 1.0f), ImVec2(120, 0), label);
@@ -1404,8 +1436,7 @@ void DemoApp::drawUI()
             // The solve is two unrelated costs: rebuilding and coloring the constraint
             // graph, then the iterations themselves. Primal and dual are per iteration.
             ImGui::Text("    graph %6.3f ms", st.buildMs);
-            ImGui::Text("    iter  %6.3f ms (primal %.3f, dual %.3f per it)", st.iterMs, st.primalMs,
-                        st.dualMs);
+            ImGui::Text("    iter  %6.3f ms (primal %.3f, dual %.3f per it)", st.iterMs, st.primalMs, st.dualMs);
         }
         if (st.gpuMs >= 0.0f)
         {
@@ -1433,7 +1464,9 @@ void DemoApp::drawUI()
         bool logOn = demolog::active();
         if (ImGui::Checkbox("Write log file", &logOn))
             setLogging(logOn);
-        itemTooltip("Writes a session log beside avbd3d_demo.exe: scene loads, every setting you change, grabs, spawns, step reruns and failures, periodic stats, everything printed to the console, and on a crash what was running plus a backtrace. Turn it on, reproduce the problem, and send the file.");
+        itemTooltip("Writes a session log beside avbd3d_demo.exe: scene loads, every setting you change, grabs, "
+                    "spawns, step reruns and failures, periodic stats, everything printed to the console, and on a "
+                    "crash what was running plus a backtrace. Turn it on, reproduce the problem, and send the file.");
         ImGui::Checkbox("Log every step", &m_logEveryStep);
         itemTooltip("A stats line per step instead of every 60 steps.");
         if (demolog::path()[0])

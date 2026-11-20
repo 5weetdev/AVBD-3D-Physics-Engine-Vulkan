@@ -9,7 +9,6 @@
  * It is provided "as is" without express or implied warranty.
  */
 
-
 #pragma once
 
 #include "collision.h"
@@ -27,8 +26,7 @@
 // A density of zero yields zero mass and zero moment, which is how a static body is
 // spelled everywhere else.
 // ---------------------------------------------------------------------------
-inline void shapeMassProperties(int shape, const vec3 &half, float density,
-                                float &massOut, vec3 &momentOut)
+inline void shapeMassProperties(int shape, const vec3 &half, float density, float &massOut, vec3 &momentOut)
 {
     const float kPi = 3.14159265358979323846f;
 
@@ -58,8 +56,8 @@ inline void shapeMassProperties(int shape, const vec3 &half, float density,
         // them as a point mass at L/2 would) understates a stubby capsule's inertia by
         // tens of percent.
         const float iAxial = 0.5f * mCyl * r * r + 0.4f * mCap * r * r;
-        const float iLateral = mCyl * (L * L / 12.0f + r * r * 0.25f) +
-                               mCap * (0.4f * r * r + 0.25f * L * L + 0.375f * r * L);
+        const float iLateral =
+            mCyl * (L * L / 12.0f + r * r * 0.25f) + mCap * (0.4f * r * r + 0.25f * L * L + 0.375f * r * L);
 
         massOut = mCyl + mCap;
         momentOut = vec3{iLateral, iLateral, iAxial};
@@ -69,8 +67,6 @@ inline void shapeMassProperties(int shape, const vec3 &half, float density,
     const vec3 size = half * 2.0f;
     const float m = size.x * size.y * size.z * density;
     massOut = m;
-    momentOut = vec3{
-        (size.y * size.y + size.z * size.z) / 12.0f * m,
-        (size.x * size.x + size.z * size.z) / 12.0f * m,
-        (size.x * size.x + size.y * size.y) / 12.0f * m};
+    momentOut = vec3{(size.y * size.y + size.z * size.z) / 12.0f * m, (size.x * size.x + size.z * size.z) / 12.0f * m,
+                     (size.x * size.x + size.y * size.y) / 12.0f * m};
 }

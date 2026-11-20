@@ -9,16 +9,16 @@
 #include <cstdio>
 
 static int g_fail = 0;
-#define CHECK(cond, ...)                                                                                              \
-    do                                                                                                                \
-    {                                                                                                                 \
-        if (!(cond))                                                                                                  \
-        {                                                                                                             \
-            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                               \
-            std::printf(__VA_ARGS__);                                                                                 \
-            std::printf("\n");                                                                                        \
-            g_fail++;                                                                                                 \
-        }                                                                                                             \
+#define CHECK(cond, ...)                                                                                               \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        if (!(cond))                                                                                                   \
+        {                                                                                                              \
+            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                                \
+            std::printf(__VA_ARGS__);                                                                                  \
+            std::printf("\n");                                                                                         \
+            g_fail++;                                                                                                  \
+        }                                                                                                              \
     } while (0)
 
 static Avbd3dBodyId makeBox(Avbd3dWorld *w, Avbd3dBodyType type, Avbd3dVec3 p, float hx, float hy, float hz)
@@ -113,7 +113,8 @@ int main()
     CHECK(batch[0].x == 2 && batch[0].y == 5, "batched position");
     step(w, 6);
     q = t3d_body_get_position(box);
-    CHECK(std::fabs(q.x - (2 + 0.1f)) < 0.02f && std::fabs(q.y - (5 + 0.2f)) < 0.02f && std::fabs(q.z - (1 + 0.3f)) < 0.02f,
+    CHECK(std::fabs(q.x - (2 + 0.1f)) < 0.02f && std::fabs(q.y - (5 + 0.2f)) < 0.02f &&
+              std::fabs(q.z - (1 + 0.3f)) < 0.02f,
           "moved by velocity: (%g %g %g)", q.x, q.y, q.z);
     t3d_body_set_awake(box, true);
     CHECK(t3d_body_is_awake(box), "awake after SetAwake");
@@ -231,10 +232,10 @@ int main()
     Avbd3dBodyId gCtrl = makeBodyBox(pw, bodyDef(AVBD3D_DYNAMIC_BODY, {-60, 5, 0}), 0.5f, 0.5f, 0.5f);
     step(pw, 30);
     CHECK(t3d_body_get_position(gCtrl).y < 4.5f, "control falls (y %g)", t3d_body_get_position(gCtrl).y);
-    CHECK(std::fabs(t3d_body_get_position(gFloatDef).y - 5.0f) < 1e-3f,
-          "gravityScale 0 at creation floats (y %g)", t3d_body_get_position(gFloatDef).y);
-    CHECK(std::fabs(t3d_body_get_position(gFloatRt).y - 5.0f) < 1e-3f,
-          "gravityScale 0 at runtime floats (y %g)", t3d_body_get_position(gFloatRt).y);
+    CHECK(std::fabs(t3d_body_get_position(gFloatDef).y - 5.0f) < 1e-3f, "gravityScale 0 at creation floats (y %g)",
+          t3d_body_get_position(gFloatDef).y);
+    CHECK(std::fabs(t3d_body_get_position(gFloatRt).y - 5.0f) < 1e-3f, "gravityScale 0 at runtime floats (y %g)",
+          t3d_body_get_position(gFloatRt).y);
 
     // Damping: a flying body with linear and angular damping slows; the control does not.
     Avbd3dBodyDef ddef = bodyDef(AVBD3D_DYNAMIC_BODY, {-20, 5, 0});
@@ -312,10 +313,10 @@ int main()
     t3d_body_set_motion_locks(spinLocked, aml);
     t3d_body_set_angular_velocity(spinLocked, {0, 5, 0});
     step(pw, 60);
-    CHECK(std::fabs(t3d_body_get_position(locked).y - 5.0f) < 1e-3f,
-          "linearY lock holds the body (y %g)", t3d_body_get_position(locked).y);
-    CHECK(std::fabs(t3d_body_get_angular_velocity(spinLocked).y) < 0.05f,
-          "angularY lock stops the spin (w %g)", t3d_body_get_angular_velocity(spinLocked).y);
+    CHECK(std::fabs(t3d_body_get_position(locked).y - 5.0f) < 1e-3f, "linearY lock holds the body (y %g)",
+          t3d_body_get_position(locked).y);
+    CHECK(std::fabs(t3d_body_get_angular_velocity(spinLocked).y) < 0.05f, "angularY lock stops the spin (w %g)",
+          t3d_body_get_angular_velocity(spinLocked).y);
 
     // Shape restitution and surface material: stored and read back. Restitution is not
     // simulated by the solver (documented gap); it reaches BodyProps for the primary shape.

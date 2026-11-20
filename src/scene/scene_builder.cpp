@@ -35,22 +35,56 @@ unsigned long long pairKey(int a, int b)
 
 void SceneBuilder::clear()
 {
-    m_pos.clear(); m_vel.clear(); m_velAng.clear(); m_half.clear(); m_moment.clear();
-    m_rot.clear(); m_mass.clear(); m_friction.clear();
-    m_shape.clear(); m_tier.clear(); m_asleep.clear(); m_group.clear();
-    m_jointA.clear(); m_jointB.clear(); m_jointRA.clear(); m_jointRB.clear();
-    m_jointKLin.clear(); m_jointKAng.clear(); m_jointFrac.clear(); m_jointFracAng.clear();
-    m_jointFrameA.clear(); m_jointFrameB.clear();
-    m_jointAxisMode.clear(); m_jointGeneric.clear(); m_jointAxisLo.clear(); m_jointAxisHi.clear();
-    m_springA.clear(); m_springB.clear(); m_springRA.clear(); m_springRB.clear();
-    m_springRest.clear(); m_springK.clear();
+    m_pos.clear();
+    m_vel.clear();
+    m_velAng.clear();
+    m_half.clear();
+    m_moment.clear();
+    m_rot.clear();
+    m_mass.clear();
+    m_friction.clear();
+    m_shape.clear();
+    m_tier.clear();
+    m_asleep.clear();
+    m_group.clear();
+    m_jointA.clear();
+    m_jointB.clear();
+    m_jointRA.clear();
+    m_jointRB.clear();
+    m_jointKLin.clear();
+    m_jointKAng.clear();
+    m_jointFrac.clear();
+    m_jointFracAng.clear();
+    m_jointFrameA.clear();
+    m_jointFrameB.clear();
+    m_jointAxisMode.clear();
+    m_jointGeneric.clear();
+    m_jointAxisLo.clear();
+    m_jointAxisHi.clear();
+    m_springA.clear();
+    m_springB.clear();
+    m_springRA.clear();
+    m_springRB.clear();
+    m_springRest.clear();
+    m_springK.clear();
     m_ignore.clear();
-    m_shapeBody.clear(); m_bodyPrimary.clear(); m_shapeLocalPos.clear(); m_shapeHalf.clear();
-    m_shapeLocalRot.clear(); m_shapeKind.clear(); m_shapeFriction.clear();
-    m_shapeCategory.clear(); m_shapeMask.clear(); m_shapeFlags.clear(); m_shapeGroup.clear();
+    m_shapeBody.clear();
+    m_bodyPrimary.clear();
+    m_shapeLocalPos.clear();
+    m_shapeHalf.clear();
+    m_shapeLocalRot.clear();
+    m_shapeKind.clear();
+    m_shapeFriction.clear();
+    m_shapeCategory.clear();
+    m_shapeMask.clear();
+    m_shapeFlags.clear();
+    m_shapeGroup.clear();
     m_props.clear();
-    m_shapeGeom.clear(); m_geomBlob.clear(); m_geomHash.clear();
-    m_bodyLocalCenter.clear(); m_bodyPrincipalRot.clear();
+    m_shapeGeom.clear();
+    m_geomBlob.clear();
+    m_geomHash.clear();
+    m_bodyLocalCenter.clear();
+    m_bodyPrincipalRot.clear();
 }
 
 BodyProps &SceneBuilder::propsOf(int body)
@@ -81,7 +115,14 @@ void SceneBuilder::setBodyFilter(int body, uint64_t category, uint64_t mask, int
             setShapeFilter(s, category, mask, group);
 }
 
-#define AVBD_BODY_SETTER(name, params, stmt)                                                      void SceneBuilder::name params                                                                {                                                                                                 if (body < 0 || body >= (int)m_pos.size())                                                        return;                                                                                   BodyProps &p = propsOf(body);                                                                 stmt;                                                                                     }
+#define AVBD_BODY_SETTER(name, params, stmt)                                                                           \
+    void SceneBuilder::name params                                                                                     \
+    {                                                                                                                  \
+        if (body < 0 || body >= (int)m_pos.size())                                                                     \
+            return;                                                                                                    \
+        BodyProps &p = propsOf(body);                                                                                  \
+        stmt;                                                                                                          \
+    }
 
 void SceneBuilder::setKinematic(int body, bool kinematic)
 {
@@ -97,12 +138,15 @@ void SceneBuilder::setKinematic(int body, bool kinematic)
     else
         p.flags &= ~(unsigned)BODY_KINEMATIC;
 }
-AVBD_BODY_SETTER(setBodyDamping, (int body, float linear, float angular), p.linearDamping = linear; p.angularDamping = angular)
+AVBD_BODY_SETTER(setBodyDamping, (int body, float linear, float angular), p.linearDamping = linear;
+                 p.angularDamping = angular)
 AVBD_BODY_SETTER(setGravityScale, (int body, float scale), p.gravityScale = scale)
 AVBD_BODY_SETTER(setMaxLinearSpeed, (int body, float speed), p.maxLinearSpeed = speed)
 AVBD_BODY_SETTER(setSleepThreshold, (int body, float speed), p.sleepThreshold = speed)
-AVBD_BODY_SETTER(setEnableSleep, (int body, bool enable), if (enable) p.flags &= ~(unsigned)BODY_NO_SLEEP; else p.flags |= BODY_NO_SLEEP)
-AVBD_BODY_SETTER(setMotionLocks, (int body, unsigned lockFlags), p.flags = (p.flags & ~(unsigned)BODY_LOCK_ANY) | (lockFlags & BODY_LOCK_ANY))
+AVBD_BODY_SETTER(setEnableSleep, (int body, bool enable), if (enable) p.flags &= ~(unsigned)BODY_NO_SLEEP;
+                 else p.flags |= BODY_NO_SLEEP)
+AVBD_BODY_SETTER(setMotionLocks, (int body, unsigned lockFlags),
+                 p.flags = (p.flags & ~(unsigned)BODY_LOCK_ANY) | (lockFlags & BODY_LOCK_ANY))
 AVBD_BODY_SETTER(setTangentSpeed, (int body, float speed), p.tangentSpeed = speed)
 AVBD_BODY_SETTER(setRollingResistance, (int body, float coefficient), p.rollingResistance = coefficient)
 AVBD_BODY_SETTER(setFrictionMix, (int body, FrictionMix mix), p.frictionMix = (unsigned)mix)
@@ -112,9 +156,8 @@ AVBD_BODY_SETTER(setRestitution, (int body, float restitution), p.restitution = 
 
 int SceneBuilder::pushShape(int body, int type, vec3 localPos, quat localRot, vec3 half, float friction)
 {
-    const bool identity = localPos.x == 0.0f && localPos.y == 0.0f && localPos.z == 0.0f &&
-                          localRot.x == 0.0f && localRot.y == 0.0f && localRot.z == 0.0f &&
-                          localRot.w == 1.0f;
+    const bool identity = localPos.x == 0.0f && localPos.y == 0.0f && localPos.z == 0.0f && localRot.x == 0.0f &&
+                          localRot.y == 0.0f && localRot.z == 0.0f && localRot.w == 1.0f;
     m_shapeBody.push_back(body);
     m_shapeLocalPos.push_back(localPos);
     m_shapeLocalRot.push_back(localRot);
@@ -236,14 +279,14 @@ int SceneBuilder::addMeshBody(const vec3 *vertices, int vertexCount, const int *
     if (blob < 0)
         return -1;
     // Static: density 0, no velocity. The mesh is the primary shape.
-    const int body = addShapedBody(AVBD_SHAPE_MESH, half, 0.0f, friction, position, vec3{0, 0, 0},
-                                   vec3{0, 0, 0}, rotation);
+    const int body =
+        addShapedBody(AVBD_SHAPE_MESH, half, 0.0f, friction, position, vec3{0, 0, 0}, vec3{0, 0, 0}, rotation);
     m_shapeGeom[m_bodyPrimary[body]] = blob;
     return body;
 }
 
-int SceneBuilder::addMeshShape(int body, const vec3 *vertices, int vertexCount, const int *indices,
-                               int triangleCount, vec3 localPos, quat localRot, float friction)
+int SceneBuilder::addMeshShape(int body, const vec3 *vertices, int vertexCount, const int *indices, int triangleCount,
+                               vec3 localPos, quat localRot, float friction)
 {
     if (body < 0 || body >= (int)m_pos.size())
         return -1;
@@ -281,15 +324,15 @@ int SceneBuilder::addHullShape(int body, const b3HullData *hull, vec3 localPos, 
     return s;
 }
 
-int SceneBuilder::addHullBody(const b3HullData *hull, float density, float friction, vec3 position,
-                              vec3 velocity, vec3 angularVelocity, quat rotation)
+int SceneBuilder::addHullBody(const b3HullData *hull, float density, float friction, vec3 position, vec3 velocity,
+                              vec3 angularVelocity, quat rotation)
 {
     const int blob = internGeometry(hull);
     if (blob < 0)
         return -1;
     // Created static; the mass pass below makes it dynamic.
-    const int body = addShapedBody(AVBD_SHAPE_HULL, hullHalf(hull), 0.0f, friction, position, velocity,
-                                   angularVelocity, rotation);
+    const int body =
+        addShapedBody(AVBD_SHAPE_HULL, hullHalf(hull), 0.0f, friction, position, velocity, angularVelocity, rotation);
     m_shapeGeom[m_bodyPrimary[body]] = blob;
     if (density > 0.0f)
         computeMassFromShapes(body, density);
@@ -346,8 +389,8 @@ bool SceneBuilder::computeMassFromShapes(int body, float density)
         const quat q = rpInv * m_shapeLocalRot[s];
         m_shapeLocalPos[s] = p;
         m_shapeLocalRot[s] = q;
-        const bool identity = p.x == 0.0f && p.y == 0.0f && p.z == 0.0f &&
-                              q.x == 0.0f && q.y == 0.0f && q.z == 0.0f && q.w == 1.0f;
+        const bool identity =
+            p.x == 0.0f && p.y == 0.0f && p.z == 0.0f && q.x == 0.0f && q.y == 0.0f && q.z == 0.0f && q.w == 1.0f;
         m_shapeFlags[s] = (m_shapeFlags[s] & ~AVBD_SHAPE_FLAG_IDENTITY) | (identity ? AVBD_SHAPE_FLAG_IDENTITY : 0u);
     }
     m_bodyLocalCenter[body] = m_bodyLocalCenter[body] + rotate(m_bodyPrincipalRot[body], cm.center);
@@ -359,8 +402,8 @@ bool SceneBuilder::computeMassFromShapes(int body, float density)
 
 // The one place a body is appended. addBody/addSphere/addCapsule differ only in the
 // shape tag and in how the caller spells the tight OBB.
-int SceneBuilder::addShapedBody(int shape, vec3 half, float density, float friction, vec3 position,
-                                vec3 velocity, vec3 angularVelocity, quat rotation)
+int SceneBuilder::addShapedBody(int shape, vec3 half, float density, float friction, vec3 position, vec3 velocity,
+                                vec3 angularVelocity, quat rotation)
 {
     float mass;
     vec3 moment;
@@ -385,30 +428,29 @@ int SceneBuilder::addShapedBody(int shape, vec3 half, float density, float frict
     return body;
 }
 
-int SceneBuilder::addBody(vec3 size, float density, float friction, vec3 position, vec3 velocity,
-                          vec3 angularVelocity, quat rotation)
+int SceneBuilder::addBody(vec3 size, float density, float friction, vec3 position, vec3 velocity, vec3 angularVelocity,
+                          quat rotation)
 {
-    return addShapedBody(AVBD_SHAPE_BOX, size * 0.5f, density, friction, position, velocity,
-                         angularVelocity, rotation);
+    return addShapedBody(AVBD_SHAPE_BOX, size * 0.5f, density, friction, position, velocity, angularVelocity, rotation);
 }
 
 int SceneBuilder::addSphere(float radius, float density, float friction, vec3 position, vec3 velocity,
                             vec3 angularVelocity, quat rotation)
 {
-    return addShapedBody(AVBD_SHAPE_SPHERE, vec3{radius, radius, radius}, density, friction, position,
-                         velocity, angularVelocity, rotation);
+    return addShapedBody(AVBD_SHAPE_SPHERE, vec3{radius, radius, radius}, density, friction, position, velocity,
+                         angularVelocity, rotation);
 }
 
-int SceneBuilder::addCapsule(float radius, float halfSegment, float density, float friction,
-                             vec3 position, vec3 velocity, vec3 angularVelocity, quat rotation)
+int SceneBuilder::addCapsule(float radius, float halfSegment, float density, float friction, vec3 position,
+                             vec3 velocity, vec3 angularVelocity, quat rotation)
 {
     const float hs = halfSegment > 0.0f ? halfSegment : 0.0f;
-    return addShapedBody(AVBD_SHAPE_CAPSULE, vec3{radius, radius, radius + hs}, density, friction,
-                         position, velocity, angularVelocity, rotation);
+    return addShapedBody(AVBD_SHAPE_CAPSULE, vec3{radius, radius, radius + hs}, density, friction, position, velocity,
+                         angularVelocity, rotation);
 }
 
-int SceneBuilder::addJoint(int bodyA, int bodyB, vec3 rA, vec3 rB, float stiffnessLin,
-                           float stiffnessAng, float fracture)
+int SceneBuilder::addJoint(int bodyA, int bodyB, vec3 rA, vec3 rB, float stiffnessLin, float stiffnessAng,
+                           float fracture)
 {
     m_jointA.push_back(bodyA);
     m_jointB.push_back(bodyB);
@@ -460,8 +502,8 @@ quat SceneBuilder::bodyRot(int i) const
     return i >= 0 && i < (int)m_rot.size() ? m_rot[i] : quat{0, 0, 0, 1};
 }
 
-int SceneBuilder::addJointWorld(int bodyA, int bodyB, vec3 worldAnchor, float stiffnessLin,
-                                float stiffnessAng, float fracture)
+int SceneBuilder::addJointWorld(int bodyA, int bodyB, vec3 worldAnchor, float stiffnessLin, float stiffnessAng,
+                                float fracture)
 {
     const vec3 pA = bodyPos(bodyA), pB = bodyPos(bodyB);
     const quat qA = bodyRot(bodyA), qB = bodyRot(bodyB);
@@ -494,8 +536,8 @@ int SceneBuilder::addJoint6(int bodyA, int bodyB, const JointDesc &desc)
     return i;
 }
 
-int SceneBuilder::addJoint6World(int bodyA, int bodyB, vec3 worldAnchor, quat worldFrame,
-                                 const JointAxis axes[6], float fracture)
+int SceneBuilder::addJoint6World(int bodyA, int bodyB, vec3 worldAnchor, quat worldFrame, const JointAxis axes[6],
+                                 float fracture)
 {
     const vec3 pA = bodyPos(bodyA), pB = bodyPos(bodyB);
     const quat qA = bodyRot(bodyA), qB = bodyRot(bodyB);
@@ -517,8 +559,8 @@ int SceneBuilder::addJoint6World(int bodyA, int bodyB, vec3 worldAnchor, quat wo
     return addJoint6(bodyA, bodyB, d);
 }
 
-int SceneBuilder::addSpringWorld(int bodyA, int bodyB, vec3 worldAnchorA, vec3 worldAnchorB,
-                                 float stiffness, float rest)
+int SceneBuilder::addSpringWorld(int bodyA, int bodyB, vec3 worldAnchorA, vec3 worldAnchorB, float stiffness,
+                                 float rest)
 {
     const vec3 pA = bodyPos(bodyA), pB = bodyPos(bodyB);
     const quat qA = bodyRot(bodyA), qB = bodyRot(bodyB);

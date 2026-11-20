@@ -117,43 +117,127 @@ void VkWorld::init()
     m_stepCmd.init(dev, 2 * 16 + 6);
     m_stepRing.init(dev, 1 << 23);
 
-    pos.init(dev); rot.init(dev); initialLin.init(dev); initialAng.init(dev);
-    inertialLin.init(dev); inertialAng.init(dev);
-    velLin.init(dev); velAng.init(dev); prevVelLin.init(dev);
-    halfExtents.init(dev); shapeType.init(dev); moment.init(dev); mass.init(dev); friction.init(dev);
-    awake.init(dev); sleepTimer.init(dev); restPos.init(dev); restRot.init(dev); gyration.init(dev);
+    pos.init(dev);
+    rot.init(dev);
+    initialLin.init(dev);
+    initialAng.init(dev);
+    inertialLin.init(dev);
+    inertialAng.init(dev);
+    velLin.init(dev);
+    velAng.init(dev);
+    prevVelLin.init(dev);
+    halfExtents.init(dev);
+    shapeType.init(dev);
+    moment.init(dev);
+    mass.init(dev);
+    friction.init(dev);
+    awake.init(dev);
+    sleepTimer.init(dev);
+    restPos.init(dev);
+    restRot.init(dev);
+    gyration.init(dev);
     props.init(dev);
-    dynamicIdx.init(dev); staticIdx.init(dev); ignorePairs.init(dev);
-    gridIdx.init(dev); oversizeIdx.init(dev);
-    shpBody.init(dev); shpLocalPos.init(dev); shpLocalRot.init(dev); shpHalf.init(dev); shpType.init(dev);
-    shpFriction.init(dev); shpRestitution.init(dev); shpRolling.init(dev); shpCategory.init(dev); shpMask.init(dev); shpGroup.init(dev); shpFlags.init(dev);
-    shpGeomOffset.init(dev); geomHeap.init(dev);
-    dynShapeIdx.init(dev); staticShapeIdx.init(dev);
+    dynamicIdx.init(dev);
+    staticIdx.init(dev);
+    ignorePairs.init(dev);
+    gridIdx.init(dev);
+    oversizeIdx.init(dev);
+    shpBody.init(dev);
+    shpLocalPos.init(dev);
+    shpLocalRot.init(dev);
+    shpHalf.init(dev);
+    shpType.init(dev);
+    shpFriction.init(dev);
+    shpRestitution.init(dev);
+    shpRolling.init(dev);
+    shpCategory.init(dev);
+    shpMask.init(dev);
+    shpGroup.init(dev);
+    shpFlags.init(dev);
+    shpGeomOffset.init(dev);
+    geomHeap.init(dev);
+    dynShapeIdx.init(dev);
+    staticShapeIdx.init(dev);
 
-    jBodyA.init(dev); jBodyB.init(dev); jRA.init(dev); jRB.init(dev);
-    jC0Lin.init(dev); jC0Ang.init(dev); jPenaltyLin.init(dev); jPenaltyAng.init(dev);
-    jLambdaLin.init(dev); jLambdaAng.init(dev);
-    jStiffnessLin.init(dev); jStiffnessAng.init(dev); jFracture.init(dev); jFractureAng.init(dev);
-    jTorqueArm.init(dev); jRestAng.init(dev); jBroken.init(dev);
-    jFrameA.init(dev); jFrameB.init(dev); jAxisMode.init(dev); jAxisLo.init(dev); jAxisHi.init(dev); jGeneric.init(dev);
+    jBodyA.init(dev);
+    jBodyB.init(dev);
+    jRA.init(dev);
+    jRB.init(dev);
+    jC0Lin.init(dev);
+    jC0Ang.init(dev);
+    jPenaltyLin.init(dev);
+    jPenaltyAng.init(dev);
+    jLambdaLin.init(dev);
+    jLambdaAng.init(dev);
+    jStiffnessLin.init(dev);
+    jStiffnessAng.init(dev);
+    jFracture.init(dev);
+    jFractureAng.init(dev);
+    jTorqueArm.init(dev);
+    jRestAng.init(dev);
+    jBroken.init(dev);
+    jFrameA.init(dev);
+    jFrameB.init(dev);
+    jAxisMode.init(dev);
+    jAxisLo.init(dev);
+    jAxisHi.init(dev);
+    jGeneric.init(dev);
 
-    sBodyA.init(dev); sBodyB.init(dev); sRA.init(dev); sRB.init(dev); sRest.init(dev); sStiffness.init(dev);
+    sBodyA.init(dev);
+    sBodyB.init(dev);
+    sRA.init(dev);
+    sRB.init(dev);
+    sRest.init(dev);
+    sStiffness.init(dev);
 
-    activeIdx.init(dev); activeFlags.init(dev); activeCounter.init(dev);
-    coarseAggOf.init(dev); coarseKeys.init(dev); coarseAcc.init(dev); coarseDelta.init(dev); coarseStats.init(dev);
-    touchCount.init(dev); touchHash.init(dev); snapCount.init(dev); snapHash.init(dev);
-    wakeRequest.init(dev); wakeSeed.init(dev); wakeAny.init(dev); wakeChanged.init(dev);
-    floodChanged.init(dev); islandSeed.init(dev); primalIndirect.init(dev); stepState.init(dev); m_gate.init(dev); m_gateCap.init(dev); mutIdxBuf.init(dev); mutDataBuf.init(dev);
-    readIdxBuf.init(dev); readDataBuf.init(dev); jwBuf.init(dev);
-    sleepCandidate.init(dev); sleepBlock.init(dev);
-    reportCounter.init(dev); reportRecords.init(dev); restSlots.init(dev);
+    activeIdx.init(dev);
+    activeFlags.init(dev);
+    activeCounter.init(dev);
+    coarseAggOf.init(dev);
+    coarseKeys.init(dev);
+    coarseAcc.init(dev);
+    coarseDelta.init(dev);
+    coarseStats.init(dev);
+    touchCount.init(dev);
+    touchHash.init(dev);
+    snapCount.init(dev);
+    snapHash.init(dev);
+    wakeRequest.init(dev);
+    wakeSeed.init(dev);
+    wakeAny.init(dev);
+    wakeChanged.init(dev);
+    floodChanged.init(dev);
+    islandSeed.init(dev);
+    primalIndirect.init(dev);
+    stepState.init(dev);
+    m_gate.init(dev);
+    m_gateCap.init(dev);
+    mutIdxBuf.init(dev);
+    mutDataBuf.init(dev);
+    readIdxBuf.init(dev);
+    readDataBuf.init(dev);
+    jwBuf.init(dev);
+    sleepCandidate.init(dev);
+    sleepBlock.init(dev);
+    reportCounter.init(dev);
+    reportRecords.init(dev);
+    restSlots.init(dev);
 
-    instances.init(dev); debugInstances.init(dev);
-    frustumBuf.init(dev); shapeBaseBuf.init(dev); shapeVisBuf.init(dev);
-    visibleCounterBuf.init(dev); debugCounterBuf.init(dev);
+    instances.init(dev);
+    debugInstances.init(dev);
+    frustumBuf.init(dev);
+    shapeBaseBuf.init(dev);
+    shapeVisBuf.init(dev);
+    visibleCounterBuf.init(dev);
+    debugCounterBuf.init(dev);
     groupIdx.init(dev);
-    overlayLoad.init(dev); overlayPush.init(dev); overlayPull.init(dev); overlayStress.init(dev);
-    overlayCone.init(dev); overlayPen.init(dev); overlayJointDeg.init(dev);
+    overlayLoad.init(dev);
+    overlayPush.init(dev);
+    overlayPull.init(dev);
+    overlayStress.init(dev);
+    overlayCone.init(dev);
+    overlayPen.init(dev);
+    overlayJointDeg.init(dev);
     shapeBaseBuf.resize(3 * sizeof(int32_t));
     shapeVisBuf.resize(3 * sizeof(int32_t));
     // writeInstances() uploads into this unconditionally when culling is on, so it
@@ -162,9 +246,14 @@ void VkWorld::init()
     frustumBuf.resize(24 * sizeof(float));
     visibleCounterBuf.resize(sizeof(int32_t));
     debugCounterBuf.resize(sizeof(int32_t));
-    dragBodies_.init(dev); dragTargets.init(dev); dragLocals.init(dev); dragStiffness.init(dev);
-    dragBodies_.resize(kMaxDragJoints * sizeof(int)); dragTargets.resize(kMaxDragJoints * sizeof(vec3));
-    dragLocals.resize(kMaxDragJoints * sizeof(vec3)); dragStiffness.resize(kMaxDragJoints * sizeof(float));
+    dragBodies_.init(dev);
+    dragTargets.init(dev);
+    dragLocals.init(dev);
+    dragStiffness.init(dev);
+    dragBodies_.resize(kMaxDragJoints * sizeof(int));
+    dragTargets.resize(kMaxDragJoints * sizeof(vec3));
+    dragLocals.resize(kMaxDragJoints * sizeof(vec3));
+    dragStiffness.resize(kMaxDragJoints * sizeof(float));
     dragStage.init(dev, kDragStageBytes, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, MappedBuffer::HostAccess::Write);
 
     m_init = true;
@@ -177,44 +266,128 @@ void VkWorld::reset()
     // vkAllocateMemory allocation outright -- this is the "does not grow across scene
     // reset" gate. Re-`init()`ing each Buffer with a fresh 0-byte state is enough;
     // build() will resize() them again on the next call.
-    pos.destroy(); rot.destroy(); initialLin.destroy(); initialAng.destroy();
-    inertialLin.destroy(); inertialAng.destroy();
-    velLin.destroy(); velAng.destroy(); prevVelLin.destroy();
-    halfExtents.destroy(); shapeType.destroy(); moment.destroy(); mass.destroy(); friction.destroy();
-    awake.destroy(); sleepTimer.destroy(); restPos.destroy(); restRot.destroy(); gyration.destroy();
+    pos.destroy();
+    rot.destroy();
+    initialLin.destroy();
+    initialAng.destroy();
+    inertialLin.destroy();
+    inertialAng.destroy();
+    velLin.destroy();
+    velAng.destroy();
+    prevVelLin.destroy();
+    halfExtents.destroy();
+    shapeType.destroy();
+    moment.destroy();
+    mass.destroy();
+    friction.destroy();
+    awake.destroy();
+    sleepTimer.destroy();
+    restPos.destroy();
+    restRot.destroy();
+    gyration.destroy();
     props.destroy();
-    dynamicIdx.destroy(); staticIdx.destroy(); ignorePairs.destroy();
-    gridIdx.destroy(); oversizeIdx.destroy();
-    shpBody.destroy(); shpLocalPos.destroy(); shpLocalRot.destroy(); shpHalf.destroy(); shpType.destroy();
-    shpFriction.destroy(); shpRestitution.destroy(); shpRolling.destroy(); shpCategory.destroy(); shpMask.destroy(); shpGroup.destroy(); shpFlags.destroy();
+    dynamicIdx.destroy();
+    staticIdx.destroy();
+    ignorePairs.destroy();
+    gridIdx.destroy();
+    oversizeIdx.destroy();
+    shpBody.destroy();
+    shpLocalPos.destroy();
+    shpLocalRot.destroy();
+    shpHalf.destroy();
+    shpType.destroy();
+    shpFriction.destroy();
+    shpRestitution.destroy();
+    shpRolling.destroy();
+    shpCategory.destroy();
+    shpMask.destroy();
+    shpGroup.destroy();
+    shpFlags.destroy();
     shpGeomOffset.destroy();
     // The geometry heap goes with the scene (the memory-reset gate), blobs and all.
-    geomHeap.destroy(); geomStage.destroy();
-    m_geomPending.clear(); m_geomCopies.clear(); m_geomIndex.clear(); m_geomSceneOffset.clear();
+    geomHeap.destroy();
+    geomStage.destroy();
+    m_geomPending.clear();
+    m_geomCopies.clear();
+    m_geomIndex.clear();
+    m_geomSceneOffset.clear();
     m_geomCursor = 0;
-    dynShapeIdx.destroy(); staticShapeIdx.destroy();
+    dynShapeIdx.destroy();
+    staticShapeIdx.destroy();
     ccd.release();
 
-    jBodyA.destroy(); jBodyB.destroy(); jRA.destroy(); jRB.destroy();
-    jC0Lin.destroy(); jC0Ang.destroy(); jPenaltyLin.destroy(); jPenaltyAng.destroy();
-    jLambdaLin.destroy(); jLambdaAng.destroy();
-    jStiffnessLin.destroy(); jStiffnessAng.destroy(); jFracture.destroy(); jFractureAng.destroy();
-    jTorqueArm.destroy(); jRestAng.destroy(); jBroken.destroy();
-    jFrameA.destroy(); jFrameB.destroy(); jAxisMode.destroy(); jAxisLo.destroy(); jAxisHi.destroy(); jGeneric.destroy();
+    jBodyA.destroy();
+    jBodyB.destroy();
+    jRA.destroy();
+    jRB.destroy();
+    jC0Lin.destroy();
+    jC0Ang.destroy();
+    jPenaltyLin.destroy();
+    jPenaltyAng.destroy();
+    jLambdaLin.destroy();
+    jLambdaAng.destroy();
+    jStiffnessLin.destroy();
+    jStiffnessAng.destroy();
+    jFracture.destroy();
+    jFractureAng.destroy();
+    jTorqueArm.destroy();
+    jRestAng.destroy();
+    jBroken.destroy();
+    jFrameA.destroy();
+    jFrameB.destroy();
+    jAxisMode.destroy();
+    jAxisLo.destroy();
+    jAxisHi.destroy();
+    jGeneric.destroy();
 
-    sBodyA.destroy(); sBodyB.destroy(); sRA.destroy(); sRB.destroy(); sRest.destroy(); sStiffness.destroy();
+    sBodyA.destroy();
+    sBodyB.destroy();
+    sRA.destroy();
+    sRB.destroy();
+    sRest.destroy();
+    sStiffness.destroy();
 
-    activeIdx.destroy(); activeFlags.destroy(); activeCounter.destroy();
-    coarseAggOf.destroy(); coarseKeys.destroy(); coarseAcc.destroy(); coarseDelta.destroy(); coarseStats.destroy();
-    touchCount.destroy(); touchHash.destroy(); snapCount.destroy(); snapHash.destroy();
-    wakeRequest.destroy(); wakeSeed.destroy(); wakeAny.destroy(); wakeChanged.destroy();
-    floodChanged.destroy(); islandSeed.destroy(); wakeReadout.destroy(); stepFlagReadout.destroy(); snapshotDestroy(false); primalIndirect.destroy(); stepState.destroy(); m_gate.destroy(); m_gateCap.destroy(); mutIdxBuf.destroy(); mutDataBuf.destroy(); mutIdxStage.destroy(); mutDataStage.destroy();
-    jwBuf.destroy(); jwStage.destroy(); m_jwRecs.clear();
-    readIdxBuf.destroy(); readDataBuf.destroy();
-    m_mutBatches.clear(); m_mutIdx.clear(); m_mutData.clear();
+    activeIdx.destroy();
+    activeFlags.destroy();
+    activeCounter.destroy();
+    coarseAggOf.destroy();
+    coarseKeys.destroy();
+    coarseAcc.destroy();
+    coarseDelta.destroy();
+    coarseStats.destroy();
+    touchCount.destroy();
+    touchHash.destroy();
+    snapCount.destroy();
+    snapHash.destroy();
+    wakeRequest.destroy();
+    wakeSeed.destroy();
+    wakeAny.destroy();
+    wakeChanged.destroy();
+    floodChanged.destroy();
+    islandSeed.destroy();
+    wakeReadout.destroy();
+    stepFlagReadout.destroy();
+    snapshotDestroy(false);
+    primalIndirect.destroy();
+    stepState.destroy();
+    m_gate.destroy();
+    m_gateCap.destroy();
+    mutIdxBuf.destroy();
+    mutDataBuf.destroy();
+    mutIdxStage.destroy();
+    mutDataStage.destroy();
+    jwBuf.destroy();
+    jwStage.destroy();
+    m_jwRecs.clear();
+    readIdxBuf.destroy();
+    readDataBuf.destroy();
+    m_mutBatches.clear();
+    m_mutIdx.clear();
+    m_mutData.clear();
     m_jwRecs.clear();
     m_seedsPending = false;
-    sleepCandidate.destroy(); sleepBlock.destroy();
+    sleepCandidate.destroy();
+    sleepBlock.destroy();
 
     // The phases' capacity-sized buffers and the sort scratch go too: reserve() and
     // the radix/scan ensure-paths rebuild them for the next scene, and without this a
@@ -227,10 +400,16 @@ void VkWorld::reset()
     radix.destroy();
     m_select.destroy();
 
-    instances.destroy(); debugInstances.destroy();
+    instances.destroy();
+    debugInstances.destroy();
     groupIdx.destroy();
-    overlayLoad.destroy(); overlayPush.destroy(); overlayPull.destroy(); overlayStress.destroy();
-    overlayCone.destroy(); overlayPen.destroy(); overlayJointDeg.destroy();
+    overlayLoad.destroy();
+    overlayPush.destroy();
+    overlayPull.destroy();
+    overlayStress.destroy();
+    overlayCone.destroy();
+    overlayPen.destroy();
+    overlayJointDeg.destroy();
     m_instanceCount = m_debugInstanceCount = m_debugRequested = 0;
     m_groupBase.clear();
     m_groupVisible.clear();
@@ -255,10 +434,17 @@ void VkWorld::destroy()
     if (!m_init)
         return;
     reset();
-    instances.destroy(); debugInstances.destroy();
-    frustumBuf.destroy(); shapeBaseBuf.destroy(); shapeVisBuf.destroy();
-    visibleCounterBuf.destroy(); debugCounterBuf.destroy();
-    dragBodies_.destroy(); dragTargets.destroy(); dragLocals.destroy(); dragStiffness.destroy();
+    instances.destroy();
+    debugInstances.destroy();
+    frustumBuf.destroy();
+    shapeBaseBuf.destroy();
+    shapeVisBuf.destroy();
+    visibleCounterBuf.destroy();
+    debugCounterBuf.destroy();
+    dragBodies_.destroy();
+    dragTargets.destroy();
+    dragLocals.destroy();
+    dragStiffness.destroy();
     dragStage.destroy();
     radix.destroy();
     m_select.destroy();
@@ -277,7 +463,10 @@ void VkWorld::destroy()
     ccd.destroy();
     restPl.destroy();
     restSlots.destroy();
-    reportCounter.destroy(); reportRecords.destroy(); reportCountReadout.destroy(); reportRecReadout.destroy();
+    reportCounter.destroy();
+    reportRecords.destroy();
+    reportCountReadout.destroy();
+    reportRecReadout.destroy();
     sleepPl.destroy();
     solverPl.destroy();
     csPl.destroy();
@@ -309,42 +498,66 @@ void VkWorld::reserve(int bodyCap, int jointCap, int springCap, int pairCap, int
 {
     auto vb = [](Buffer &b, size_t bytes) { b.resize((VkDeviceSize)bytes); };
 
-    vb(pos, bodyCap * sizeof(vec3)); vb(rot, bodyCap * sizeof(quat));
-    vb(initialLin, bodyCap * sizeof(vec3)); vb(initialAng, bodyCap * sizeof(quat));
-    vb(inertialLin, bodyCap * sizeof(vec3)); vb(inertialAng, bodyCap * sizeof(quat));
-    vb(velLin, bodyCap * sizeof(vec3)); vb(velAng, bodyCap * sizeof(vec3)); vb(prevVelLin, bodyCap * sizeof(vec3));
-    vb(halfExtents, bodyCap * sizeof(vec3)); vb(shapeType, bodyCap * sizeof(unsigned char));
+    vb(pos, bodyCap * sizeof(vec3));
+    vb(rot, bodyCap * sizeof(quat));
+    vb(initialLin, bodyCap * sizeof(vec3));
+    vb(initialAng, bodyCap * sizeof(quat));
+    vb(inertialLin, bodyCap * sizeof(vec3));
+    vb(inertialAng, bodyCap * sizeof(quat));
+    vb(velLin, bodyCap * sizeof(vec3));
+    vb(velAng, bodyCap * sizeof(vec3));
+    vb(prevVelLin, bodyCap * sizeof(vec3));
+    vb(halfExtents, bodyCap * sizeof(vec3));
+    vb(shapeType, bodyCap * sizeof(unsigned char));
     vb(moment, bodyCap * sizeof(vec3));
-    vb(mass, bodyCap * sizeof(float)); vb(friction, bodyCap * sizeof(float));
-    vb(awake, bodyCap * sizeof(unsigned char)); vb(sleepTimer, bodyCap * sizeof(int));
-    vb(restPos, bodyCap * sizeof(vec3)); vb(restRot, bodyCap * sizeof(quat));
+    vb(mass, bodyCap * sizeof(float));
+    vb(friction, bodyCap * sizeof(float));
+    vb(awake, bodyCap * sizeof(unsigned char));
+    vb(sleepTimer, bodyCap * sizeof(int));
+    vb(restPos, bodyCap * sizeof(vec3));
+    vb(restRot, bodyCap * sizeof(quat));
     vb(gyration, bodyCap * sizeof(vec3));
     vb(props, bodyCap * sizeof(BodyProps));
-    vb(dynamicIdx, bodyCap * sizeof(int)); vb(staticIdx, bodyCap * sizeof(int));
-    vb(gridIdx, shapeCap * sizeof(int)); vb(oversizeIdx, kMaxOversizeBodies * sizeof(int));
-    vb(dynShapeIdx, shapeCap * sizeof(int)); vb(staticShapeIdx, shapeCap * sizeof(int));
+    vb(dynamicIdx, bodyCap * sizeof(int));
+    vb(staticIdx, bodyCap * sizeof(int));
+    vb(gridIdx, shapeCap * sizeof(int));
+    vb(oversizeIdx, kMaxOversizeBodies * sizeof(int));
+    vb(dynShapeIdx, shapeCap * sizeof(int));
+    vb(staticShapeIdx, shapeCap * sizeof(int));
     vb(shpBody, shapeCap * sizeof(int));
-    vb(shpLocalPos, shapeCap * sizeof(vec3)); vb(shpLocalRot, shapeCap * sizeof(quat));
-    vb(shpHalf, shapeCap * sizeof(vec3)); vb(shpType, shapeCap * sizeof(unsigned char));
+    vb(shpLocalPos, shapeCap * sizeof(vec3));
+    vb(shpLocalRot, shapeCap * sizeof(quat));
+    vb(shpHalf, shapeCap * sizeof(vec3));
+    vb(shpType, shapeCap * sizeof(unsigned char));
     vb(shpFriction, shapeCap * sizeof(float));
-    vb(shpRestitution, shapeCap * sizeof(float)); vb(shpRolling, shapeCap * sizeof(float));
-    vb(shpCategory, shapeCap * sizeof(uint64_t)); vb(shpMask, shapeCap * sizeof(uint64_t));
-    vb(shpGroup, shapeCap * sizeof(int)); vb(shpFlags, shapeCap * sizeof(unsigned));
+    vb(shpRestitution, shapeCap * sizeof(float));
+    vb(shpRolling, shapeCap * sizeof(float));
+    vb(shpCategory, shapeCap * sizeof(uint64_t));
+    vb(shpMask, shapeCap * sizeof(uint64_t));
+    vb(shpGroup, shapeCap * sizeof(int));
+    vb(shpFlags, shapeCap * sizeof(unsigned));
     vb(shpGeomOffset, shapeCap * sizeof(unsigned));
 
-    vb(activeIdx, bodyCap * sizeof(int)); vb(activeFlags, bodyCap * sizeof(unsigned char));
+    vb(activeIdx, bodyCap * sizeof(int));
+    vb(activeFlags, bodyCap * sizeof(unsigned char));
     vb(activeCounter, sizeof(int));
     sizeCoarse(bodyCap);
-    vb(touchCount, bodyCap * sizeof(int)); vb(touchHash, bodyCap * sizeof(unsigned int));
-    vb(snapCount, bodyCap * sizeof(int)); vb(snapHash, bodyCap * sizeof(unsigned int));
-    vb(wakeRequest, bodyCap * sizeof(unsigned char)); vb(wakeSeed, bodyCap * sizeof(unsigned char));
-    vb(wakeAny, sizeof(int)); vb(wakeChanged, kIslandMaxRounds * sizeof(int));
-    vb(floodChanged, kFloodMaxRounds * sizeof(int)); vb(islandSeed, bodyCap * sizeof(unsigned char));
+    vb(touchCount, bodyCap * sizeof(int));
+    vb(touchHash, bodyCap * sizeof(unsigned int));
+    vb(snapCount, bodyCap * sizeof(int));
+    vb(snapHash, bodyCap * sizeof(unsigned int));
+    vb(wakeRequest, bodyCap * sizeof(unsigned char));
+    vb(wakeSeed, bodyCap * sizeof(unsigned char));
+    vb(wakeAny, sizeof(int));
+    vb(wakeChanged, kIslandMaxRounds * sizeof(int));
+    vb(floodChanged, kFloodMaxRounds * sizeof(int));
+    vb(islandSeed, bodyCap * sizeof(unsigned char));
     if (!wakeReadout.mapped())
         wakeReadout.init(dev, (VkDeviceSize)(1 + kFloodMaxRounds + kIslandMaxRounds) * sizeof(int32_t),
                          VK_BUFFER_USAGE_TRANSFER_DST_BIT, MappedBuffer::HostAccess::Read);
     if (!stepFlagReadout.mapped())
-        stepFlagReadout.init(dev, 2 * sizeof(int32_t), VK_BUFFER_USAGE_TRANSFER_DST_BIT, MappedBuffer::HostAccess::Read);
+        stepFlagReadout.init(dev, 2 * sizeof(int32_t), VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                             MappedBuffer::HostAccess::Read);
     primalIndirect.resize((VkDeviceSize)AVBD_MAX_COLORS_VK * 3 * sizeof(uint32_t), VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT);
     if (stepState.size() == 0)
         stepState.resize(16);
@@ -352,23 +565,37 @@ void VkWorld::reserve(int bodyCap, int jointCap, int springCap, int pairCap, int
     vb(sleepBlock, bodyCap * sizeof(unsigned char));
 
     int jc = std::max(jointCap, 1);
-    vb(jBodyA, jc * sizeof(int)); vb(jBodyB, jc * sizeof(int));
-    vb(jRA, jc * sizeof(vec3)); vb(jRB, jc * sizeof(vec3));
-    vb(jC0Lin, jc * sizeof(vec3)); vb(jC0Ang, jc * sizeof(vec3));
-    vb(jPenaltyLin, jc * sizeof(vec3)); vb(jPenaltyAng, jc * sizeof(vec3));
-    vb(jLambdaLin, jc * sizeof(vec3)); vb(jLambdaAng, jc * sizeof(vec3));
-    vb(jStiffnessLin, jc * sizeof(float)); vb(jStiffnessAng, jc * sizeof(float));
-    vb(jFracture, jc * sizeof(float)); vb(jFractureAng, jc * sizeof(float)); vb(jTorqueArm, jc * sizeof(float));
-    vb(jRestAng, jc * sizeof(quat)); vb(jBroken, jc * sizeof(unsigned char));
-    vb(jFrameA, jc * sizeof(quat)); vb(jFrameB, jc * sizeof(quat));
+    vb(jBodyA, jc * sizeof(int));
+    vb(jBodyB, jc * sizeof(int));
+    vb(jRA, jc * sizeof(vec3));
+    vb(jRB, jc * sizeof(vec3));
+    vb(jC0Lin, jc * sizeof(vec3));
+    vb(jC0Ang, jc * sizeof(vec3));
+    vb(jPenaltyLin, jc * sizeof(vec3));
+    vb(jPenaltyAng, jc * sizeof(vec3));
+    vb(jLambdaLin, jc * sizeof(vec3));
+    vb(jLambdaAng, jc * sizeof(vec3));
+    vb(jStiffnessLin, jc * sizeof(float));
+    vb(jStiffnessAng, jc * sizeof(float));
+    vb(jFracture, jc * sizeof(float));
+    vb(jFractureAng, jc * sizeof(float));
+    vb(jTorqueArm, jc * sizeof(float));
+    vb(jRestAng, jc * sizeof(quat));
+    vb(jBroken, jc * sizeof(unsigned char));
+    vb(jFrameA, jc * sizeof(quat));
+    vb(jFrameB, jc * sizeof(quat));
     vb(jAxisMode, jc * 6 * sizeof(unsigned char));
-    vb(jAxisLo, jc * 6 * sizeof(float)); vb(jAxisHi, jc * 6 * sizeof(float));
+    vb(jAxisLo, jc * 6 * sizeof(float));
+    vb(jAxisHi, jc * 6 * sizeof(float));
     vb(jGeneric, jc * sizeof(unsigned char));
 
     int sc = std::max(springCap, 1);
-    vb(sBodyA, sc * sizeof(int)); vb(sBodyB, sc * sizeof(int));
-    vb(sRA, sc * sizeof(vec3)); vb(sRB, sc * sizeof(vec3));
-    vb(sRest, sc * sizeof(float)); vb(sStiffness, sc * sizeof(float));
+    vb(sBodyA, sc * sizeof(int));
+    vb(sBodyB, sc * sizeof(int));
+    vb(sRA, sc * sizeof(vec3));
+    vb(sRB, sc * sizeof(vec3));
+    vb(sRest, sc * sizeof(float));
+    vb(sStiffness, sc * sizeof(float));
 
     broad.reserve(shapeCap, std::max(pairCap, 1));
     narrow.reserve(std::max(pairCap, 1), std::max(contactCap, 1));
@@ -608,7 +835,8 @@ uint32_t VkWorld::addGeometry(const void *blob, uint32_t bytes, uint64_t hash)
     if (geomStage.size() < m_geomPending.size())
     {
         // Between steps, so nothing in flight reads the old stage.
-        const VkDeviceSize cap = std::max<VkDeviceSize>(m_geomPending.size(), std::max<VkDeviceSize>(geomStage.size() * 2, 1u << 16));
+        const VkDeviceSize cap =
+            std::max<VkDeviceSize>(m_geomPending.size(), std::max<VkDeviceSize>(geomStage.size() * 2, 1u << 16));
         geomStage.destroy();
         geomStage.init(dev, cap, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, MappedBuffer::HostAccess::Write);
     }
@@ -657,7 +885,8 @@ void VkWorld::uploadJoints(const SceneDesc &scene)
     // values for a drag slot: world anchor, bodyB 0, infinite fracture.
     std::vector<int> dragA(kMaxDragJoints, -1), dragB(kMaxDragJoints, 0);
     std::vector<vec3> dragZeroV(kMaxDragJoints, vec3{0, 0, 0});
-    std::vector<float> dragZeroF(kMaxDragJoints, 0.0f), dragInf(kMaxDragJoints, INFINITY), dragNeg(kMaxDragJoints, -1.0f);
+    std::vector<float> dragZeroF(kMaxDragJoints, 0.0f), dragInf(kMaxDragJoints, INFINITY),
+        dragNeg(kMaxDragJoints, -1.0f);
     std::vector<quat> dragIdentQ(kMaxDragJoints, quat{0, 0, 0, 1});
     std::vector<unsigned char> dragGeneric(kMaxDragJoints, 0);
     const size_t j0 = m_jointCount;
@@ -1043,20 +1272,35 @@ void VkWorld::snapshotDestroy(bool all)
     }
 }
 
-
 RestitutionArgsGpu VkWorld::restitutionArgs(int slots, const ConstraintGraphGpu &g)
 {
     const VkManifoldSet cur = narrow.pendingOutput();
     RestitutionArgsGpu a{};
-    a.pos = pos.address(); a.rot = rot.address(); a.velLin = velLin.address(); a.velAng = velAng.address();
-    a.mass = mass.address(); a.moment = moment.address(); a.props = props.address();
-    a.bodyA = cur.bodyA; a.bodyB = cur.bodyB; a.basis = cur.basis;
-    a.contactOffset = cur.contactOffset; a.contactCount = cur.contactCount;
-    a.rA = cur.rA; a.rB = cur.rB; a.lambda = cur.lambda;
-    a.gKey = g.key; a.gIsA = g.isA; a.gStart = g.start; a.gEnd = g.end;
-    a.dyn = dynamicIdx.address(); a.dynCount = (uint32_t)m_dynCount;
+    a.pos = pos.address();
+    a.rot = rot.address();
+    a.velLin = velLin.address();
+    a.velAng = velAng.address();
+    a.mass = mass.address();
+    a.moment = moment.address();
+    a.props = props.address();
+    a.bodyA = cur.bodyA;
+    a.bodyB = cur.bodyB;
+    a.basis = cur.basis;
+    a.contactOffset = cur.contactOffset;
+    a.contactCount = cur.contactCount;
+    a.rA = cur.rA;
+    a.rB = cur.rB;
+    a.lambda = cur.lambda;
+    a.gKey = g.key;
+    a.gIsA = g.isA;
+    a.gStart = g.start;
+    a.gEnd = g.end;
+    a.dyn = dynamicIdx.address();
+    a.dynCount = (uint32_t)m_dynCount;
     a.out = restSlots.address();
-    a.shapeA = cur.shapeA; a.shapeB = cur.shapeB; a.shpRestitution = shpRestitution.address();
+    a.shapeA = cur.shapeA;
+    a.shapeB = cur.shapeB;
+    a.shpRestitution = shpRestitution.address();
     a.slots = (uint32_t)slots;
     a.threshold = m_restitutionThreshold;
     return a;
@@ -1248,7 +1492,10 @@ void VkWorld::uploadScene(const SceneDesc &scene)
 
     // A new scene starts a new heap: the allocation is kept (it never shrinks), the contents
     // and the dedup table are not.
-    m_geomPending.clear(); m_geomCopies.clear(); m_geomIndex.clear(); m_geomSceneOffset.clear();
+    m_geomPending.clear();
+    m_geomCopies.clear();
+    m_geomIndex.clear();
+    m_geomSceneOffset.clear();
     m_geomCursor = 0;
     registerSceneGeometry(scene);
     m_anyShapeRestitution = false;
@@ -1259,7 +1506,9 @@ void VkWorld::uploadScene(const SceneDesc &scene)
     // Seeds are read by the explicit flood, so they must start clean (the capacity code's
     // resizeZeroed); nothing queued against a previous scene survives it either.
     wakeSeed.zero();
-    m_mutBatches.clear(); m_mutIdx.clear(); m_mutData.clear();
+    m_mutBatches.clear();
+    m_mutIdx.clear();
+    m_mutData.clear();
     m_jwRecs.clear();
     m_seedsPending = false;
     activeIdx.upload(scene.dynamicIdx.data(), m_dynCount * sizeof(int));
@@ -1310,12 +1559,12 @@ void VkWorld::append(const SceneDesc &scene)
     {
         const int oldCap = std::max(m_bodyCap, 1);
         const int cap = std::max(m_bodyCount, oldCap + oldCap / 2);
-        Buffer *bodyBufs[] = {&pos, &rot, &initialLin, &initialAng, &inertialLin, &inertialAng,
-                              &velLin, &velAng, &prevVelLin, &halfExtents, &shapeType, &moment,
-                              &mass, &friction, &awake, &sleepTimer, &restPos, &restRot, &gyration, &props,
-                              &dynamicIdx, &staticIdx, &activeIdx, &activeFlags, &touchCount,
-                              &touchHash, &snapCount, &snapHash, &wakeRequest, &wakeSeed,
-                              &islandSeed, &sleepCandidate, &sleepBlock};
+        Buffer *bodyBufs[] = {
+            &pos,         &rot,        &initialLin,  &initialAng,     &inertialLin, &inertialAng, &velLin,
+            &velAng,      &prevVelLin, &halfExtents, &shapeType,      &moment,      &mass,        &friction,
+            &awake,       &sleepTimer, &restPos,     &restRot,        &gyration,    &props,       &dynamicIdx,
+            &staticIdx,   &activeIdx,  &activeFlags, &touchCount,     &touchHash,   &snapCount,   &snapHash,
+            &wakeRequest, &wakeSeed,   &islandSeed,  &sleepCandidate, &sleepBlock};
         for (Buffer *b : bodyBufs)
             b->resizePreserve((b->size() / oldCap + 1) * cap);
         constraints.reserve(cap, std::max(m_manifoldCap, 1), m_jointCap + m_springCap);
@@ -1326,9 +1575,9 @@ void VkWorld::append(const SceneDesc &scene)
     {
         const int oldCap = std::max(m_shapeCap, 1);
         const int cap = std::max(m_shapeCount, oldCap + oldCap / 2);
-        Buffer *shapeBufs[] = {&shpBody, &shpLocalPos, &shpLocalRot, &shpHalf, &shpType, &shpFriction,
-                               &shpRestitution, &shpRolling, &shpCategory, &shpMask, &shpGroup, &shpFlags, &shpGeomOffset, &dynShapeIdx,
-                               &staticShapeIdx, &gridIdx};
+        Buffer *shapeBufs[] = {&shpBody,        &shpLocalPos, &shpLocalRot,    &shpHalf, &shpType,  &shpFriction,
+                               &shpRestitution, &shpRolling,  &shpCategory,    &shpMask, &shpGroup, &shpFlags,
+                               &shpGeomOffset,  &dynShapeIdx, &staticShapeIdx, &gridIdx};
         for (Buffer *b : shapeBufs)
             b->resizePreserve((b->size() / oldCap + 1) * cap);
         broad.reserve(cap, std::max(m_pairCap, 1));
@@ -1339,21 +1588,35 @@ void VkWorld::append(const SceneDesc &scene)
         const int jc = std::max(m_jointSlots, m_jointCap);
         const int sc = std::max(std::max(m_springCount, m_springCap), 1);
         auto vb = [](Buffer &b, size_t bytes) { b.resize((VkDeviceSize)bytes); };
-        vb(jBodyA, jc * sizeof(int)); vb(jBodyB, jc * sizeof(int));
-        vb(jRA, jc * sizeof(vec3)); vb(jRB, jc * sizeof(vec3));
-        vb(jC0Lin, jc * sizeof(vec3)); vb(jC0Ang, jc * sizeof(vec3));
-        vb(jPenaltyLin, jc * sizeof(vec3)); vb(jPenaltyAng, jc * sizeof(vec3));
-        vb(jLambdaLin, jc * sizeof(vec3)); vb(jLambdaAng, jc * sizeof(vec3));
-        vb(jStiffnessLin, jc * sizeof(float)); vb(jStiffnessAng, jc * sizeof(float));
-        vb(jFracture, jc * sizeof(float)); vb(jFractureAng, jc * sizeof(float)); vb(jTorqueArm, jc * sizeof(float));
-        vb(jRestAng, jc * sizeof(quat)); vb(jBroken, jc * sizeof(unsigned char));
-        vb(jFrameA, jc * sizeof(quat)); vb(jFrameB, jc * sizeof(quat));
+        vb(jBodyA, jc * sizeof(int));
+        vb(jBodyB, jc * sizeof(int));
+        vb(jRA, jc * sizeof(vec3));
+        vb(jRB, jc * sizeof(vec3));
+        vb(jC0Lin, jc * sizeof(vec3));
+        vb(jC0Ang, jc * sizeof(vec3));
+        vb(jPenaltyLin, jc * sizeof(vec3));
+        vb(jPenaltyAng, jc * sizeof(vec3));
+        vb(jLambdaLin, jc * sizeof(vec3));
+        vb(jLambdaAng, jc * sizeof(vec3));
+        vb(jStiffnessLin, jc * sizeof(float));
+        vb(jStiffnessAng, jc * sizeof(float));
+        vb(jFracture, jc * sizeof(float));
+        vb(jFractureAng, jc * sizeof(float));
+        vb(jTorqueArm, jc * sizeof(float));
+        vb(jRestAng, jc * sizeof(quat));
+        vb(jBroken, jc * sizeof(unsigned char));
+        vb(jFrameA, jc * sizeof(quat));
+        vb(jFrameB, jc * sizeof(quat));
         vb(jAxisMode, jc * 6 * sizeof(unsigned char));
-        vb(jAxisLo, jc * 6 * sizeof(float)); vb(jAxisHi, jc * 6 * sizeof(float));
+        vb(jAxisLo, jc * 6 * sizeof(float));
+        vb(jAxisHi, jc * 6 * sizeof(float));
         vb(jGeneric, jc * sizeof(unsigned char));
-        vb(sBodyA, sc * sizeof(int)); vb(sBodyB, sc * sizeof(int));
-        vb(sRA, sc * sizeof(vec3)); vb(sRB, sc * sizeof(vec3));
-        vb(sRest, sc * sizeof(float)); vb(sStiffness, sc * sizeof(float));
+        vb(sBodyA, sc * sizeof(int));
+        vb(sBodyB, sc * sizeof(int));
+        vb(sRA, sc * sizeof(vec3));
+        vb(sRB, sc * sizeof(vec3));
+        vb(sRest, sc * sizeof(float));
+        vb(sStiffness, sc * sizeof(float));
         constraints.reserve(m_bodyCap, std::max(m_manifoldCap, 1), jc + sc);
         m_jointCap = jc;
         m_springCap = sc;
@@ -1426,8 +1689,8 @@ void VkWorld::assertIdle(const char *who) const
 
 namespace
 {
-constexpr int kMaxCapAttempts = 5;   // the pass after this many capacity reruns commits clamped
-constexpr int kCapSlotsBase = 2048;  // phase 4 <= ~670 dispatches, phase 5 ~100 + JP rounds
+constexpr int kMaxCapAttempts = 5;  // the pass after this many capacity reruns commits clamped
+constexpr int kCapSlotsBase = 2048; // phase 4 <= ~670 dispatches, phase 5 ~100 + JP rounds
 // First zero slot + 1 (the convergence round), or 0 if every slot changed.
 int convergedAt(const int32_t *flags, int n)
 {
@@ -1442,7 +1705,8 @@ void VkWorld::recordPhase1()
 {
     StepCtx &S = m_step;
     const SolverParams &params = m_params;
-    CommandList &cmd = m_stepCmd; HostRingBuffer &ring = m_stepRing;
+    CommandList &cmd = m_stepCmd;
+    HostRingBuffer &ring = m_stepRing;
     auto &b = S.b;
     auto &j = S.j;
     auto &p = S.p;
@@ -1477,7 +1741,8 @@ void VkWorld::recordPhase1()
             mutDataBuf.resize(m_mutData.size());
         // Host-filled staging, landed by recorded copies (no submission of their own).
         // Every submission is waited, so regrowing here cannot free one in flight.
-        auto growStage = [&](MappedBuffer &stage, VkDeviceSize bytes) {
+        auto growStage = [&](MappedBuffer &stage, VkDeviceSize bytes)
+        {
             if (stage.size() >= bytes)
                 return;
             const VkDeviceSize cap = std::max<VkDeviceSize>(bytes, stage.size() * 2);
@@ -1495,14 +1760,19 @@ void VkWorld::recordPhase1()
         for (const MutBatch &batch : m_mutBatches)
         {
             MutateApplyArgsGpu ma{};
-            ma.b = b; ma.type = batch.type;
+            ma.b = b;
+            ma.type = batch.type;
             ma.idx = mutIdxBuf.address() + (VkDeviceAddress)batch.offset * sizeof(int);
             ma.data = mutDataBuf.address() + (VkDeviceAddress)batch.dataOffset;
-            ma.count = batch.count; ma.dt = params.dt; ma.seed = wakeSeed.address();
+            ma.count = batch.count;
+            ma.dt = params.dt;
+            ma.seed = wakeSeed.address();
             launchMutateApply(cmd, ring, mutatePl, ma, batch.count);
             cmd.barrier();
         }
-        m_mutBatches.clear(); m_mutIdx.clear(); m_mutData.clear();
+        m_mutBatches.clear();
+        m_mutIdx.clear();
+        m_mutData.clear();
     }
     // Joint row rewrites queued since the last step: one upload, one launch. Recorded after the
     // mutate batches and before joint init, which rebuilds each row's C0 from the new fields.
@@ -1541,21 +1811,38 @@ void VkWorld::recordPhase1()
         // jointsTotal-sized joint_init dispatch -- k_joint_init/jointInitialize()
         // itself is broken-agnostic, so this also (harmlessly) re-derives C0/kAuto
         // for a broken drag slot every step, exactly as VkWorld::step() does.
-        JointInitArgsGpu ja{}; ja.b = b; ja.j = j; ja.p = p;
+        JointInitArgsGpu ja{};
+        ja.b = b;
+        ja.j = j;
+        ja.p = p;
         launchJointInit(cmd, ring, solverPl, ja, m_jointSlots);
         cmd.barrier();
     }
     IntegrateBodySoAGpu ib{};
-    ib.pos = pos.address(); ib.rot = rot.address();
-    ib.initialLin = initialLin.address(); ib.initialAng = initialAng.address();
-    ib.inertialLin = inertialLin.address(); ib.inertialAng = inertialAng.address();
-    ib.velLin = velLin.address(); ib.velAng = velAng.address(); ib.prevVelLin = prevVelLin.address();
-    ib.mass = mass.address(); ib.awake = b.awake;
+    ib.pos = pos.address();
+    ib.rot = rot.address();
+    ib.initialLin = initialLin.address();
+    ib.initialAng = initialAng.address();
+    ib.inertialLin = inertialLin.address();
+    ib.inertialAng = inertialAng.address();
+    ib.velLin = velLin.address();
+    ib.velAng = velAng.address();
+    ib.prevVelLin = prevVelLin.address();
+    ib.mass = mass.address();
+    ib.awake = b.awake;
     ib.count = (uint32_t)m_bodyCount;
-    IntegrateArgsGpu ia{}; ia.b = ib; ia.p.dt = params.dt; ia.p.gravityX = params.gravity.x; ia.p.gravityY = params.gravity.y; ia.p.gravityZ = params.gravity.z;
+    IntegrateArgsGpu ia{};
+    ia.b = ib;
+    ia.p.dt = params.dt;
+    ia.p.gravityX = params.gravity.x;
+    ia.p.gravityY = params.gravity.y;
+    ia.p.gravityZ = params.gravity.z;
     if (m_anyProps)
     {
-        IntegratePropsArgsGpu pa{}; pa.b = ib; pa.p = ia.p; pa.props = props.address();
+        IntegratePropsArgsGpu pa{};
+        pa.b = ib;
+        pa.p = ia.p;
+        pa.props = props.address();
         launchIntegrateProps(cmd, ring, integratePl, pa, m_bodyCount);
     }
     else
@@ -1605,40 +1892,80 @@ void VkWorld::setupFront()
     auto &csr = S.csr;
     auto &phase4Done = S.phase4Done;
     auto &p4Fresh = S.p4Fresh;
-        const VkManifoldSet cur = narrow.pendingOutput();
-        slots = narrow.pendingSlots();
-        m = FullManifoldSoAGpu{};
-        m.key = cur.key; m.bodyA = cur.bodyA; m.bodyB = cur.bodyB; m.basis = cur.basis;
-        m.shapeA = cur.shapeA; m.shapeB = cur.shapeB;
-        m.friction = cur.friction; m.contactOffset = cur.contactOffset; m.contactCount = cur.contactCount;
-        // count/contactTotal are host bookkeeping no shader reads (every consumer walks
-        // `slots`, skipping contactCount <= 0): the record-time capacities stand in.
-        m.count = slots; m.capacity = slots;
-        m.feature = cur.feature; m.rA = cur.rA; m.rB = cur.rB; m.C0 = cur.C0;
-        m.penalty = cur.penalty; m.lambda = cur.lambda; m.stick = cur.stick;
-        m.contactTotal = m_contactCap; m.contactCapacity = m_contactCap;
-        wd = WakeDetectCall{}; fc = WakeFloodContactsArgsGpu{}; fj = WakeFloodJointsArgsGpu{};
-        fi = WakeFloodJointsArgsGpu{}; merge = WakeSeedMergeArgsGpu{}; mergeIsland = WakeSeedMergeArgsGpu{};
-        isArgs = WakeIslandSeedArgsGpu{};
-        floodDone = true; floodRec = islandRec = 0; floodBound = islandBound = 0;
-        phase4Done = !sleepOn; p4Fresh = true;
+    const VkManifoldSet cur = narrow.pendingOutput();
+    slots = narrow.pendingSlots();
+    m = FullManifoldSoAGpu{};
+    m.key = cur.key;
+    m.bodyA = cur.bodyA;
+    m.bodyB = cur.bodyB;
+    m.basis = cur.basis;
+    m.shapeA = cur.shapeA;
+    m.shapeB = cur.shapeB;
+    m.friction = cur.friction;
+    m.contactOffset = cur.contactOffset;
+    m.contactCount = cur.contactCount;
+    // count/contactTotal are host bookkeeping no shader reads (every consumer walks
+    // `slots`, skipping contactCount <= 0): the record-time capacities stand in.
+    m.count = slots;
+    m.capacity = slots;
+    m.feature = cur.feature;
+    m.rA = cur.rA;
+    m.rB = cur.rB;
+    m.C0 = cur.C0;
+    m.penalty = cur.penalty;
+    m.lambda = cur.lambda;
+    m.stick = cur.stick;
+    m.contactTotal = m_contactCap;
+    m.contactCapacity = m_contactCap;
+    wd = WakeDetectCall{};
+    fc = WakeFloodContactsArgsGpu{};
+    fj = WakeFloodJointsArgsGpu{};
+    fi = WakeFloodJointsArgsGpu{};
+    merge = WakeSeedMergeArgsGpu{};
+    mergeIsland = WakeSeedMergeArgsGpu{};
+    isArgs = WakeIslandSeedArgsGpu{};
+    floodDone = true;
+    floodRec = islandRec = 0;
+    floodBound = islandBound = 0;
+    phase4Done = !sleepOn;
+    p4Fresh = true;
     if (sleepOn)
     {
-        wd.clear.dyn = dynamicIdx.address(); wd.clear.dynCount = m_dynCount;
-        wd.clear.count = touchCount.address(); wd.clear.hash = touchHash.address();
-        wd.accum.b = b; wd.accum.m = m; wd.accum.slots = slots;
-        wd.accum.count = touchCount.address(); wd.accum.hash = touchHash.address();
-        wd.accumJ.b = b; wd.accumJ.j = j; wd.accumJ.sp = sp;
-        wd.accumJ.count = touchCount.address(); wd.accumJ.hash = touchHash.address();
-        wd.request.b = b; wd.request.m = m; wd.request.slots = slots;
-        wd.request.wakeLinVel = params.sleepLinVel; wd.request.wakeAngVel = params.sleepAngVel;
+        wd.clear.dyn = dynamicIdx.address();
+        wd.clear.dynCount = m_dynCount;
+        wd.clear.count = touchCount.address();
+        wd.clear.hash = touchHash.address();
+        wd.accum.b = b;
+        wd.accum.m = m;
+        wd.accum.slots = slots;
+        wd.accum.count = touchCount.address();
+        wd.accum.hash = touchHash.address();
+        wd.accumJ.b = b;
+        wd.accumJ.j = j;
+        wd.accumJ.sp = sp;
+        wd.accumJ.count = touchCount.address();
+        wd.accumJ.hash = touchHash.address();
+        wd.request.b = b;
+        wd.request.m = m;
+        wd.request.slots = slots;
+        wd.request.wakeLinVel = params.sleepLinVel;
+        wd.request.wakeAngVel = params.sleepAngVel;
         wd.request.request = wakeRequest.address();
-        wd.requestJ.b = b; wd.requestJ.j = j; wd.requestJ.sp = sp; wd.requestJ.request = wakeRequest.address();
-        wd.lostSupport.b = b; wd.lostSupport.dyn = dynamicIdx.address(); wd.lostSupport.dynCount = m_dynCount;
-        wd.lostSupport.count = touchCount.address(); wd.lostSupport.hash = touchHash.address();
-        wd.lostSupport.snapCount = snapCount.address(); wd.lostSupport.snapHash = snapHash.address();
+        wd.requestJ.b = b;
+        wd.requestJ.j = j;
+        wd.requestJ.sp = sp;
+        wd.requestJ.request = wakeRequest.address();
+        wd.lostSupport.b = b;
+        wd.lostSupport.dyn = dynamicIdx.address();
+        wd.lostSupport.dynCount = m_dynCount;
+        wd.lostSupport.count = touchCount.address();
+        wd.lostSupport.hash = touchHash.address();
+        wd.lostSupport.snapCount = snapCount.address();
+        wd.lostSupport.snapHash = snapHash.address();
         wd.lostSupport.request = wakeRequest.address();
-        wd.dynCount = m_dynCount; wd.slots = slots; wd.edgeCount = edgeCount;
+        wd.dynCount = m_dynCount;
+        wd.slots = slots;
+        wd.edgeCount = edgeCount;
 
         // Phase 4 is recorded blind to a bound (the last step's convergence round + 2, at
         // least 4) instead of looping on a readback. Each round flags into its own slot,
@@ -1652,16 +1979,28 @@ void VkWorld::setupFront()
         // that set's closure -- a first-pass partial wake only ever adds bodies of the
         // final closure, and WakeApply is idempotent -- so it closes to the same set.
         // At a cap the merge is ungated, as the old loops merged whatever they had.
-        fc.b = b; fc.m = m; fc.slots = slots; fc.seed = wakeSeed.address();
-        fj.b = b; fj.j = j; fj.sp = sp; fj.seed = wakeSeed.address();
+        fc.b = b;
+        fc.m = m;
+        fc.slots = slots;
+        fc.seed = wakeSeed.address();
+        fj.b = b;
+        fj.j = j;
+        fj.sp = sp;
+        fj.seed = wakeSeed.address();
         fi = fj;
         fi.seed = islandSeed.address();
-        merge.dyn = dynamicIdx.address(); merge.dynCount = m_dynCount;
-        merge.seed = wakeSeed.address(); merge.request = wakeRequest.address();
+        merge.dyn = dynamicIdx.address();
+        merge.dynCount = m_dynCount;
+        merge.seed = wakeSeed.address();
+        merge.request = wakeRequest.address();
         mergeIsland = merge;
         mergeIsland.seed = islandSeed.address();
-        isArgs.b = b; isArgs.dyn = dynamicIdx.address(); isArgs.dynCount = m_dynCount;
-        isArgs.request = wakeRequest.address(); isArgs.seed = islandSeed.address(); isArgs.any = wakeAny.address();
+        isArgs.b = b;
+        isArgs.dyn = dynamicIdx.address();
+        isArgs.dynCount = m_dynCount;
+        isArgs.request = wakeRequest.address();
+        isArgs.seed = islandSeed.address();
+        isArgs.any = wakeAny.address();
 
         floodDone = !seedsPendingAtStart;
         m_seedsPending = false;
@@ -1678,16 +2017,25 @@ void VkWorld::setupFront()
         // (Wake seeds were already zeroed in phase 1 if pending.)
     }
 
-    cmr.bodyA = m.bodyA; cmr.bodyB = m.bodyB; cmr.contactCount = m.contactCount; cmr.slots = slots;
-    cjr.bodyA = j.bodyA; cjr.bodyB = j.bodyB; cjr.broken = j.broken; cjr.count = m_jointSlots;
-    csr.bodyA = sp.bodyA; csr.bodyB = sp.bodyB; csr.count = m_springCount;
+    cmr.bodyA = m.bodyA;
+    cmr.bodyB = m.bodyB;
+    cmr.contactCount = m.contactCount;
+    cmr.slots = slots;
+    cjr.bodyA = j.bodyA;
+    cjr.bodyB = j.bodyB;
+    cjr.broken = j.broken;
+    cjr.count = m_jointSlots;
+    csr.bodyA = sp.bodyA;
+    csr.bodyB = sp.bodyB;
+    csr.count = m_springCount;
 }
 
 void VkWorld::recordAndSubmitPass()
 {
     StepCtx &S = m_step;
     const SolverParams &params = m_params;
-    CommandList &cmd = m_stepCmd; HostRingBuffer &ring = m_stepRing;
+    CommandList &cmd = m_stepCmd;
+    HostRingBuffer &ring = m_stepRing;
     auto &b = S.b;
     auto &j = S.j;
     auto &sp = S.sp;
@@ -1738,8 +2086,8 @@ void VkWorld::recordAndSubmitPass()
     // Everything that can reallocate is grown before the first recorded command.
     // +25: the tail's fixed dispatches.
     const int coarseIters = std::min(std::max(params.coarseIterations, 0), params.iterations);
-    const int gateSlots = params.iterations * (colorBound + 2) + 25
-                          + 24 * coarseIters + 2; // coarse: reset, assign, 8 parities x 3
+    const int gateSlots =
+        params.iterations * (colorBound + 2) + 25 + 24 * coarseIters + 2; // coarse: reset, assign, 8 parities x 3
     // Reserved for the worst-case colour / JP-round bounds, not this pass's: a bound
     // that grows between steps must not allocate.
     m_gate.reserve(params.iterations * (AVBD_MAX_COLORS_VK + 2) + 24 + 128 + 24 * params.iterations + 2);
@@ -1764,11 +2112,12 @@ void VkWorld::recordAndSubmitPass()
         const bool last = capAttempt >= kMaxCapAttempts;
         cmd.writeTimestamp(0);
         BroadphaseOversize bo;
-        bo.gridIdx = &gridIdx; bo.gridCount = m_gridCount;
-        bo.oversizeIdx = &oversizeIdx; bo.oversizeCount = m_oversizeCount;
-        broad.record(cmd, ring, bphPl, primPl, radix, pos.address(), rot.address(), broadphaseShapes(),
-                     dynShapeIdx, m_dynShapeCount, staticShapeIdx, m_staticShapeCount, m_gridCell,
-                     &ignorePairs, m_ignoreCount, &bo);
+        bo.gridIdx = &gridIdx;
+        bo.gridCount = m_gridCount;
+        bo.oversizeIdx = &oversizeIdx;
+        bo.oversizeCount = m_oversizeCount;
+        broad.record(cmd, ring, bphPl, primPl, radix, pos.address(), rot.address(), broadphaseShapes(), dynShapeIdx,
+                     m_dynShapeCount, staticShapeIdx, m_staticShapeCount, m_gridCell, &ignorePairs, m_ignoreCount, &bo);
         cmd.barrier();
         cmd.writeTimestamp(1);
         if (S.hasMeshes && narrow.childCapacity() == 0)
@@ -1778,7 +2127,7 @@ void VkWorld::recordAndSubmitPass()
             syncManifoldCap();
         }
         narrow.record(cmd, ring, npPl, npb, broad.pairs(), broad.capacity(), &broad.counter(), npp,
-                     S.hasHulls ? &S.nph : nullptr, S.hasMeshes ? &S.nmh : nullptr);
+                      S.hasHulls ? &S.nph : nullptr, S.hasMeshes ? &S.nmh : nullptr);
         cmd.writeTimestamp(2);
         broad.recordReadout(cmd);
         narrow.recordReadout(cmd);
@@ -1831,8 +2180,8 @@ void VkWorld::recordAndSubmitPass()
             if (p4First)
                 cmd.fill(floodChanged, 0u);
             const int more = p4First ? floodBound : std::min(floodRec, kFloodMaxRounds - floodRec);
-            recordWakeFloodRounds(cmd, ring, mutatePl, fc, fj, slots, edgeCount, floodChanged.address(),
-                                  floodRec, more);
+            recordWakeFloodRounds(cmd, ring, mutatePl, fc, fj, slots, edgeCount, floodChanged.address(), floodRec,
+                                  more);
             floodRec += more;
             merge.gate = floodRec < kFloodMaxRounds
                              ? floodChanged.address() + (VkDeviceAddress)(floodRec - 1) * sizeof(int32_t)
@@ -1854,15 +2203,16 @@ void VkWorld::recordAndSubmitPass()
                 launchWakeIslandSeed(cmd, ring, wakePl, isArgs, m_dynCount);
                 cmd.barrier();
                 cmd.fill(wakeChanged, 0u);
-                islandMore = p4First ? islandBound : std::max(islandBound, std::min(2 * islandRec, (int)kIslandMaxRounds));
+                islandMore =
+                    p4First ? islandBound : std::max(islandBound, std::min(2 * islandRec, (int)kIslandMaxRounds));
             }
             else
             {
                 islandFirst = islandRec;
                 islandMore = std::min(islandRec, kIslandMaxRounds - islandRec);
             }
-            recordWakeFloodRounds(cmd, ring, mutatePl, fc, fi, 0, edgeCount, wakeChanged.address(),
-                                  islandFirst, islandMore);
+            recordWakeFloodRounds(cmd, ring, mutatePl, fc, fi, 0, edgeCount, wakeChanged.address(), islandFirst,
+                                  islandMore);
             islandRec = islandFirst + islandMore;
             mergeIsland.gate = islandRec < kIslandMaxRounds
                                    ? wakeChanged.address() + (VkDeviceAddress)(islandRec - 1) * sizeof(int32_t)
@@ -1872,12 +2222,18 @@ void VkWorld::recordAndSubmitPass()
         }
 
         WakeApplyArgsGpu wa{};
-        wa.b = b; wa.dyn = dynamicIdx.address(); wa.dynCount = m_dynCount; wa.request = wakeRequest.address();
+        wa.b = b;
+        wa.dyn = dynamicIdx.address();
+        wa.dynCount = m_dynCount;
+        wa.request = wakeRequest.address();
         launchWakeApply(cmd, ring, wakePl, wa, m_dynCount);
         cmd.barrier();
 
         ActiveFlagsArgsGpu af{};
-        af.b = b; af.dyn = dynamicIdx.address(); af.dynCount = m_dynCount; af.flags = activeFlags.address();
+        af.b = b;
+        af.dyn = dynamicIdx.address();
+        af.dynCount = m_dynCount;
+        af.flags = activeFlags.address();
         launchActiveFlags(cmd, ring, sleepPl, af, m_dynCount);
         cmd.barrier();
         selectFlagged(cmd, ring, primPl, m_select, dynamicIdx, activeFlags, activeIdx, activeCounter,
@@ -1897,8 +2253,7 @@ void VkWorld::recordAndSubmitPass()
 
         cmd.copyToHost(activeCounter, wakeReadout, sizeof(int32_t));
         if (floodThisPass)
-            cmd.copyToHost(floodChanged, wakeReadout, (VkDeviceSize)floodRec * sizeof(int32_t), 0,
-                           sizeof(int32_t));
+            cmd.copyToHost(floodChanged, wakeReadout, (VkDeviceSize)floodRec * sizeof(int32_t), 0, sizeof(int32_t));
         if (edgeCount > 0)
             cmd.copyToHost(wakeChanged, wakeReadout, (VkDeviceSize)islandRec * sizeof(int32_t), 0,
                            (VkDeviceSize)(1 + kFloodMaxRounds) * sizeof(int32_t));
@@ -1910,8 +2265,7 @@ void VkWorld::recordAndSubmitPass()
     const int recordedJp = constraints.recordBuild(cmd, ring, csPl, primPl, radix, cbr, cmr, cjr, csr, activeIdx,
                                                    m_dynCount, activeCounter.address(), jpRounds);
     if (m_dynCount > 0 && recordedJp > 0 && recordedJp < VkConstraints::kMaxJpRounds)
-        launchStepFlagIfSet(cmd, ring, solverPl, constraints.remainingSlotAddr(recordedJp - 1),
-                            stepState.address());
+        launchStepFlagIfSet(cmd, ring, solverPl, constraints.remainingSlotAddr(recordedJp - 1), stepState.address());
     if (colorBound < AVBD_MAX_COLORS_VK)
         launchStepColorBound(cmd, ring, solverPl, constraints.colorStartAddr(), constraints.colorEndAddr(),
                              stepState.address(), colorBound, AVBD_MAX_COLORS_VK);
@@ -1922,7 +2276,10 @@ void VkWorld::recordAndSubmitPass()
 
     VkConstraintGraph gRaw = constraints.graph();
     ConstraintGraphGpu g{};
-    g.key = gRaw.key; g.isA = gRaw.isA; g.start = gRaw.start; g.end = gRaw.end;
+    g.key = gRaw.key;
+    g.isA = gRaw.isA;
+    g.start = gRaw.start;
+    g.end = gRaw.end;
 
     const bool restitutionOn = (m_anyRestitution || m_anyShapeRestitution) && slots > 0;
     if (restitutionOn)
@@ -1949,8 +2306,7 @@ void VkWorld::recordAndSubmitPass()
     // run (the coarse correction, thread-per-body primal) keeps the
     // multi-dispatch path below, as does a world past the workgroup's reach.
     const bool fusedIter = smallWorldEnabled() && warp4 && params.iterations > 0 && coarseIters == 0 &&
-                           m_dynCount > 0 &&
-                           m_dynCount <= kFusedIterMaxBodies && slots <= kFusedIterMaxManifoldSlots &&
+                           m_dynCount > 0 && m_dynCount <= kFusedIterMaxBodies && slots <= kFusedIterMaxManifoldSlots &&
                            m_jointSlots <= kFusedIterMaxJointSlots;
     m_lastFusedIter = fusedIter;
     if (fusedIter)
@@ -1973,13 +2329,25 @@ void VkWorld::recordAndSubmitPass()
     CoarseArgsGpu ca{};
     if (coarseIters > 0)
     {
-        ca.pa.b = b; ca.pa.g = g; ca.pa.m = m; ca.pa.joints = j; ca.pa.springs = sp; ca.pa.p = p;
-        ca.active = activeIdx.address(); ca.activeCount = activeCounter.address();
-        ca.aggOf = coarseAggOf.address(); ca.keys = coarseKeys.address();
-        ca.acc = coarseAcc.address(); ca.delta = coarseDelta.address(); ca.stats = coarseStats.address();
-        ca.maxActive = m_dynCount; ca.bodyCount = m_bodyCount; ca.tableSize = m_coarseTable;
+        ca.pa.b = b;
+        ca.pa.g = g;
+        ca.pa.m = m;
+        ca.pa.joints = j;
+        ca.pa.springs = sp;
+        ca.pa.p = p;
+        ca.active = activeIdx.address();
+        ca.activeCount = activeCounter.address();
+        ca.aggOf = coarseAggOf.address();
+        ca.keys = coarseKeys.address();
+        ca.acc = coarseAcc.address();
+        ca.delta = coarseDelta.address();
+        ca.stats = coarseStats.address();
+        ca.maxActive = m_dynCount;
+        ca.bodyCount = m_bodyCount;
+        ca.tableSize = m_coarseTable;
         ca.cell = params.coarseCell > 0.0f ? params.coarseCell : 4.0f * std::max(m_cellSize, 1e-3f);
-        ca.damping = params.coarseDamping; ca.withForces = withForces ? 1 : 0;
+        ca.damping = params.coarseDamping;
+        ca.withForces = withForces ? 1 : 0;
         cmd.fill(coarseStats, 0u);
         launchCoarse(cmd, ring, solverPl.coarseReset, ca, std::max(m_coarseTable, m_bodyCount), 256);
         cmd.barrier();
@@ -1989,15 +2357,26 @@ void VkWorld::recordAndSubmitPass()
     if (fusedIter)
     {
         PrimalArgsGpu pa{};
-        pa.b = b; pa.g = g; pa.m = m; pa.joints = j; pa.springs = sp;
+        pa.b = b;
+        pa.g = g;
+        pa.m = m;
+        pa.joints = j;
+        pa.springs = sp;
         pa.colorBodies = constraints.colorBodies().address();
         pa.p = p;
-        pa.colorStart = cStart; pa.colorEnd = cEnd;
+        pa.colorStart = cStart;
+        pa.colorEnd = cEnd;
         pa.shapeRolling = m_anyRolling ? shpRolling.address() : 0;
-        DualArgsGpu da{}; da.b = b; da.m = m; da.slots = slots; da.p = p;
-        JointDualArgsGpu jd{}; jd.b = b; jd.j = j; jd.p = p;
-        launchIterateSmall(cmd, ring, solverPl, pa, da, jd, params.iterations, colorBound, withForces,
-                           m_jointSlots);
+        DualArgsGpu da{};
+        da.b = b;
+        da.m = m;
+        da.slots = slots;
+        da.p = p;
+        JointDualArgsGpu jd{};
+        jd.b = b;
+        jd.j = j;
+        jd.p = p;
+        launchIterateSmall(cmd, ring, solverPl, pa, da, jd, params.iterations, colorBound, withForces, m_jointSlots);
         cmd.barrier();
         // The per-iteration stamps finishPass reads; the loop is one dispatch, so they all land
         // after it and primalMs / dualMs report the loop as a whole in the first interval.
@@ -2008,53 +2387,81 @@ void VkWorld::recordAndSubmitPass()
         }
     }
     else
-    for (int it = 0; it < params.iterations; it++)
-    {
-        for (int c = 0; c < colorBound; c++)
+        for (int it = 0; it < params.iterations; it++)
         {
-            PrimalArgsGpu pa{};
-            pa.b = b; pa.g = g; pa.m = m; pa.joints = j; pa.springs = sp;
-            pa.colorBodies = constraints.colorBodies().address();
-            pa.p = p;
-            pa.colorStart = cStart; pa.colorEnd = cEnd; pa.color = c;
-            pa.shapeRolling = m_anyRolling ? shpRolling.address() : 0;
-            launchPrimalColorIndirect(cmd, ring, solverPl, pa, warp4, withForces, primalIndirect);
+            for (int c = 0; c < colorBound; c++)
+            {
+                PrimalArgsGpu pa{};
+                pa.b = b;
+                pa.g = g;
+                pa.m = m;
+                pa.joints = j;
+                pa.springs = sp;
+                pa.colorBodies = constraints.colorBodies().address();
+                pa.p = p;
+                pa.colorStart = cStart;
+                pa.colorEnd = cEnd;
+                pa.color = c;
+                pa.shapeRolling = m_anyRolling ? shpRolling.address() : 0;
+                launchPrimalColorIndirect(cmd, ring, solverPl, pa, warp4, withForces, primalIndirect);
+                cmd.barrier();
+            }
+            for (int c = 0; it < coarseIters && c < 8; c++)
+            {
+                ca.color = c; // Gauss-Seidel over the 8 cell parities: neighbours never move together
+                launchCoarse(cmd, ring, solverPl.coarseAssemble, ca, m_dynCount, 128);
+                cmd.barrier();
+                launchCoarse(cmd, ring, solverPl.coarseSolve, ca, m_coarseTable, 128);
+                cmd.barrier();
+                launchCoarse(cmd, ring, solverPl.coarseApply, ca, m_dynCount, 256);
+                cmd.barrier();
+            }
+            cmd.writeTimestamp((uint32_t)(3 + 2 * it + 1));
+            DualArgsGpu da{};
+            da.b = b;
+            da.m = m;
+            da.slots = slots;
+            da.p = p;
+            launchDual(cmd, ring, solverPl, da, slots);
             cmd.barrier();
+            {
+                JointDualArgsGpu jd{};
+                jd.b = b;
+                jd.j = j;
+                jd.p = p;
+                launchJointDual(cmd, ring, solverPl, jd, m_jointSlots);
+                cmd.barrier();
+            }
+            cmd.writeTimestamp((uint32_t)(3 + 2 * it + 2));
         }
-        for (int c = 0; it < coarseIters && c < 8; c++)
-        {
-            ca.color = c; // Gauss-Seidel over the 8 cell parities: neighbours never move together
-            launchCoarse(cmd, ring, solverPl.coarseAssemble, ca, m_dynCount, 128);
-            cmd.barrier();
-            launchCoarse(cmd, ring, solverPl.coarseSolve, ca, m_coarseTable, 128);
-            cmd.barrier();
-            launchCoarse(cmd, ring, solverPl.coarseApply, ca, m_dynCount, 256);
-            cmd.barrier();
-        }
-        cmd.writeTimestamp((uint32_t)(3 + 2 * it + 1));
-        DualArgsGpu da{}; da.b = b; da.m = m; da.slots = slots; da.p = p;
-        launchDual(cmd, ring, solverPl, da, slots);
-        cmd.barrier();
-        {
-            JointDualArgsGpu jd{}; jd.b = b; jd.j = j; jd.p = p;
-            launchJointDual(cmd, ring, solverPl, jd, m_jointSlots);
-            cmd.barrier();
-        }
-        cmd.writeTimestamp((uint32_t)(3 + 2 * it + 2));
-    }
 
     // --- Phase 7: velocity, explosion guard, kill-fallen -------------------------
     IntegrateBodySoAGpu ib{};
-    ib.pos = pos.address(); ib.rot = rot.address();
-    ib.initialLin = initialLin.address(); ib.initialAng = initialAng.address();
-    ib.inertialLin = inertialLin.address(); ib.inertialAng = inertialAng.address();
-    ib.velLin = velLin.address(); ib.velAng = velAng.address(); ib.prevVelLin = prevVelLin.address();
-    ib.mass = mass.address(); ib.awake = awake.address();
+    ib.pos = pos.address();
+    ib.rot = rot.address();
+    ib.initialLin = initialLin.address();
+    ib.initialAng = initialAng.address();
+    ib.inertialLin = inertialLin.address();
+    ib.inertialAng = inertialAng.address();
+    ib.velLin = velLin.address();
+    ib.velAng = velAng.address();
+    ib.prevVelLin = prevVelLin.address();
+    ib.mass = mass.address();
+    ib.awake = awake.address();
     ib.count = (uint32_t)m_bodyCount;
-    VelocityArgsGpu va{}; va.b = ib; va.p.dt = params.dt; va.p.gravityX = params.gravity.x; va.p.gravityY = params.gravity.y; va.p.gravityZ = params.gravity.z; va.p.spinExact = params.exactSpinVelocity ? 1u : 0u;
+    VelocityArgsGpu va{};
+    va.b = ib;
+    va.p.dt = params.dt;
+    va.p.gravityX = params.gravity.x;
+    va.p.gravityY = params.gravity.y;
+    va.p.gravityZ = params.gravity.z;
+    va.p.spinExact = params.exactSpinVelocity ? 1u : 0u;
     if (m_anyProps)
     {
-        VelocityPropsArgsGpu pa{}; pa.b = ib; pa.p = va.p; pa.props = props.address();
+        VelocityPropsArgsGpu pa{};
+        pa.b = ib;
+        pa.p = va.p;
+        pa.props = props.address();
         launchVelocityProps(cmd, ring, integratePl, pa, m_bodyCount);
     }
     else
@@ -2079,13 +2486,25 @@ void VkWorld::recordAndSubmitPass()
         cmd.fill(reportCounter, 0u, sizeof(uint32_t));
         cmd.barrier();
         ContactReportArgsGpu ra{};
-        ra.pos = b.pos; ra.rot = b.rot; ra.prevVelLin = b.prevVelLin;
-        ra.bodyA = m.bodyA; ra.bodyB = m.bodyB; ra.shapeA = m.shapeA; ra.shapeB = m.shapeB;
-        ra.basis = m.basis; ra.contactOffset = m.contactOffset; ra.contactCount = m.contactCount;
-        ra.rA = m.rA; ra.rB = m.rB; ra.C0 = m.C0; ra.lambda = m.lambda;
+        ra.pos = b.pos;
+        ra.rot = b.rot;
+        ra.prevVelLin = b.prevVelLin;
+        ra.bodyA = m.bodyA;
+        ra.bodyB = m.bodyB;
+        ra.shapeA = m.shapeA;
+        ra.shapeB = m.shapeB;
+        ra.basis = m.basis;
+        ra.contactOffset = m.contactOffset;
+        ra.contactCount = m.contactCount;
+        ra.rA = m.rA;
+        ra.rB = m.rB;
+        ra.C0 = m.C0;
+        ra.lambda = m.lambda;
         ra.shapeFlags = shpFlags.address();
-        ra.counter = reportCounter.address(); ra.records = reportRecords.address();
-        ra.capacity = (uint32_t)m_reportCap; ra.slots = (uint32_t)slots;
+        ra.counter = reportCounter.address();
+        ra.records = reportRecords.address();
+        ra.capacity = (uint32_t)m_reportCap;
+        ra.slots = (uint32_t)slots;
         launchContactReport(cmd, ring, reportPl, ra);
         cmd.barrier();
         // Nothing after this writes the report buffers, so the copies can ride here.
@@ -2096,8 +2515,12 @@ void VkWorld::recordAndSubmitPass()
     if (m_dynCount > 0)
     {
         ExplosionGuardArgsGpu ega{};
-        ega.b = ib; ega.dyn = dynamicIdx.address(); ega.dynCount = m_dynCount;
-        ega.sleepTimer = sleepTimer.address(); ega.restPos = restPos.address(); ega.restRot = restRot.address();
+        ega.b = ib;
+        ega.dyn = dynamicIdx.address();
+        ega.dynCount = m_dynCount;
+        ega.sleepTimer = sleepTimer.address();
+        ega.restPos = restPos.address();
+        ega.restRot = restRot.address();
         launchExplosionGuard(cmd, ring, integratePl, ega, m_dynCount);
         cmd.barrier();
 
@@ -2105,34 +2528,54 @@ void VkWorld::recordAndSubmitPass()
         {
             // Continuous collision (ccd.slang): pose clamp to the earliest time of impact.
             CcdArgsGpu ca{};
-            ca.pos = ib.pos; ca.rot = ib.rot; ca.velLin = ib.velLin; ca.initLin = ib.initialLin; ca.initAng = ib.initialAng;
-            ca.mass = mass.address(); ca.awake = awake.address(); ca.sleepTimer = sleepTimer.address();
+            ca.pos = ib.pos;
+            ca.rot = ib.rot;
+            ca.velLin = ib.velLin;
+            ca.initLin = ib.initialLin;
+            ca.initAng = ib.initialAng;
+            ca.mass = mass.address();
+            ca.awake = awake.address();
+            ca.sleepTimer = sleepTimer.address();
             ca.props = propsAddress();
-            ca.shpBody = shpBody.address(); ca.shpLocalPos = shpLocalPos.address();
-            ca.shpLocalRot = shpLocalRot.address(); ca.shpHalf = shpHalf.address();
-            ca.shpType = shpType.address(); ca.shpFlags = shpFlags.address();
-            ca.shpCategory = shpCategory.address(); ca.shpMask = shpMask.address();
+            ca.shpBody = shpBody.address();
+            ca.shpLocalPos = shpLocalPos.address();
+            ca.shpLocalRot = shpLocalRot.address();
+            ca.shpHalf = shpHalf.address();
+            ca.shpType = shpType.address();
+            ca.shpFlags = shpFlags.address();
+            ca.shpCategory = shpCategory.address();
+            ca.shpMask = shpMask.address();
             ca.shpGroup = shpGroup.address();
-            ca.dynShape = dynShapeIdx.address(); ca.staticShape = staticShapeIdx.address();
-            ca.ignore = ignorePairs.address(); ca.ignoreCount = (uint32_t)m_ignoreCount;
-            ca.geomHeap = geomHeap.address(); ca.geomOffset = shpGeomOffset.address();
+            ca.dynShape = dynShapeIdx.address();
+            ca.staticShape = staticShapeIdx.address();
+            ca.ignore = ignorePairs.address();
+            ca.ignoreCount = (uint32_t)m_ignoreCount;
+            ca.geomHeap = geomHeap.address();
+            ca.geomOffset = shpGeomOffset.address();
             ca.geomHeapBytes = geomHeap.size();
-            ca.dynCount = (uint32_t)m_dynShapeCount; ca.staticCount = (uint32_t)m_staticShapeCount;
+            ca.dynCount = (uint32_t)m_dynShapeCount;
+            ca.staticCount = (uint32_t)m_staticShapeCount;
             ccd.record(cmd, ring, ca, m_bodyCap, m_anyBullet);
         }
 
         if (params.killFallenEnabled)
         {
             KillFallenArgsGpu kfa{};
-            kfa.b = ib; kfa.dyn = dynamicIdx.address(); kfa.dynCount = m_dynCount; {
+            kfa.b = ib;
+            kfa.dyn = dynamicIdx.address();
+            kfa.dynCount = m_dynCount;
+            {
                 // Kill height is measured along up = -normalize(gravity); zero gravity falls back to +Y.
-                const float gl = std::sqrt(params.gravity.x * params.gravity.x + params.gravity.y * params.gravity.y + params.gravity.z * params.gravity.z);
+                const float gl = std::sqrt(params.gravity.x * params.gravity.x + params.gravity.y * params.gravity.y +
+                                           params.gravity.z * params.gravity.z);
                 kfa.killHeight = params.killHeight;
                 kfa.upX = gl > 0.0f ? -params.gravity.x / gl : 0.0f;
                 kfa.upY = gl > 0.0f ? -params.gravity.y / gl : 1.0f;
                 kfa.upZ = gl > 0.0f ? -params.gravity.z / gl : 0.0f;
             }
-            kfa.sleepTimer = sleepTimer.address(); kfa.restPos = restPos.address(); kfa.restRot = restRot.address();
+            kfa.sleepTimer = sleepTimer.address();
+            kfa.restPos = restPos.address();
+            kfa.restRot = restRot.address();
             launchKillFallen(cmd, ring, integratePl, kfa, m_dynCount);
             cmd.barrier();
         }
@@ -2142,22 +2585,41 @@ void VkWorld::recordAndSubmitPass()
     if (sleepOn)
     {
         SleepCommitCall sc{};
-        sc.fracture.b = b; sc.fracture.j = j; sc.fracture.ratio = params.sleepFracture;
+        sc.fracture.b = b;
+        sc.fracture.j = j;
+        sc.fracture.ratio = params.sleepFracture;
         // csSleepBlockFracture stores block[body] for every joint loaded past sleepFracture of
         // its break force; a null block here lost the device the first time one was (a grab or
         // an impact on a jointed structure).
         sc.fracture.block = sleepBlock.address();
-        sc.drag.dragIdx = 0; sc.drag.dragCount = 0; sc.drag.block = sleepBlock.address();
-        sc.jointCount = m_jointSlots; sc.dragCount = 0; sc.dynCount = m_dynCount; sc.solveCount = m_dynCount;
-        sc.commit.b = b; sc.commit.g = g; sc.commit.m = m; sc.commit.j = j; sc.commit.sp = sp;
-        sc.commit.active = activeIdx.address(); sc.commit.activeCount = m_dynCount;
+        sc.drag.dragIdx = 0;
+        sc.drag.dragCount = 0;
+        sc.drag.block = sleepBlock.address();
+        sc.jointCount = m_jointSlots;
+        sc.dragCount = 0;
+        sc.dynCount = m_dynCount;
+        sc.solveCount = m_dynCount;
+        sc.commit.b = b;
+        sc.commit.g = g;
+        sc.commit.m = m;
+        sc.commit.j = j;
+        sc.commit.sp = sp;
+        sc.commit.active = activeIdx.address();
+        sc.commit.activeCount = m_dynCount;
         sc.commit.activeCountPtr = activeCounter.address();
         sc.commit.candidate = sleepCandidate.address();
-        sc.commit.touchCount = touchCount.address(); sc.commit.touchHash = touchHash.address();
-        sc.commit.snapCount = snapCount.address(); sc.commit.snapHash = snapHash.address();
-        sc.mark.b = b; sc.mark.dyn = dynamicIdx.address(); sc.mark.dynCount = m_dynCount;
-        sc.mark.candidate = sleepCandidate.address(); sc.mark.frames = params.sleepFrames;
-        sc.mark.linVel = params.sleepLinVel; sc.mark.angVel = params.sleepAngVel; sc.mark.disp = params.sleepDisp;
+        sc.commit.touchCount = touchCount.address();
+        sc.commit.touchHash = touchHash.address();
+        sc.commit.snapCount = snapCount.address();
+        sc.commit.snapHash = snapHash.address();
+        sc.mark.b = b;
+        sc.mark.dyn = dynamicIdx.address();
+        sc.mark.dynCount = m_dynCount;
+        sc.mark.candidate = sleepCandidate.address();
+        sc.mark.frames = params.sleepFrames;
+        sc.mark.linVel = params.sleepLinVel;
+        sc.mark.angVel = params.sleepAngVel;
+        sc.mark.disp = params.sleepDisp;
         sc.mark.leak = params.sleepLeak;
         sc.mark.block = sleepBlock.address();
         sc.mark.hasBlock = 1u;
@@ -2300,27 +2762,39 @@ bool VkWorld::finishPass()
         frontPending = false;
         if (broad.overflowed())
         {
-            result.ok = false; result.truncated = true;
-            result.failPhase = "broadphase"; result.failResource = "pairs";
-            result.required = broad.producedPairs(); result.capacity = m_pairCap;
+            result.ok = false;
+            result.truncated = true;
+            result.failPhase = "broadphase";
+            result.failResource = "pairs";
+            result.required = broad.producedPairs();
+            result.capacity = m_pairCap;
         }
         else if (narrow.overflowed())
         {
-            result.ok = false; result.truncated = true;
-            result.failPhase = "narrowphase"; result.failResource = "contacts";
-            result.required = narrow.requiredContacts(); result.capacity = m_contactCap;
+            result.ok = false;
+            result.truncated = true;
+            result.failPhase = "narrowphase";
+            result.failResource = "contacts";
+            result.required = narrow.requiredContacts();
+            result.capacity = m_contactCap;
         }
         else if (narrow.hullRecorded() && narrow.hullPairs() > narrow.hullCapacity())
         {
-            result.ok = false; result.truncated = true;
-            result.failPhase = "narrowphase"; result.failResource = "hullPairs";
-            result.required = narrow.hullPairs(); result.capacity = narrow.hullCapacity();
+            result.ok = false;
+            result.truncated = true;
+            result.failPhase = "narrowphase";
+            result.failResource = "hullPairs";
+            result.required = narrow.hullPairs();
+            result.capacity = narrow.hullCapacity();
         }
         else if (narrow.meshRecorded() && narrow.childOverflowed())
         {
-            result.ok = false; result.truncated = true;
-            result.failPhase = "narrowphase"; result.failResource = "meshChildren";
-            result.required = narrow.childRaw(); result.capacity = narrow.childCapacity();
+            result.ok = false;
+            result.truncated = true;
+            result.failPhase = "narrowphase";
+            result.failResource = "meshChildren";
+            result.required = narrow.childRaw();
+            result.capacity = narrow.childCapacity();
         }
     }
 
@@ -2456,29 +2930,51 @@ uint64_t VkWorld::stepBeginImpl(const SolverParams &params)
     ensureReportCapacity();
 
     FullBodySoAGpu &b = S.b;
-    b.pos = pos.address(); b.rot = rot.address();
-    b.initialLin = initialLin.address(); b.initialAng = initialAng.address();
-    b.inertialLin = inertialLin.address(); b.inertialAng = inertialAng.address();
-    b.velLin = velLin.address(); b.velAng = velAng.address(); b.prevVelLin = prevVelLin.address();
-    b.halfExtents = halfExtents.address(); b.shapeType = shapeType.address();
-    b.moment = moment.address(); b.mass = mass.address(); b.friction = friction.address();
-    b.awake = awake.address(); b.sleepTimer = sleepTimer.address();
-    b.restPos = restPos.address(); b.restRot = restRot.address();
+    b.pos = pos.address();
+    b.rot = rot.address();
+    b.initialLin = initialLin.address();
+    b.initialAng = initialAng.address();
+    b.inertialLin = inertialLin.address();
+    b.inertialAng = inertialAng.address();
+    b.velLin = velLin.address();
+    b.velAng = velAng.address();
+    b.prevVelLin = prevVelLin.address();
+    b.halfExtents = halfExtents.address();
+    b.shapeType = shapeType.address();
+    b.moment = moment.address();
+    b.mass = mass.address();
+    b.friction = friction.address();
+    b.awake = awake.address();
+    b.sleepTimer = sleepTimer.address();
+    b.restPos = restPos.address();
+    b.restRot = restRot.address();
     b.gyration = gyration.address();
     b.props = propsAddress();
     b.count = (uint32_t)m_bodyCount;
 
     FullJointSoAGpu &j = S.j;
-    j.bodyA = jBodyA.address(); j.bodyB = jBodyB.address();
-    j.rA = jRA.address(); j.rB = jRB.address();
-    j.C0Lin = jC0Lin.address(); j.C0Ang = jC0Ang.address();
-    j.penaltyLin = jPenaltyLin.address(); j.penaltyAng = jPenaltyAng.address();
-    j.lambdaLin = jLambdaLin.address(); j.lambdaAng = jLambdaAng.address();
-    j.stiffnessLin = jStiffnessLin.address(); j.stiffnessAng = jStiffnessAng.address();
-    j.fracture = jFracture.address(); j.fractureAng = jFractureAng.address(); j.torqueArm = jTorqueArm.address();
-    j.restAng = jRestAng.address(); j.broken = jBroken.address();
-    j.frameA = jFrameA.address(); j.frameB = jFrameB.address();
-    j.axisMode = jAxisMode.address(); j.axisLo = jAxisLo.address(); j.axisHi = jAxisHi.address();
+    j.bodyA = jBodyA.address();
+    j.bodyB = jBodyB.address();
+    j.rA = jRA.address();
+    j.rB = jRB.address();
+    j.C0Lin = jC0Lin.address();
+    j.C0Ang = jC0Ang.address();
+    j.penaltyLin = jPenaltyLin.address();
+    j.penaltyAng = jPenaltyAng.address();
+    j.lambdaLin = jLambdaLin.address();
+    j.lambdaAng = jLambdaAng.address();
+    j.stiffnessLin = jStiffnessLin.address();
+    j.stiffnessAng = jStiffnessAng.address();
+    j.fracture = jFracture.address();
+    j.fractureAng = jFractureAng.address();
+    j.torqueArm = jTorqueArm.address();
+    j.restAng = jRestAng.address();
+    j.broken = jBroken.address();
+    j.frameA = jFrameA.address();
+    j.frameB = jFrameB.address();
+    j.axisMode = jAxisMode.address();
+    j.axisLo = jAxisLo.address();
+    j.axisHi = jAxisHi.address();
     j.generic = jGeneric.address();
     j.count = (uint32_t)m_jointSlots;
 
@@ -2487,29 +2983,43 @@ uint64_t VkWorld::stepBeginImpl(const SolverParams &params)
     S.sleepOn = params.sleepEnabled && params.sleepFrames > 0 && m_dynCount > 0;
 
     // Phases 2+3 inputs (see recordAndSubmitPass for the capacity-rerun contract).
-    S.npb.pos = pos.address(); S.npb.rot = rot.address();
-    S.npb.shapeBody = shpBody.address(); S.npb.localPos = shpLocalPos.address();
-    S.npb.localRot = shpLocalRot.address(); S.npb.halfExtents = shpHalf.address();
-    S.npb.shapeType = shpType.address(); S.npb.friction = shpFriction.address();
+    S.npb.pos = pos.address();
+    S.npb.rot = rot.address();
+    S.npb.shapeBody = shpBody.address();
+    S.npb.localPos = shpLocalPos.address();
+    S.npb.localRot = shpLocalRot.address();
+    S.npb.halfExtents = shpHalf.address();
+    S.npb.shapeType = shpType.address();
+    S.npb.friction = shpFriction.address();
     S.npb.flags = shpFlags.address();
-    S.npb.mass = mass.address(); S.npb.moment = moment.address();
-    S.npb.velLin = velLin.address(); S.npb.velAng = velAng.address();
+    S.npb.mass = mass.address();
+    S.npb.moment = moment.address();
+    S.npb.velLin = velLin.address();
+    S.npb.velAng = velAng.address();
     S.npb.props = propsAddress();
-    S.npb.category = shpCategory.address(); S.npb.mask = shpMask.address(); S.npb.group = shpGroup.address();
+    S.npb.category = shpCategory.address();
+    S.npb.mask = shpMask.address();
+    S.npb.group = shpGroup.address();
     S.hasHulls = m_hullShapes > 0 && geomHeap.size() > 0;
-    S.nph.geomHeap = geomHeap.address(); S.nph.geomOffset = shpGeomOffset.address();
+    S.nph.geomHeap = geomHeap.address();
+    S.nph.geomOffset = shpGeomOffset.address();
     S.nph.geomHeapBytes = geomHeap.size();
     S.hasMeshes = m_meshShapes > 0 && geomHeap.size() > 0;
     S.nmh.geom = S.nph;
     S.nmh.prim = &primPl;
     S.nmh.radix = &radix;
-    S.npp.dt = params.dt; S.npp.alpha = params.alpha; S.npp.gamma = params.gamma;
-    S.npp.autoKStart = params.autoKStart; S.npp.dualDamping = params.dualDamping; S.npp.dualDampVel = params.dualDampVel;
+    S.npp.dt = params.dt;
+    S.npp.alpha = params.alpha;
+    S.npp.gamma = params.gamma;
+    S.npp.autoKStart = params.autoKStart;
+    S.npp.dualDamping = params.dualDamping;
+    S.npp.dualDampVel = params.dualDampVel;
     S.edgeCount = m_jointSlots + m_springCount;
 
     // Timestamp layout: see recordAndSubmitPass.
     S.iters = std::max(params.iterations, 0);
-    S.tsStart = (uint32_t)(2 * S.iters + 4); S.tsEnd = (uint32_t)(2 * S.iters + 5);
+    S.tsStart = (uint32_t)(2 * S.iters + 4);
+    S.tsEnd = (uint32_t)(2 * S.iters + 5);
     if (S.tsEnd + 1 > m_stepCmd.maxTimestamps())
     {
         m_stepCmd.destroy();
@@ -2519,7 +3029,8 @@ uint64_t VkWorld::stepBeginImpl(const SolverParams &params)
 
     S.npp.contactCap = effectiveContactCap(params.contactCap);
 
-    S.cbr.mass = mass.address(); S.cbr.awake = b.awake;
+    S.cbr.mass = mass.address();
+    S.cbr.awake = b.awake;
     S.phase4Done = !S.sleepOn;
 
     S.jpRounds = m_dbg.jpBound > 0 ? std::min(m_dbg.jpBound, (int)VkConstraints::kMaxJpRounds) : constraints.jpBound();
@@ -2637,7 +3148,6 @@ VkWorld::StepResult VkWorld::step(const SolverParams &params)
     return stepEnd();
 }
 
-
 void VkWorld::downloadPositions(std::vector<vec3> &out) const
 {
     assertIdle("VkWorld::downloadPositions");
@@ -2706,9 +3216,12 @@ void VkWorld::computeRenderGroups(const SceneDesc &scene)
 FullSpringSoAGpu VkWorld::springView() const
 {
     FullSpringSoAGpu sp{};
-    sp.bodyA = sBodyA.address(); sp.bodyB = sBodyB.address();
-    sp.rA = sRA.address(); sp.rB = sRB.address();
-    sp.rest = sRest.address(); sp.stiffness = sStiffness.address();
+    sp.bodyA = sBodyA.address();
+    sp.bodyB = sBodyB.address();
+    sp.rA = sRA.address();
+    sp.rB = sRB.address();
+    sp.rest = sRest.address();
+    sp.stiffness = sStiffness.address();
     sp.count = (uint32_t)m_springCount;
     return sp;
 }
@@ -2717,13 +3230,26 @@ FullManifoldSoAGpu VkWorld::manifoldView() const
 {
     FullManifoldSoAGpu m{};
     const VkManifoldSet &cur = narrow.manifolds();
-    m.key = cur.key; m.bodyA = cur.bodyA; m.bodyB = cur.bodyB; m.basis = cur.basis;
-    m.shapeA = cur.shapeA; m.shapeB = cur.shapeB;
-    m.friction = cur.friction; m.contactOffset = cur.contactOffset; m.contactCount = cur.contactCount;
-    m.count = narrow.activeManifolds(); m.capacity = narrow.manifoldSlots();
-    m.feature = cur.feature; m.rA = cur.rA; m.rB = cur.rB; m.C0 = cur.C0;
-    m.penalty = cur.penalty; m.lambda = cur.lambda; m.stick = cur.stick;
-    m.contactTotal = narrow.contactTotal(); m.contactCapacity = m_contactCap;
+    m.key = cur.key;
+    m.bodyA = cur.bodyA;
+    m.bodyB = cur.bodyB;
+    m.basis = cur.basis;
+    m.shapeA = cur.shapeA;
+    m.shapeB = cur.shapeB;
+    m.friction = cur.friction;
+    m.contactOffset = cur.contactOffset;
+    m.contactCount = cur.contactCount;
+    m.count = narrow.activeManifolds();
+    m.capacity = narrow.manifoldSlots();
+    m.feature = cur.feature;
+    m.rA = cur.rA;
+    m.rB = cur.rB;
+    m.C0 = cur.C0;
+    m.penalty = cur.penalty;
+    m.lambda = cur.lambda;
+    m.stick = cur.stick;
+    m.contactTotal = narrow.contactTotal();
+    m.contactCapacity = m_contactCap;
     return m;
 }
 
@@ -2762,14 +3288,17 @@ void VkWorld::writeInstances(const RenderInstancesParams &params)
     args.ov.push = args.ov.pull = args.ov.stress = args.ov.cone = args.ov.penetration = args.ov.jointDegree = 0;
 
     const VkDeviceSize perBody = (VkDeviceSize)m_bodyCount * sizeof(float);
-    auto ensure = [perBody](Buffer &buf) {
+    auto ensure = [perBody](Buffer &buf)
+    {
         if (buf.size() < perBody)
             buf.resize(perBody);
         return buf.address();
     };
 
-    CommandList cmd; HostRingBuffer ring;
-    cmd.init(dev); ring.init(dev, 1 << 16);
+    CommandList cmd;
+    HostRingBuffer ring;
+    cmd.init(dev);
+    ring.init(dev, 1 << 16);
     cmd.begin();
 
     const int slots = narrow.manifoldSlots();
@@ -2783,7 +3312,10 @@ void VkWorld::writeInstances(const RenderInstancesParams &params)
         if (slots > 0)
         {
             OverlayLoadAccumArgsGpu la{};
-            la.b = b; la.m = manifoldView(); la.slots = slots; la.load = lc.load;
+            la.b = b;
+            la.m = manifoldView();
+            la.slots = slots;
+            la.load = lc.load;
             launchOverlayLoadAccum(cmd, ring, renderPl, la, slots);
             cmd.barrier();
         }
@@ -2815,7 +3347,8 @@ void VkWorld::writeInstances(const RenderInstancesParams &params)
             st.jointDegree = ensure(overlayJointDeg);
 
         OverlayStatsClearArgsGpu sc{};
-        sc.s = st; sc.n = m_bodyCount;
+        sc.s = st;
+        sc.n = m_bodyCount;
         launchOverlayStatsClear(cmd, ring, renderPl, sc, m_bodyCount);
         cmd.barrier();
 
@@ -2824,7 +3357,9 @@ void VkWorld::writeInstances(const RenderInstancesParams &params)
         if (slots > 0 && (st.push || st.cone || st.penetration))
         {
             OverlayStatsContactsArgsGpu ca{};
-            ca.m = manifoldView(); ca.slots = slots; ca.s = st;
+            ca.m = manifoldView();
+            ca.slots = slots;
+            ca.s = st;
             launchOverlayStatsContacts(cmd, ring, renderPl, ca, slots);
             cmd.barrier();
         }
@@ -2834,12 +3369,20 @@ void VkWorld::writeInstances(const RenderInstancesParams &params)
         if (forceCount > 0 && (st.push || st.pull || st.stress || st.jointDegree))
         {
             OverlayStatsForcesArgsGpu fa{};
-            fa.b = b; fa.j = jointView(); fa.sp = springView(); fa.jointsAuthored = m_jointCount; fa.s = st;
+            fa.b = b;
+            fa.j = jointView();
+            fa.sp = springView();
+            fa.jointsAuthored = m_jointCount;
+            fa.s = st;
             launchOverlayStatsForces(cmd, ring, renderPl, fa, forceCount);
             cmd.barrier();
         }
-        args.ov.push = st.push; args.ov.pull = st.pull; args.ov.stress = st.stress;
-        args.ov.cone = st.cone; args.ov.penetration = st.penetration; args.ov.jointDegree = st.jointDegree;
+        args.ov.push = st.push;
+        args.ov.pull = st.pull;
+        args.ov.stress = st.stress;
+        args.ov.cone = st.cone;
+        args.ov.penetration = st.penetration;
+        args.ov.jointDegree = st.jointDegree;
     }
 
     if (params.frustum)
@@ -2860,7 +3403,8 @@ void VkWorld::writeInstances(const RenderInstancesParams &params)
     }
 
     launchWriteInstances(cmd, ring, renderPl, args, m_shapeCount);
-    cmd.submit(); cmd.wait();
+    cmd.submit();
+    cmd.wait();
 
     if (params.segmentByShape)
     {
@@ -2881,7 +3425,8 @@ void VkWorld::writeInstances(const RenderInstancesParams &params)
         m_instanceCount = m_shapeCount;
     }
 
-    cmd.destroy(); ring.destroy();
+    cmd.destroy();
+    ring.destroy();
 }
 
 void VkWorld::writeDebugInstances(const DebugDrawViewGpu &view, int maxMarkers)
@@ -2922,11 +3467,14 @@ void VkWorld::writeDebugInstances(const DebugDrawViewGpu &view, int maxMarkers)
     args.counter = debugCounterBuf.address();
     args.d = view;
 
-    CommandList cmd; HostRingBuffer ring;
-    cmd.init(dev); ring.init(dev, 1 << 16);
+    CommandList cmd;
+    HostRingBuffer ring;
+    cmd.init(dev);
+    ring.init(dev, 1 << 16);
     cmd.begin();
     launchWriteDebugInstances(cmd, ring, renderPl, args, slots);
-    cmd.submit(); cmd.wait();
+    cmd.submit();
+    cmd.wait();
 
     // The counter overshoots `limit` by however many markers did not fit, which is
     // exactly what the UI needs in order to say the view is incomplete.
@@ -2934,20 +3482,31 @@ void VkWorld::writeDebugInstances(const DebugDrawViewGpu &view, int maxMarkers)
     debugCounterBuf.readback(&requested, sizeof(int32_t));
     m_debugRequested = requested;
     m_debugInstanceCount = std::min((int)requested, limit);
-    cmd.destroy(); ring.destroy();
+    cmd.destroy();
+    ring.destroy();
 }
 
 FullBodySoAGpu VkWorld::bodyView() const
 {
     FullBodySoAGpu b{};
-    b.pos = pos.address(); b.rot = rot.address();
-    b.initialLin = initialLin.address(); b.initialAng = initialAng.address();
-    b.inertialLin = inertialLin.address(); b.inertialAng = inertialAng.address();
-    b.velLin = velLin.address(); b.velAng = velAng.address(); b.prevVelLin = prevVelLin.address();
-    b.halfExtents = halfExtents.address(); b.shapeType = shapeType.address();
-    b.moment = moment.address(); b.mass = mass.address(); b.friction = friction.address();
-    b.awake = awake.address(); b.sleepTimer = sleepTimer.address();
-    b.restPos = restPos.address(); b.restRot = restRot.address();
+    b.pos = pos.address();
+    b.rot = rot.address();
+    b.initialLin = initialLin.address();
+    b.initialAng = initialAng.address();
+    b.inertialLin = inertialLin.address();
+    b.inertialAng = inertialAng.address();
+    b.velLin = velLin.address();
+    b.velAng = velAng.address();
+    b.prevVelLin = prevVelLin.address();
+    b.halfExtents = halfExtents.address();
+    b.shapeType = shapeType.address();
+    b.moment = moment.address();
+    b.mass = mass.address();
+    b.friction = friction.address();
+    b.awake = awake.address();
+    b.sleepTimer = sleepTimer.address();
+    b.restPos = restPos.address();
+    b.restRot = restRot.address();
     b.gyration = gyration.address();
     b.props = propsAddress();
     b.count = (uint32_t)m_bodyCount;
@@ -2957,10 +3516,17 @@ FullBodySoAGpu VkWorld::bodyView() const
 ShapeSoAGpu VkWorld::shapeView() const
 {
     ShapeSoAGpu v{};
-    v.body = shpBody.address(); v.localPos = shpLocalPos.address(); v.localRot = shpLocalRot.address();
-    v.halfExtents = shpHalf.address(); v.shapeType = shpType.address(); v.friction = shpFriction.address();
-    v.category = shpCategory.address(); v.mask = shpMask.address(); v.group = shpGroup.address();
-    v.flags = shpFlags.address(); v.geomOffset = shpGeomOffset.address();
+    v.body = shpBody.address();
+    v.localPos = shpLocalPos.address();
+    v.localRot = shpLocalRot.address();
+    v.halfExtents = shpHalf.address();
+    v.shapeType = shpType.address();
+    v.friction = shpFriction.address();
+    v.category = shpCategory.address();
+    v.mask = shpMask.address();
+    v.group = shpGroup.address();
+    v.flags = shpFlags.address();
+    v.geomOffset = shpGeomOffset.address();
     v.count = (uint32_t)m_shapeCount;
     return v;
 }
@@ -2968,24 +3534,39 @@ ShapeSoAGpu VkWorld::shapeView() const
 BroadphaseShapes VkWorld::broadphaseShapes() const
 {
     BroadphaseShapes v;
-    v.shapeBody = shpBody.address(); v.localPos = shpLocalPos.address(); v.localRot = shpLocalRot.address();
-    v.halfExtents = shpHalf.address(); v.flags = shpFlags.address();
+    v.shapeBody = shpBody.address();
+    v.localPos = shpLocalPos.address();
+    v.localRot = shpLocalRot.address();
+    v.halfExtents = shpHalf.address();
+    v.flags = shpFlags.address();
     return v;
 }
 
 FullJointSoAGpu VkWorld::jointView() const
 {
     FullJointSoAGpu j{};
-    j.bodyA = jBodyA.address(); j.bodyB = jBodyB.address();
-    j.rA = jRA.address(); j.rB = jRB.address();
-    j.C0Lin = jC0Lin.address(); j.C0Ang = jC0Ang.address();
-    j.penaltyLin = jPenaltyLin.address(); j.penaltyAng = jPenaltyAng.address();
-    j.lambdaLin = jLambdaLin.address(); j.lambdaAng = jLambdaAng.address();
-    j.stiffnessLin = jStiffnessLin.address(); j.stiffnessAng = jStiffnessAng.address();
-    j.fracture = jFracture.address(); j.fractureAng = jFractureAng.address(); j.torqueArm = jTorqueArm.address();
-    j.restAng = jRestAng.address(); j.broken = jBroken.address();
-    j.frameA = jFrameA.address(); j.frameB = jFrameB.address();
-    j.axisMode = jAxisMode.address(); j.axisLo = jAxisLo.address(); j.axisHi = jAxisHi.address();
+    j.bodyA = jBodyA.address();
+    j.bodyB = jBodyB.address();
+    j.rA = jRA.address();
+    j.rB = jRB.address();
+    j.C0Lin = jC0Lin.address();
+    j.C0Ang = jC0Ang.address();
+    j.penaltyLin = jPenaltyLin.address();
+    j.penaltyAng = jPenaltyAng.address();
+    j.lambdaLin = jLambdaLin.address();
+    j.lambdaAng = jLambdaAng.address();
+    j.stiffnessLin = jStiffnessLin.address();
+    j.stiffnessAng = jStiffnessAng.address();
+    j.fracture = jFracture.address();
+    j.fractureAng = jFractureAng.address();
+    j.torqueArm = jTorqueArm.address();
+    j.restAng = jRestAng.address();
+    j.broken = jBroken.address();
+    j.frameA = jFrameA.address();
+    j.frameB = jFrameB.address();
+    j.axisMode = jAxisMode.address();
+    j.axisLo = jAxisLo.address();
+    j.axisHi = jAxisHi.address();
     j.generic = jGeneric.address();
     j.count = (uint32_t)m_jointSlots;
     return j;
@@ -3000,19 +3581,23 @@ void VkWorld::releaseDragSlots(int first, int count)
     args.slot0 = m_jointCount + first;
     args.count = count;
 
-    CommandList cmd; HostRingBuffer ring;
-    cmd.init(dev); ring.init(dev, 1 << 14);
+    CommandList cmd;
+    HostRingBuffer ring;
+    cmd.init(dev);
+    ring.init(dev, 1 << 14);
     cmd.begin();
     launchDragRelease(cmd, ring, interactPl, args, count);
-    cmd.submit(); cmd.wait();
-    cmd.destroy(); ring.destroy();
+    cmd.submit();
+    cmd.wait();
+    cmd.destroy();
+    ring.destroy();
 }
 
 // the drag path's GpuSolver::dragBodies, step for step: the same per-body stiffness
 // (5000 * mass * grabStrength * weight), the same "fresh grab" rule (the group changed
 // size, or nothing was held), and the same release of slots the group no longer uses.
-void VkWorld::dragBodies(const int *bodies, const vec3 *targets, const vec3 *locals, int count,
-                         const float *weights, float grabStrength)
+void VkWorld::dragBodies(const int *bodies, const vec3 *targets, const vec3 *locals, int count, const float *weights,
+                         float grabStrength)
 {
     assertIdle("VkWorld::dragBodies");
     if (!bodies || count <= 0)
@@ -3073,8 +3658,10 @@ void VkWorld::recordDragUpdate(CommandList &cmd, HostRingBuffer &ring)
     args.j = jointView();
     args.slot0 = m_jointCount;
     args.count = n;
-    args.bodies = dragBodies_.address(); args.targets = dragTargets.address();
-    args.locals = dragLocals.address(); args.stiffness = dragStiffness.address();
+    args.bodies = dragBodies_.address();
+    args.targets = dragTargets.address();
+    args.locals = dragLocals.address();
+    args.stiffness = dragStiffness.address();
     args.grab = m_dragPendingGrab ? 1 : 0;
     launchDragUpdate(cmd, ring, interactPl, args, n);
     cmd.barrier();
@@ -3103,12 +3690,16 @@ void VkWorld::wakeAll()
     args.dyn = dynamicIdx.address();
     args.dynCount = m_dynCount;
 
-    CommandList cmd; HostRingBuffer ring;
-    cmd.init(dev); ring.init(dev, 1 << 14);
+    CommandList cmd;
+    HostRingBuffer ring;
+    cmd.init(dev);
+    ring.init(dev, 1 << 14);
     cmd.begin();
     launchWakeAll(cmd, ring, wakePl, args, m_dynCount);
-    cmd.submit(); cmd.wait();
-    cmd.destroy(); ring.destroy();
+    cmd.submit();
+    cmd.wait();
+    cmd.destroy();
+    ring.destroy();
     m_activeCount = m_dynCount;
 }
 
@@ -3223,16 +3814,23 @@ void VkWorld::getBodyData(const int *indices, void *data, BodyRead type, int cou
     readIdxBuf.upload(indices, idxBytes);
 
     BodyGatherArgsGpu args{};
-    args.b = bodyView(); args.type = (int)type;
-    args.idx = readIdxBuf.address(); args.out = readDataBuf.address(); args.count = count;
+    args.b = bodyView();
+    args.type = (int)type;
+    args.idx = readIdxBuf.address();
+    args.out = readDataBuf.address();
+    args.count = count;
 
     VkWorld &self = const_cast<VkWorld &>(*this); // the pipelines are not const
-    CommandList cmd; HostRingBuffer ring;
-    cmd.init(self.dev); ring.init(self.dev, 1 << 14);
+    CommandList cmd;
+    HostRingBuffer ring;
+    cmd.init(self.dev);
+    ring.init(self.dev, 1 << 14);
     cmd.begin();
     launchBodyGather(cmd, ring, self.mutatePl, args, count);
-    cmd.submit(); cmd.wait();
-    cmd.destroy(); ring.destroy();
+    cmd.submit();
+    cmd.wait();
+    cmd.destroy();
+    ring.destroy();
     readDataBuf.readback(data, outBytes);
 }
 
@@ -3242,9 +3840,15 @@ void VkWorld::setTransform(int body, vec3 p, quat r)
     setBodyData(&body, &x, BodyWrite::Transform, 1);
 }
 
-void VkWorld::setLinearVelocity(int body, vec3 v) { setBodyData(&body, &v, BodyWrite::LinearVelocity, 1); }
+void VkWorld::setLinearVelocity(int body, vec3 v)
+{
+    setBodyData(&body, &v, BodyWrite::LinearVelocity, 1);
+}
 
-void VkWorld::setAngularVelocity(int body, vec3 w) { setBodyData(&body, &w, BodyWrite::AngularVelocity, 1); }
+void VkWorld::setAngularVelocity(int body, vec3 w)
+{
+    setBodyData(&body, &w, BodyWrite::AngularVelocity, 1);
+}
 
 void VkWorld::applyImpulse(int body, vec3 impulse, vec3 worldPoint)
 {
@@ -3258,7 +3862,10 @@ void VkWorld::applyForce(int body, vec3 force, vec3 worldPoint)
     setBodyData(&body, &pv, BodyWrite::Force, 1);
 }
 
-void VkWorld::applyTorque(int body, vec3 torque) { setBodyData(&body, &torque, BodyWrite::Torque, 1); }
+void VkWorld::applyTorque(int body, vec3 torque)
+{
+    setBodyData(&body, &torque, BodyWrite::Torque, 1);
+}
 
 void VkWorld::setAwake(int body, bool on)
 {
@@ -3266,7 +3873,10 @@ void VkWorld::setAwake(int body, bool on)
     setBodyData(&body, &v, BodyWrite::Awake, 1);
 }
 
-void VkWorld::setBodyProps(int body, const BodyProps &p) { setBodyData(&body, &p, BodyWrite::Props, 1); }
+void VkWorld::setBodyProps(int body, const BodyProps &p)
+{
+    setBodyData(&body, &p, BodyWrite::Props, 1);
+}
 
 void VkWorld::setTargetTransform(int body, vec3 p, quat r, float dt)
 {
@@ -3289,18 +3899,29 @@ void VkWorld::wakeRegion(vec3 aabbMin, vec3 aabbMax)
     // Seeded straight into the device buffer rather than queued: a wake is idempotent
     // and the flood that consumes it runs after every batch has landed (the mutation path).
     WakeSeedRegionArgsGpu args{};
-    args.b = bodyView(); args.dyn = dynamicIdx.address(); args.dynCount = m_dynCount;
-    args.loX = aabbMin.x; args.loY = aabbMin.y; args.loZ = aabbMin.z;
-    args.hiX = aabbMax.x; args.hiY = aabbMax.y; args.hiZ = aabbMax.z;
-    args.seed = wakeSeed.address(); args.changed = floodChanged.address();
+    args.b = bodyView();
+    args.dyn = dynamicIdx.address();
+    args.dynCount = m_dynCount;
+    args.loX = aabbMin.x;
+    args.loY = aabbMin.y;
+    args.loZ = aabbMin.z;
+    args.hiX = aabbMax.x;
+    args.hiY = aabbMax.y;
+    args.hiZ = aabbMax.z;
+    args.seed = wakeSeed.address();
+    args.changed = floodChanged.address();
     floodChanged.zero(sizeof(int));
 
-    CommandList cmd; HostRingBuffer ring;
-    cmd.init(dev); ring.init(dev, 1 << 14);
+    CommandList cmd;
+    HostRingBuffer ring;
+    cmd.init(dev);
+    ring.init(dev, 1 << 14);
     cmd.begin();
     launchWakeSeedRegion(cmd, ring, mutatePl, args, m_dynCount);
-    cmd.submit(); cmd.wait();
-    cmd.destroy(); ring.destroy();
+    cmd.submit();
+    cmd.wait();
+    cmd.destroy();
+    ring.destroy();
     m_seedsPending = true;
 }
 
@@ -3397,23 +4018,116 @@ JointForce VkWorld::jointForce(int gen, const vec3 &lamLin, const vec3 &lamAng, 
 uint64_t VkWorld::deviceBytesAllocated() const
 {
     const Buffer *all[] = {
-        &pos, &rot, &initialLin, &initialAng, &inertialLin, &inertialAng,
-        &velLin, &velAng, &prevVelLin, &halfExtents, &shapeType, &moment, &mass, &friction,
-        &awake, &sleepTimer, &restPos, &restRot, &gyration, &props, &dynamicIdx, &staticIdx, &gridIdx, &oversizeIdx,
-        &shpBody, &shpLocalPos, &shpLocalRot, &shpHalf, &shpType, &shpFriction, &shpRestitution, &shpRolling, &shpCategory, &shpMask,
-        &shpGroup, &shpFlags, &shpGeomOffset, &geomHeap, &dynShapeIdx, &staticShapeIdx,
-        &jBodyA, &jBodyB, &jRA, &jRB, &jC0Lin, &jC0Ang, &jPenaltyLin, &jPenaltyAng,
-        &jLambdaLin, &jLambdaAng, &jStiffnessLin, &jStiffnessAng, &jFracture, &jFractureAng, &jTorqueArm,
-        &jRestAng, &jBroken, &jFrameA, &jFrameB, &jAxisMode, &jAxisLo, &jAxisHi, &jGeneric,
-        &sBodyA, &sBodyB, &sRA, &sRB, &sRest, &sStiffness,
-        &activeIdx, &activeFlags, &activeCounter, &touchCount, &touchHash, &snapCount, &snapHash,
-        &wakeRequest, &wakeSeed, &wakeAny, &wakeChanged, &sleepCandidate, &sleepBlock,
-        &ignorePairs, &floodChanged, &islandSeed, &primalIndirect, &stepState,
-        &mutIdxBuf, &mutDataBuf, &readIdxBuf, &readDataBuf,
-        &instances, &debugInstances, &groupIdx,
-        &overlayLoad, &overlayPush, &overlayPull, &overlayStress, &overlayCone, &overlayPen, &overlayJointDeg,
-        &frustumBuf, &shapeBaseBuf, &shapeVisBuf, &visibleCounterBuf, &debugCounterBuf,
-        &dragBodies_, &dragTargets, &dragLocals, &dragStiffness,
+        &pos,
+        &rot,
+        &initialLin,
+        &initialAng,
+        &inertialLin,
+        &inertialAng,
+        &velLin,
+        &velAng,
+        &prevVelLin,
+        &halfExtents,
+        &shapeType,
+        &moment,
+        &mass,
+        &friction,
+        &awake,
+        &sleepTimer,
+        &restPos,
+        &restRot,
+        &gyration,
+        &props,
+        &dynamicIdx,
+        &staticIdx,
+        &gridIdx,
+        &oversizeIdx,
+        &shpBody,
+        &shpLocalPos,
+        &shpLocalRot,
+        &shpHalf,
+        &shpType,
+        &shpFriction,
+        &shpRestitution,
+        &shpRolling,
+        &shpCategory,
+        &shpMask,
+        &shpGroup,
+        &shpFlags,
+        &shpGeomOffset,
+        &geomHeap,
+        &dynShapeIdx,
+        &staticShapeIdx,
+        &jBodyA,
+        &jBodyB,
+        &jRA,
+        &jRB,
+        &jC0Lin,
+        &jC0Ang,
+        &jPenaltyLin,
+        &jPenaltyAng,
+        &jLambdaLin,
+        &jLambdaAng,
+        &jStiffnessLin,
+        &jStiffnessAng,
+        &jFracture,
+        &jFractureAng,
+        &jTorqueArm,
+        &jRestAng,
+        &jBroken,
+        &jFrameA,
+        &jFrameB,
+        &jAxisMode,
+        &jAxisLo,
+        &jAxisHi,
+        &jGeneric,
+        &sBodyA,
+        &sBodyB,
+        &sRA,
+        &sRB,
+        &sRest,
+        &sStiffness,
+        &activeIdx,
+        &activeFlags,
+        &activeCounter,
+        &touchCount,
+        &touchHash,
+        &snapCount,
+        &snapHash,
+        &wakeRequest,
+        &wakeSeed,
+        &wakeAny,
+        &wakeChanged,
+        &sleepCandidate,
+        &sleepBlock,
+        &ignorePairs,
+        &floodChanged,
+        &islandSeed,
+        &primalIndirect,
+        &stepState,
+        &mutIdxBuf,
+        &mutDataBuf,
+        &readIdxBuf,
+        &readDataBuf,
+        &instances,
+        &debugInstances,
+        &groupIdx,
+        &overlayLoad,
+        &overlayPush,
+        &overlayPull,
+        &overlayStress,
+        &overlayCone,
+        &overlayPen,
+        &overlayJointDeg,
+        &frustumBuf,
+        &shapeBaseBuf,
+        &shapeVisBuf,
+        &visibleCounterBuf,
+        &debugCounterBuf,
+        &dragBodies_,
+        &dragTargets,
+        &dragLocals,
+        &dragStiffness,
     };
     uint64_t total = 0;
     for (const Buffer *buf : all)

@@ -37,9 +37,9 @@ struct SceneDesc
     std::vector<quat> rot;
     std::vector<float> mass, friction;
     std::vector<unsigned char> shapeType;
-    std::vector<int> renderGroup;         // -1: the body's shape class
-    std::vector<unsigned char> tier;      // BodyTier
-    std::vector<unsigned char> asleep;    // authored initial sleep state (1: starts asleep)
+    std::vector<int> renderGroup;      // -1: the body's shape class
+    std::vector<unsigned char> tier;   // BodyTier
+    std::vector<unsigned char> asleep; // authored initial sleep state (1: starts asleep)
     std::vector<int> dynamicIdx, staticIdx;
     float cellSize = 1.0f;
 
@@ -51,11 +51,11 @@ struct SceneDesc
     // earlier shape index (they key the persistent contact cache). Mass and inertia stay on
     // the body: an added shape contributes no mass.
     int shapeCount = 0;
-    std::vector<int> shapeBody;                 // owning body
-    std::vector<vec3> shapeLocalPos;            // in the body frame
+    std::vector<int> shapeBody;      // owning body
+    std::vector<vec3> shapeLocalPos; // in the body frame
     std::vector<quat> shapeLocalRot;
-    std::vector<unsigned char> shapeKind;       // AVBD_SHAPE_*
-    std::vector<vec3> shapeHalf;                // half extents as halfExtents above
+    std::vector<unsigned char> shapeKind; // AVBD_SHAPE_*
+    std::vector<vec3> shapeHalf;          // half extents as halfExtents above
     std::vector<float> shapeFriction;
     // Per-shape bounce and rolling resistance (the API layer's surface material); may be empty or
     // shorter than shapeCount, which reads as 0. Rolling is 0 for a shape that is not a sphere or
@@ -67,11 +67,11 @@ struct SceneDesc
     // all 64 bits, group 0.
     std::vector<uint64_t> shapeCategory, shapeMask;
     std::vector<int> shapeGroup;
-    std::vector<unsigned> shapeFlags;           // SHAPE_FLAG_*
+    std::vector<unsigned> shapeFlags; // SHAPE_FLAG_*
     // Per-body settings (scene_types.h BodyProps), one entry per body; may be empty or shorter
     // than `count`, which reads as all defaults.
     std::vector<BodyProps> bodyProps;
-    std::vector<int> bodyPrimaryShape;          // per body: index of its primary shape
+    std::vector<int> bodyPrimaryShape; // per body: index of its primary shape
 
     // Geometry blobs (Box3D b3HullData, verbatim bytes: relocatable, so a byte copy is valid).
     // shapeGeom[s] indexes geomBlob, or -1 for a shape with no blob. Blobs are deduplicated by
@@ -94,7 +94,8 @@ struct SceneDesc
     std::vector<int> jointA, jointB;
     std::vector<vec3> jointRA, jointRB;
     std::vector<float> jointKLin, jointKAng, jointFrac, jointArm;
-    std::vector<float> jointFracAng; // N*m bending capacity per joint; < 0: legacy test on |lambdaAng| (see jointFracture)
+    std::vector<float>
+        jointFracAng; // N*m bending capacity per joint; < 0: legacy test on |lambdaAng| (see jointFracture)
     std::vector<quat> jointRestAng, jointFrameA, jointFrameB;
     std::vector<unsigned char> jointAxisMode, jointGeneric;
     std::vector<float> jointAxisLo, jointAxisHi;

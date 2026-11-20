@@ -25,20 +25,20 @@ struct b3MeshData; // Box3D's cooked mesh blob.
 
 struct ShapeMassInput
 {
-    int kind = AVBD_SHAPE_BOX;   // AVBD_SHAPE_BOX / SPHERE / CAPSULE / HULL
-    vec3 half{0, 0, 0};          // as SceneDesc::shapeHalf (box half extents, sphere r, capsule r,r,r+hs)
-    vec3 localPos{0, 0, 0};      // shape frame in the body frame
+    int kind = AVBD_SHAPE_BOX; // AVBD_SHAPE_BOX / SPHERE / CAPSULE / HULL
+    vec3 half{0, 0, 0};        // as SceneDesc::shapeHalf (box half extents, sphere r, capsule r,r,r+hs)
+    vec3 localPos{0, 0, 0};    // shape frame in the body frame
     quat localRot{0, 0, 0, 1};
     const b3HullData *hull = nullptr; // AVBD_SHAPE_HULL only
     const b3MeshData *mesh = nullptr; // AVBD_SHAPE_MESH only: a closed mesh has volume mass, an open one none
-    float density = -1.0f;       // < 0: the density passed to computeCompoundMass; 0: no mass
+    float density = -1.0f;            // < 0: the density passed to computeCompoundMass; 0: no mass
 };
 
 struct CompoundMass
 {
     float mass = 0.0f;
-    vec3 center{0, 0, 0};        // combined centre of mass, in the body frame
-    vec3 moment{0, 0, 0};        // principal moments about the centre
+    vec3 center{0, 0, 0};          // combined centre of mass, in the body frame
+    vec3 moment{0, 0, 0};          // principal moments about the centre
     quat principalRot{0, 0, 0, 1}; // principal frame -> body frame
 };
 

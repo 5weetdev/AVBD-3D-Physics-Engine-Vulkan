@@ -12,8 +12,6 @@
 //   f) world-frame inertia (SolverDef.worldFrameInertia): a long thin box spinning about a tilted
 //      axis in zero gravity conserves L = R I R^T w; the drift with the flag off and on is printed.
 
-
-
 // (merged) // Gate for restitution on the avbd3d layer (restitution.slang). Y-up, ground top at y = 0.
 // // A body dropped from rest bounces to e^2 of its drop height (energy goes as speed squared):
 // //   a) a sphere with e = 1 comes back to about its drop height;
@@ -24,9 +22,9 @@
 // //   f) an e = 0.5 sphere comes to rest on the ground;
 // //   g) restitution is per shape: a body of two spheres, one above the other, bounces only when the
 // //      sphere that touches the ground has e = 1 (the primary, first-created shape is the top one).
-// 
-// 
-// 
+//
+//
+//
 #include "test_util.h"
 #include <cmath>
 #include <cstdio>
@@ -34,21 +32,24 @@
 namespace materials
 {
 static int g_fail = 0;
-#define CHECK(cond, ...)                                                                                              \
-    do                                                                                                                \
-    {                                                                                                                 \
-        if (!(cond))                                                                                                  \
-        {                                                                                                             \
-            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                               \
-            std::printf(__VA_ARGS__);                                                                                 \
-            std::printf("\n");                                                                                        \
-            g_fail++;                                                                                                 \
-        }                                                                                                             \
+#define CHECK(cond, ...)                                                                                               \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        if (!(cond))                                                                                                   \
+        {                                                                                                              \
+            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                                \
+            std::printf(__VA_ARGS__);                                                                                  \
+            std::printf("\n");                                                                                         \
+            g_fail++;                                                                                                  \
+        }                                                                                                              \
     } while (0)
 
 static const float kDt = 1.0f / 60.0f;
 
-static Avbd3dVec3 V(float x, float y, float z) { return Avbd3dVec3{x, y, z}; }
+static Avbd3dVec3 V(float x, float y, float z)
+{
+    return Avbd3dVec3{x, y, z};
+}
 
 static Avbd3dQuat quatAxisAngle(Avbd3dVec3 axis, float angle)
 {
@@ -83,7 +84,7 @@ static Avbd3dBodyId makeGround(Avbd3dWorld *w, const Avbd3dSurfaceMaterial *mat 
 }
 
 static Avbd3dBodyId makeBox(Avbd3dWorld *w, Avbd3dVec3 pos, float half, const Avbd3dSurfaceMaterial *mat,
-                             Avbd3dBodyDef *outDef = nullptr)
+                            Avbd3dBodyDef *outDef = nullptr)
 {
     Avbd3dBodyDef bd = avbd3d_default_body_def();
     bd.type = AVBD3D_DYNAMIC_BODY;
@@ -127,7 +128,10 @@ static void stepN(Avbd3dWorld *w, int n)
         t3d_step(w, kDt);
 }
 
-static float len(Avbd3dVec3 v) { return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z); }
+static float len(Avbd3dVec3 v)
+{
+    return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+}
 
 // ---- a) motion locks -------------------------------------------------------------------------
 
@@ -157,7 +161,7 @@ static void testLocks()
         cQxy = std::fmax(cQxy, std::fmax(std::fabs(qc.v.x), std::fabs(qc.v.y)));
         cZ = std::fmax(cZ, (float)std::fabs(t3d_body_get_position(c).z));
     }
-    const Avbd3dVec3 pa = t3d_body_get_position(a) , qa = t3d_body_get_angular_velocity(a);
+    const Avbd3dVec3 pa = t3d_body_get_position(a), qa = t3d_body_get_angular_velocity(a);
     (void)pa;
     CHECK(maxZ < 1e-3f, "linear Z locked box moved %g in z", maxZ);
     CHECK(maxQxy < 1e-3f, "angular X/Y locked box rotated (quat xy %g)", maxQxy);
@@ -255,13 +259,15 @@ static void testTangent()
     // The belt's own scalar speed 1 m/s along x: 2 s moves the box about 2 m.
     const Avbd3dVec3 dx = beltDisplacement(V(1, 0, 0), none, &s);
     std::printf("tangent (1,0,0): d = (%.3f, %.3f, %.3f) speed %.3f\n", dx.x, dx.y, dx.z, s);
-    CHECK(std::fabs(std::fabs(dx.x) - 2.0f) < 0.3f && std::fabs(dx.z) < 0.1f, "x belt carried the box by (%g, %g)", dx.x, dx.z);
+    CHECK(std::fabs(std::fabs(dx.x) - 2.0f) < 0.3f && std::fabs(dx.z) < 0.1f, "x belt carried the box by (%g, %g)",
+          dx.x, dx.z);
     CHECK(std::fabs(s - 1.0f) < 0.15f, "x belt speed %g", s);
     const float signX = dx.x > 0 ? 1.0f : -1.0f;
 
     const Avbd3dVec3 dz = beltDisplacement(V(0, 0, 1), none, &s);
     std::printf("tangent (0,0,1): d = (%.3f, %.3f, %.3f) speed %.3f\n", dz.x, dz.y, dz.z, s);
-    CHECK(std::fabs(std::fabs(dz.z) - 2.0f) < 0.3f && std::fabs(dz.x) < 0.1f, "z belt carried the box by (%g, %g)", dz.x, dz.z);
+    CHECK(std::fabs(std::fabs(dz.z) - 2.0f) < 0.3f && std::fabs(dz.x) < 0.1f, "z belt carried the box by (%g, %g)",
+          dz.x, dz.z);
     CHECK(dz.z * signX > 0.0f, "x and z belts disagree in sign convention (%g vs %g)", dx.x, dz.z);
 
     // The surface normal component of the shape-frame vector is projected away.
@@ -275,10 +281,12 @@ static void testTangent()
     const Avbd3dQuat qy = quatAxisAngle(V(0, 1, 0), 1.5707963f);
     const Avbd3dVec3 dr = beltDisplacement(V(1, 0, 0), qy, &s);
     std::printf("tangent (1,0,0), belt turned about y: d = (%.3f, %.3f, %.3f) speed %.3f\n", dr.x, dr.y, dr.z, s);
-    CHECK(std::fabs(std::fabs(dr.z) - 2.0f) < 0.3f && std::fabs(dr.x) < 0.1f, "rotated belt carried the box by (%g, %g)", dr.x, dr.z);
+    CHECK(std::fabs(std::fabs(dr.z) - 2.0f) < 0.3f && std::fabs(dr.x) < 0.1f,
+          "rotated belt carried the box by (%g, %g)", dr.x, dr.z);
     const Avbd3dVec3 dq = beltDisplacement(V(0, 0, 1), qy, &s);
     std::printf("tangent (0,0,1), belt turned about y: d = (%.3f, %.3f, %.3f) speed %.3f\n", dq.x, dq.y, dq.z, s);
-    CHECK(std::fabs(std::fabs(dq.x) - 2.0f) < 0.3f && std::fabs(dq.z) < 0.1f, "belt (0,0,1) turned about y carried the box by (%g, %g)", dq.x, dq.z);
+    CHECK(std::fabs(std::fabs(dq.x) - 2.0f) < 0.3f && std::fabs(dq.z) < 0.1f,
+          "belt (0,0,1) turned about y carried the box by (%g, %g)", dq.x, dq.z);
     CHECK(dq.x * dr.z < 0.0f, "rotating the belt about y by +90 degrees: x->-z and z->+x expected");
 }
 
@@ -309,8 +317,10 @@ static void testFrictionMixing()
         const char *name;
         Avbd3dMixingRule rule;
         float mu;
-    } cases[] = {{"geometric", AVBD3D_MIX_GEOMETRIC, 0.4f}, {"average", AVBD3D_MIX_AVERAGE, 0.5f},
-                 {"min", AVBD3D_MIX_MIN, 0.2f},             {"max", AVBD3D_MIX_MAX, 0.8f},
+    } cases[] = {{"geometric", AVBD3D_MIX_GEOMETRIC, 0.4f},
+                 {"average", AVBD3D_MIX_AVERAGE, 0.5f},
+                 {"min", AVBD3D_MIX_MIN, 0.2f},
+                 {"max", AVBD3D_MIX_MAX, 0.8f},
                  {"multiply", AVBD3D_MIX_MULTIPLY, 0.16f}};
     const float vDefault = slidSpeed(AVBD3D_MIX_GEOMETRIC, false);
     float v[5];
@@ -321,9 +331,11 @@ static void testFrictionMixing()
         std::printf("friction mixing %-9s mu %.2f: v %.3f (ideal %.3f)\n", cases[i].name, cases[i].mu, v[i], want);
         CHECK(std::fabs(v[i] - want) < 0.35f, "%s: v %g, want about %g", cases[i].name, v[i], want);
     }
-    CHECK(std::fabs(vDefault - v[0]) < 1e-5f, "default friction mixing differs from geometric: %g vs %g", vDefault, v[0]);
+    CHECK(std::fabs(vDefault - v[0]) < 1e-5f, "default friction mixing differs from geometric: %g vs %g", vDefault,
+          v[0]);
     // Orderings: more friction, slower.
-    CHECK(v[3] < v[1] && v[1] < v[0] && v[0] < v[2] && v[2] < v[4] + 0.01f, "friction mixing order max<avg<geo<min<mul broken");
+    CHECK(v[3] < v[1] && v[1] < v[0] && v[0] < v[2] && v[2] < v[4] + 0.01f,
+          "friction mixing order max<avg<geo<min<mul broken");
     Avbd3dWorld *w = makeWorld();
     t3d_world_set_friction_mixing(w, AVBD3D_MIX_MIN);
     t3d_destroy_world(w);
@@ -373,8 +385,10 @@ static void testRestitutionMixing()
         const char *name;
         Avbd3dMixingRule rule;
         float e;
-    } cases[] = {{"max", AVBD3D_MIX_MAX, 1.0f},         {"average", AVBD3D_MIX_AVERAGE, 0.6f},
-                 {"geometric", AVBD3D_MIX_GEOMETRIC, 0.4472f}, {"min", AVBD3D_MIX_MIN, 0.2f},
+    } cases[] = {{"max", AVBD3D_MIX_MAX, 1.0f},
+                 {"average", AVBD3D_MIX_AVERAGE, 0.6f},
+                 {"geometric", AVBD3D_MIX_GEOMETRIC, 0.4472f},
+                 {"min", AVBD3D_MIX_MIN, 0.2f},
                  {"multiply", AVBD3D_MIX_MULTIPLY, 0.2f}};
     const float rDefault = bounceRatioMixed(AVBD3D_MIX_MAX, false);
     for (const Case &c : cases)
@@ -383,7 +397,8 @@ static void testRestitutionMixing()
         std::printf("restitution mixing %-9s e %.3f: bounce/drop %.3f (ideal %.3f)\n", c.name, c.e, r, c.e * c.e);
         CHECK(std::fabs(r - c.e * c.e) < 0.09f, "%s: bounce/drop %g, want about %g", c.name, r, c.e * c.e);
         if (c.rule == AVBD3D_MIX_MAX)
-            CHECK(std::fabs(r - rDefault) < 1e-5f, "default restitution mixing differs from max: %g vs %g", rDefault, r);
+            CHECK(std::fabs(r - rDefault) < 1e-5f, "default restitution mixing differs from max: %g vs %g", rDefault,
+                  r);
     }
 }
 
@@ -398,9 +413,15 @@ static Mat3 matFromQuat(Avbd3dQuat q)
 {
     const float x = q.v.x, y = q.v.y, z = q.v.z, s = q.s;
     Mat3 r;
-    r.m[0][0] = 1 - 2 * (y * y + z * z); r.m[0][1] = 2 * (x * y - z * s);     r.m[0][2] = 2 * (x * z + y * s);
-    r.m[1][0] = 2 * (x * y + z * s);     r.m[1][1] = 1 - 2 * (x * x + z * z); r.m[1][2] = 2 * (y * z - x * s);
-    r.m[2][0] = 2 * (x * z - y * s);     r.m[2][1] = 2 * (y * z + x * s);     r.m[2][2] = 1 - 2 * (x * x + y * y);
+    r.m[0][0] = 1 - 2 * (y * y + z * z);
+    r.m[0][1] = 2 * (x * y - z * s);
+    r.m[0][2] = 2 * (x * z + y * s);
+    r.m[1][0] = 2 * (x * y + z * s);
+    r.m[1][1] = 1 - 2 * (x * x + z * z);
+    r.m[1][2] = 2 * (y * z - x * s);
+    r.m[2][0] = 2 * (x * z - y * s);
+    r.m[2][1] = 2 * (y * z + x * s);
+    r.m[2][2] = 1 - 2 * (x * x + y * y);
     return r;
 }
 
@@ -412,7 +433,8 @@ static Avbd3dVec3 angularMomentum(Avbd3dQuat q, Avbd3dVec3 w, Avbd3dVec3 I)
                          R.m[0][1] * w.x + R.m[1][1] * w.y + R.m[2][1] * w.z,
                          R.m[0][2] * w.x + R.m[1][2] * w.y + R.m[2][2] * w.z};
     const float l[3] = {I.x * wl[0], I.y * wl[1], I.z * wl[2]};
-    return V(R.m[0][0] * l[0] + R.m[0][1] * l[1] + R.m[0][2] * l[2], R.m[1][0] * l[0] + R.m[1][1] * l[1] + R.m[1][2] * l[2],
+    return V(R.m[0][0] * l[0] + R.m[0][1] * l[1] + R.m[0][2] * l[2],
+             R.m[1][0] * l[0] + R.m[1][1] * l[1] + R.m[1][2] * l[2],
              R.m[2][0] * l[0] + R.m[2][1] * l[1] + R.m[2][2] * l[2]);
 }
 
@@ -437,7 +459,8 @@ static float angularMomentumDrift(bool worldFrame, int steps, float *energyDrift
     const Avbd3dVec3 I = V((b * b + c * c) / 3, (a * a + c * c) / 3, (a * a + b * b) / 3);
     const Avbd3dVec3 L0 = angularMomentum(bd.rotation, bd.angularVelocity, I);
     // Kinetic energy 0.5 w . L
-    auto energy = [&](Avbd3dQuat q, Avbd3dVec3 wv) {
+    auto energy = [&](Avbd3dQuat q, Avbd3dVec3 wv)
+    {
         const Avbd3dVec3 L = angularMomentum(q, wv, I);
         return 0.5f * (wv.x * L.x + wv.y * L.y + wv.z * L.z);
     };
@@ -463,8 +486,8 @@ static void testWorldFrameInertia()
     float eOff, eOn;
     const float off = angularMomentumDrift(false, 120, &eOff);
     const float on = angularMomentumDrift(true, 120, &eOn);
-    std::printf("world-frame inertia, 120 steps: |dL|/|L| max  off %.4f  on %.4f   energy drift  off %.4f  on %.4f\n", off, on,
-                eOff, eOn);
+    std::printf("world-frame inertia, 120 steps: |dL|/|L| max  off %.4f  on %.4f   energy drift  off %.4f  on %.4f\n",
+                off, on, eOff, eOn);
     CHECK(on < 0.05f, "with worldFrameInertia on, L drifted %g", on);
     CHECK(on < off, "worldFrameInertia did not reduce the drift (off %g, on %g)", off, on);
     // The default is on (since 2026-10-14).
@@ -490,16 +513,16 @@ int run()
 namespace restitution
 {
 static int g_fail = 0;
-#define CHECK(cond, ...)                                                                                              \
-    do                                                                                                                \
-    {                                                                                                                 \
-        if (!(cond))                                                                                                  \
-        {                                                                                                             \
-            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                               \
-            std::printf(__VA_ARGS__);                                                                                 \
-            std::printf("\n");                                                                                        \
-            g_fail++;                                                                                                 \
-        }                                                                                                             \
+#define CHECK(cond, ...)                                                                                               \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        if (!(cond))                                                                                                   \
+        {                                                                                                              \
+            std::printf("FAIL %s:%d: %s  ", __FILE__, __LINE__, #cond);                                                \
+            std::printf(__VA_ARGS__);                                                                                  \
+            std::printf("\n");                                                                                         \
+            g_fail++;                                                                                                  \
+        }                                                                                                              \
     } while (0)
 
 static Avbd3dWorld *makeWorld(float threshold)
@@ -540,8 +563,8 @@ static Avbd3dBodyId dropBody(Avbd3dWorld *w, float y, float e, bool box)
 
 struct Bounce
 {
-    float apex = 0;     // highest centre height after the first bounce
-    float maxSpin = 0;  // largest angular speed seen
+    float apex = 0;    // highest centre height after the first bounce
+    float maxSpin = 0; // largest angular speed seen
     bool bounced = false;
 };
 

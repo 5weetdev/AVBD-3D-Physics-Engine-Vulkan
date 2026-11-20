@@ -177,8 +177,8 @@ static void createDepthResources()
     vkGetImageMemoryRequirements(g_device.device(), g_depthImage, &req);
     VkMemoryAllocateInfo mai{VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
     mai.allocationSize = req.size;
-    mai.memoryTypeIndex = demovk::findMemoryType(g_device.physicalDevice(), req.memoryTypeBits,
-                                                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    mai.memoryTypeIndex =
+        demovk::findMemoryType(g_device.physicalDevice(), req.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
     VK_CHECK(vkAllocateMemory(g_device.device(), &mai, nullptr, &g_depthMem));
     VK_CHECK(vkBindImageMemory(g_device.device(), g_depthImage, g_depthMem, 0));
 
@@ -192,15 +192,33 @@ static void createDepthResources()
 
 static void destroySwapchainObjects()
 {
-    for (auto fb : g_framebuffers) if (fb) vkDestroyFramebuffer(g_device.device(), fb, nullptr);
+    for (auto fb : g_framebuffers)
+        if (fb)
+            vkDestroyFramebuffer(g_device.device(), fb, nullptr);
     g_framebuffers.clear();
-    for (auto v : g_swapViews) if (v) vkDestroyImageView(g_device.device(), v, nullptr);
+    for (auto v : g_swapViews)
+        if (v)
+            vkDestroyImageView(g_device.device(), v, nullptr);
     g_swapViews.clear();
-    for (auto s : g_renderDonePerImage) if (s) vkDestroySemaphore(g_device.device(), s, nullptr);
+    for (auto s : g_renderDonePerImage)
+        if (s)
+            vkDestroySemaphore(g_device.device(), s, nullptr);
     g_renderDonePerImage.clear();
-    if (g_depthView) { vkDestroyImageView(g_device.device(), g_depthView, nullptr); g_depthView = VK_NULL_HANDLE; }
-    if (g_depthImage) { vkDestroyImage(g_device.device(), g_depthImage, nullptr); g_depthImage = VK_NULL_HANDLE; }
-    if (g_depthMem) { vkFreeMemory(g_device.device(), g_depthMem, nullptr); g_depthMem = VK_NULL_HANDLE; }
+    if (g_depthView)
+    {
+        vkDestroyImageView(g_device.device(), g_depthView, nullptr);
+        g_depthView = VK_NULL_HANDLE;
+    }
+    if (g_depthImage)
+    {
+        vkDestroyImage(g_device.device(), g_depthImage, nullptr);
+        g_depthImage = VK_NULL_HANDLE;
+    }
+    if (g_depthMem)
+    {
+        vkFreeMemory(g_device.device(), g_depthMem, nullptr);
+        g_depthMem = VK_NULL_HANDLE;
+    }
 }
 
 static bool createSwapchain()
@@ -214,7 +232,8 @@ static bool createSwapchain()
         return false; // minimized
 
     g_swapExtent.width = (uint32_t)clamp((float)w, (float)caps.minImageExtent.width, (float)caps.maxImageExtent.width);
-    g_swapExtent.height = (uint32_t)clamp((float)h, (float)caps.minImageExtent.height, (float)caps.maxImageExtent.height);
+    g_swapExtent.height =
+        (uint32_t)clamp((float)h, (float)caps.minImageExtent.height, (float)caps.maxImageExtent.height);
 
     VkSurfaceFormatKHR fmt = chooseSurfaceFormat();
     g_swapFormat = fmt.format;
@@ -247,8 +266,7 @@ static bool createSwapchain()
     sci.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     sci.preTransform = caps.currentTransform;
     sci.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-    sci.presentMode = (g_wantVsync || !g_mailboxAvailable) ? VK_PRESENT_MODE_FIFO_KHR
-                                                           : VK_PRESENT_MODE_MAILBOX_KHR;
+    sci.presentMode = (g_wantVsync || !g_mailboxAvailable) ? VK_PRESENT_MODE_FIFO_KHR : VK_PRESENT_MODE_MAILBOX_KHR;
     sci.clipped = VK_TRUE;
     sci.oldSwapchain = g_swapchain;
     VkSwapchainKHR newSwapchain = VK_NULL_HANDLE;
@@ -273,8 +291,8 @@ static bool createSwapchain()
         vci.image = g_swapImages[i];
         vci.viewType = VK_IMAGE_VIEW_TYPE_2D;
         vci.format = g_swapFormat;
-        vci.components = {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY,
-                          VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY};
+        vci.components = {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY,
+                          VK_COMPONENT_SWIZZLE_IDENTITY};
         vci.subresourceRange = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1};
         VK_CHECK(vkCreateImageView(g_device.device(), &vci, nullptr, &g_swapViews[i]));
     }
@@ -361,13 +379,18 @@ static void createRenderPass()
 static void writeBmp(const char *path, const uint8_t *bgra, int w, int h)
 {
     FILE *f = fopen(path, "wb");
-    if (!f) { fprintf(stderr, "avbd_vk: could not open %s for write\n", path); return; }
+    if (!f)
+    {
+        fprintf(stderr, "avbd_vk: could not open %s for write\n", path);
+        return;
+    }
     const int rowBytes = w * 3;
     const int rowPad = (4 - (rowBytes % 4)) % 4;
     const int imgSize = (rowBytes + rowPad) * h;
     const int fileSize = 54 + imgSize;
     uint8_t header[54] = {0};
-    header[0] = 'B'; header[1] = 'M';
+    header[0] = 'B';
+    header[1] = 'M';
     *(int32_t *)&header[2] = fileSize;
     *(int32_t *)&header[10] = 54;
     *(int32_t *)&header[14] = 40;
@@ -412,8 +435,9 @@ static void screenshotImage(VkImage srcImage, int w, int h, const char *path)
     vkGetImageMemoryRequirements(g_device.device(), dst, &req);
     VkMemoryAllocateInfo mai{VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
     mai.allocationSize = req.size;
-    mai.memoryTypeIndex = demovk::findMemoryType(g_device.physicalDevice(), req.memoryTypeBits,
-                                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+    mai.memoryTypeIndex =
+        demovk::findMemoryType(g_device.physicalDevice(), req.memoryTypeBits,
+                               VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     VkDeviceMemory mem = VK_NULL_HANDLE;
     VK_CHECK(vkAllocateMemory(g_device.device(), &mai, nullptr, &mem));
     VK_CHECK(vkBindImageMemory(g_device.device(), dst, mem, 0));
@@ -428,12 +452,14 @@ static void screenshotImage(VkImage srcImage, int w, int h, const char *path)
     bi.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
     VK_CHECK(vkBeginCommandBuffer(cmd, &bi));
 
-    auto barrier = [&](VkImage img, VkImageLayout oldL, VkImageLayout newL, VkAccessFlags srcA,
-                       VkAccessFlags dstA, VkPipelineStageFlags srcS, VkPipelineStageFlags dstS)
+    auto barrier = [&](VkImage img, VkImageLayout oldL, VkImageLayout newL, VkAccessFlags srcA, VkAccessFlags dstA,
+                       VkPipelineStageFlags srcS, VkPipelineStageFlags dstS)
     {
         VkImageMemoryBarrier b{VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER};
-        b.oldLayout = oldL; b.newLayout = newL;
-        b.srcAccessMask = srcA; b.dstAccessMask = dstA;
+        b.oldLayout = oldL;
+        b.newLayout = newL;
+        b.srcAccessMask = srcA;
+        b.dstAccessMask = dstA;
         b.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
         b.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
         b.image = img;
@@ -441,24 +467,23 @@ static void screenshotImage(VkImage srcImage, int w, int h, const char *path)
         vkCmdPipelineBarrier(cmd, srcS, dstS, 0, 0, nullptr, 0, nullptr, 1, &b);
     };
 
-    barrier(dst, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 0,
-           VK_ACCESS_TRANSFER_WRITE_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT);
-    barrier(srcImage, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-           VK_ACCESS_MEMORY_READ_BIT, VK_ACCESS_TRANSFER_READ_BIT,
-           VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT);
+    barrier(dst, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 0, VK_ACCESS_TRANSFER_WRITE_BIT,
+            VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT);
+    barrier(srcImage, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_ACCESS_MEMORY_READ_BIT,
+            VK_ACCESS_TRANSFER_READ_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT);
 
     VkImageCopy region{};
     region.srcSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1};
     region.dstSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1};
     region.extent = {(uint32_t)w, (uint32_t)h, 1};
-    vkCmdCopyImage(cmd, srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dst,
-                   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+    vkCmdCopyImage(cmd, srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dst, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1,
+                   &region);
 
     barrier(dst, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_GENERAL, VK_ACCESS_TRANSFER_WRITE_BIT,
-           VK_ACCESS_HOST_READ_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_HOST_BIT);
+            VK_ACCESS_HOST_READ_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_HOST_BIT);
     barrier(srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-           VK_ACCESS_TRANSFER_READ_BIT, VK_ACCESS_MEMORY_READ_BIT,
-           VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
+            VK_ACCESS_TRANSFER_READ_BIT, VK_ACCESS_MEMORY_READ_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+            VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
 
     VK_CHECK(vkEndCommandBuffer(cmd));
     VkSubmitInfo si{VK_STRUCTURE_TYPE_SUBMIT_INFO};
@@ -476,7 +501,8 @@ static void screenshotImage(VkImage srcImage, int w, int h, const char *path)
     VK_CHECK(vkMapMemory(g_device.device(), mem, 0, VK_WHOLE_SIZE, 0, &mapped));
     std::vector<uint8_t> pixels((size_t)w * h * 4);
     for (int y = 0; y < h; y++)
-        memcpy(&pixels[(size_t)y * w * 4], (uint8_t *)mapped + layout.offset + (size_t)y * layout.rowPitch, (size_t)w * 4);
+        memcpy(&pixels[(size_t)y * w * 4], (uint8_t *)mapped + layout.offset + (size_t)y * layout.rowPitch,
+               (size_t)w * 4);
     vkUnmapMemory(g_device.device(), mem);
     writeBmp(path, pixels.data(), w, h);
 
@@ -497,22 +523,21 @@ static Uint64 g_perfFreq = 0; // SDL_GetPerformanceFrequency, cached in main()
 
 static void printUsage(FILE *f)
 {
-    fprintf(f,
-            "usage: avbd3d_demo [options]\n"
-            "  --scene <index|name>   start in this scene (name is case-insensitive)\n"
-            "  --frames N             benchmark: vsync off, alternating cull blocks, print timings,\n"
-            "                         quit after N frames\n"
-            "  --screenshot file.bmp  write the last frame of --frames / --smoke to a BMP\n"
-            "  --look modern|original rendering preset\n"
-            "  --camdist D            camera distance from the look point\n"
-            "  --no-sleep             start with sleeping off (\"Never sleep\"), for benchmarks\n"
-            "  --verbose              print the selected device and whether validation is on\n"
-            "  --log                  start with the session log on (panel: Logging)\n"
-            "  --smoke                unattended run of every scene with validation on; the window is\n"
-            "                         created hidden and never shown. Exit code is nonzero on a\n"
-            "                         step failure or a validation message\n"
-            "  --help                 this text\n"
-            "environment: AVBD_VK_VALIDATION=1 turns the Vulkan validation layers on.\n");
+    fprintf(f, "usage: avbd3d_demo [options]\n"
+               "  --scene <index|name>   start in this scene (name is case-insensitive)\n"
+               "  --frames N             benchmark: vsync off, alternating cull blocks, print timings,\n"
+               "                         quit after N frames\n"
+               "  --screenshot file.bmp  write the last frame of --frames / --smoke to a BMP\n"
+               "  --look modern|original rendering preset\n"
+               "  --camdist D            camera distance from the look point\n"
+               "  --no-sleep             start with sleeping off (\"Never sleep\"), for benchmarks\n"
+               "  --verbose              print the selected device and whether validation is on\n"
+               "  --log                  start with the session log on (panel: Logging)\n"
+               "  --smoke                unattended run of every scene with validation on; the window is\n"
+               "                         created hidden and never shown. Exit code is nonzero on a\n"
+               "                         step failure or a validation message\n"
+               "  --help                 this text\n"
+               "environment: AVBD_VK_VALIDATION=1 turns the Vulkan validation layers on.\n");
 }
 
 // ---------------------------------------------------------------------------
@@ -523,8 +548,8 @@ static void printUsage(FILE *f)
 // hooks the mouse and the panel use.
 // ---------------------------------------------------------------------------
 static const int kSmokeFramesPerScene = 20;
-static int g_smokeFrame = 0;     // frames completed in the run
-static int g_smokeActed = -1;    // the g_smokeFrame the script last acted on
+static int g_smokeFrame = 0;      // frames completed in the run
+static int g_smokeActed = -1;     // the g_smokeFrame the script last acted on
 static bool g_smokeFinal = false; // the frame about to be drawn is the last
 
 static void smokeTick()
@@ -548,14 +573,34 @@ static void smokeTick()
 
     switch (f)
     {
-    case 0: app.loadSceneIndex(scene); break;
-    case 3: app.spawnAtPixel(w / 2, h / 2); break;
-    case 6: app.grabAtPixel(w / 2, h / 2); break;
-    case 7: case 8: case 9: case 10: app.moveGrab(w / 2 + (f - 6) * 24, h / 2 - (f - 6) * 12); break;
-    case 11: app.releaseGrab(); break;
-    case 13: if (resizeScene) SDL_SetWindowSize(window, 960, 540); break;
-    case 16: if (resizeScene) SDL_SetWindowSize(window, WinWidth, WinHeight); break;
-    default: break;
+    case 0:
+        app.loadSceneIndex(scene);
+        break;
+    case 3:
+        app.spawnAtPixel(w / 2, h / 2);
+        break;
+    case 6:
+        app.grabAtPixel(w / 2, h / 2);
+        break;
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+        app.moveGrab(w / 2 + (f - 6) * 24, h / 2 - (f - 6) * 12);
+        break;
+    case 11:
+        app.releaseGrab();
+        break;
+    case 13:
+        if (resizeScene)
+            SDL_SetWindowSize(window, 960, 540);
+        break;
+    case 16:
+        if (resizeScene)
+            SDL_SetWindowSize(window, WinWidth, WinHeight);
+        break;
+    default:
+        break;
     }
 }
 
@@ -577,11 +622,11 @@ static void onAbort(int)
                  "The cause is printed in the console window and written to the log:\n%s",
                  demolog::path());
     else
-        snprintf(msg, sizeof(msg), "The demo hit a fatal error and must close.\n"
-                                   "The cause is printed in the console window.");
+        snprintf(msg, sizeof(msg),
+                 "The demo hit a fatal error and must close.\n"
+                 "The cause is printed in the console window.");
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "avbd3d_demo: fatal error", msg, nullptr);
 }
-
 
 // One ImGui frame with centered text, presented and waited on. Used only before the main
 // loop starts, while no other thread touches the queue.
@@ -589,8 +634,8 @@ static void drawLoadingFrame(const char *text)
 {
     vkWaitForFences(g_device.device(), 1, &g_inFlight[g_frameIdx], VK_TRUE, UINT64_MAX);
     uint32_t imageIndex = 0;
-    if (vkAcquireNextImageKHR(g_device.device(), g_swapchain, UINT64_MAX, g_imageAvail[g_frameIdx],
-                              VK_NULL_HANDLE, &imageIndex) != VK_SUCCESS)
+    if (vkAcquireNextImageKHR(g_device.device(), g_swapchain, UINT64_MAX, g_imageAvail[g_frameIdx], VK_NULL_HANDLE,
+                              &imageIndex) != VK_SUCCESS)
         return;
     vkResetFences(g_device.device(), 1, &g_inFlight[g_frameIdx]);
 
@@ -659,20 +704,30 @@ int main(int argc, char **argv)
             printUsage(stdout);
             return 0;
         }
-        else if (strcmp(a, "--verbose") == 0) verbose = true;
-        else if (strcmp(a, "--smoke") == 0) smoke = true;
-        else if (strcmp(a, "--no-sleep") == 0) launch.noSleep = true;
-        else if (strcmp(a, "--log") == 0) launch.log = true;
-        else if (strcmp(a, "--frames") == 0 && hasValue) launch.benchFrames = atoi(argv[++i]);
-        else if (strcmp(a, "--screenshot") == 0 && hasValue) screenshotPath = argv[++i];
-        else if (strcmp(a, "--scene") == 0 && hasValue) launch.sceneName = argv[++i];
-        else if (strcmp(a, "--camdist") == 0 && hasValue) launch.camDist = (float)atof(argv[++i]);
+        else if (strcmp(a, "--verbose") == 0)
+            verbose = true;
+        else if (strcmp(a, "--smoke") == 0)
+            smoke = true;
+        else if (strcmp(a, "--no-sleep") == 0)
+            launch.noSleep = true;
+        else if (strcmp(a, "--log") == 0)
+            launch.log = true;
+        else if (strcmp(a, "--frames") == 0 && hasValue)
+            launch.benchFrames = atoi(argv[++i]);
+        else if (strcmp(a, "--screenshot") == 0 && hasValue)
+            screenshotPath = argv[++i];
+        else if (strcmp(a, "--scene") == 0 && hasValue)
+            launch.sceneName = argv[++i];
+        else if (strcmp(a, "--camdist") == 0 && hasValue)
+            launch.camDist = (float)atof(argv[++i]);
         else if (strcmp(a, "--look") == 0 && hasValue)
         {
             // The panel's two preset buttons, for a headless screenshot of either look.
             const char *look = argv[++i];
-            if (strcmp(look, "modern") == 0) applyModernLook(g_renderOpts);
-            else if (strcmp(look, "original") == 0) applyOriginalLook(g_renderOpts);
+            if (strcmp(look, "modern") == 0)
+                applyModernLook(g_renderOpts);
+            else if (strcmp(look, "original") == 0)
+                applyOriginalLook(g_renderOpts);
             else
             {
                 fprintf(stderr, "avbd3d_demo: unknown --look %s (modern|original)\n", look);
@@ -682,7 +737,8 @@ int main(int argc, char **argv)
         }
         else
         {
-            fprintf(stderr, "avbd3d_demo: %s '%s'\n", hasValue ? "unknown option" : "unknown option or missing value:", a);
+            fprintf(stderr, "avbd3d_demo: %s '%s'\n",
+                    hasValue ? "unknown option" : "unknown option or missing value:", a);
             printUsage(stderr);
             return 2;
         }
@@ -707,9 +763,8 @@ int main(int argc, char **argv)
 
     // --smoke never shows its window: it is created hidden and nothing calls SDL_ShowWindow
     // or SDL_RaiseWindow on it. The full render path (swapchain, scene, ImGui) still runs.
-    window = SDL_CreateWindow("Vulkan Physics Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                              WinWidth, WinHeight,
-                              SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE | (smoke ? SDL_WINDOW_HIDDEN : 0));
+    window = SDL_CreateWindow("Vulkan Physics Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WinWidth,
+                              WinHeight, SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE | (smoke ? SDL_WINDOW_HIDDEN : 0));
     if (!window)
     {
         fprintf(stderr, "SDL_CreateWindow failed: %s\n", SDL_GetError());
@@ -727,7 +782,8 @@ int main(int argc, char **argv)
     Avbd3dGpuDef gpuDef = avbd3d_default_gpu_def();
     gpuDef.instanceExtensions = instExts.data();
     gpuDef.instanceExtensionCount = (int)instExts.size();
-    gpuDef.makeSurface = [](void *instance, void *) -> uint64_t {
+    gpuDef.makeSurface = [](void *instance, void *) -> uint64_t
+    {
         VkSurfaceKHR surf = VK_NULL_HANDLE;
         if (!SDL_Vulkan_CreateSurface(window, (VkInstance)instance, &surf))
         {
@@ -799,10 +855,12 @@ int main(int argc, char **argv)
     drawLoadingFrame("Compiling shaders...");
     std::atomic<bool> loadDone{false};
     bool sceneOk = true;
-    std::thread loader([&] {
-        g_renderer.init(g_device, g_renderPass, g_swapExtent.width, g_swapExtent.height);
-        loadDone = true;
-    });
+    std::thread loader(
+        [&]
+        {
+            g_renderer.init(g_device, g_renderPass, g_swapExtent.width, g_swapExtent.height);
+            loadDone = true;
+        });
     while (!loadDone)
     {
         SDL_Event le;
@@ -814,8 +872,7 @@ int main(int argc, char **argv)
     loader.join();
 
     if (verbose)
-        fprintf(stdout, "avbd3d_demo: validation layers %s\n",
-                (smoke || getenv("AVBD_VK_VALIDATION")) ? "ON" : "off");
+        fprintf(stdout, "avbd3d_demo: validation layers %s\n", (smoke || getenv("AVBD_VK_VALIDATION")) ? "ON" : "off");
 
     // Wire the demo together.
     DemoHost host;
@@ -823,7 +880,8 @@ int main(int argc, char **argv)
     host.drawableSize = [](int &w, int &h) { SDL_Vulkan_GetDrawableSize(window, &w, &h); };
     host.windowSize = [](int &w, int &h) { SDL_GetWindowSize(window, &w, &h); };
     host.graphicsUI = graphicsUI;
-    host.setVsync = [](bool on) {
+    host.setVsync = [](bool on)
+    {
         if (g_wantVsync != on)
         {
             g_wantVsync = on;
@@ -836,10 +894,12 @@ int main(int argc, char **argv)
     app.init(host);
 
     loadDone = false;
-    std::thread sceneLoader([&] {
-        sceneOk = app.loadInitialScene(launch);
-        loadDone = true;
-    });
+    std::thread sceneLoader(
+        [&]
+        {
+            sceneOk = app.loadInitialScene(launch);
+            loadDone = true;
+        });
     while (!loadDone)
     {
         SDL_Event le;
@@ -940,8 +1000,8 @@ int main(int argc, char **argv)
         vkWaitForFences(g_device.device(), 1, &g_inFlight[g_frameIdx], VK_TRUE, UINT64_MAX);
 
         uint32_t imageIndex = 0;
-        VkResult acq = vkAcquireNextImageKHR(g_device.device(), g_swapchain, UINT64_MAX,
-                                             g_imageAvail[g_frameIdx], VK_NULL_HANDLE, &imageIndex);
+        VkResult acq = vkAcquireNextImageKHR(g_device.device(), g_swapchain, UINT64_MAX, g_imageAvail[g_frameIdx],
+                                             VK_NULL_HANDLE, &imageIndex);
         if (acq == VK_ERROR_OUT_OF_DATE_KHR)
         {
             // The old swapchain's images may still be in flight.
@@ -989,7 +1049,7 @@ int main(int argc, char **argv)
             drawn += r.count;
         }
         if (markers > 0)
-            {
+        {
             uint64_t markerAddr = 0;
             avbd3d_world_get_contact_marker_buffer(world, &markerAddr);
             items.push_back({kShapeBox, (VkBuffer)(uintptr_t)markerAddr, 0, (uint32_t)markers, false});
@@ -1054,8 +1114,8 @@ int main(int argc, char **argv)
         if (screenshotPath && ((benchFrames > 0 && frameNo == benchFrames - 1) || (smoke && g_smokeFinal)))
         {
             vkQueueWaitIdle(g_device.queue());
-            screenshotImage(g_swapImages[imageIndex], (int)g_swapExtent.width,
-                            (int)g_swapExtent.height, screenshotPath);
+            screenshotImage(g_swapImages[imageIndex], (int)g_swapExtent.width, (int)g_swapExtent.height,
+                            screenshotPath);
         }
 
         VkPresentInfoKHR pi{VK_STRUCTURE_TYPE_PRESENT_INFO_KHR};
@@ -1093,8 +1153,8 @@ int main(int argc, char **argv)
     {
         int32_t vmsgs = 0;
         avbd3d_get_validation_message_count(&vmsgs);
-        printf("smoke: scenes %d frames %d step-failures %d validation-messages %d\n", app.sceneCount(),
-               frameNo, app.stepFailures(), vmsgs);
+        printf("smoke: scenes %d frames %d step-failures %d validation-messages %d\n", app.sceneCount(), frameNo,
+               app.stepFailures(), vmsgs);
         if (vmsgs > 0)
             exitCode = 1;
     }

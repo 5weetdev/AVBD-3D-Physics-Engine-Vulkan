@@ -71,8 +71,8 @@ struct MutatePipelines
 // sleep.slang launchers
 // ---------------------------------------------------------------------------
 
-void launchActiveFlags(CommandList &cmd, HostRingBuffer &ring, SleepPipelines &pl,
-                        const ActiveFlagsArgsGpu &args, int dynCount);
+void launchActiveFlags(CommandList &cmd, HostRingBuffer &ring, SleepPipelines &pl, const ActiveFlagsArgsGpu &args,
+                       int dynCount);
 
 // Groups the "sleep_commit" phase exactly like the launch seam's launchSleepCommit:
 // the optional fracture/drag block guards, the per-body rest mark, and the island
@@ -109,9 +109,9 @@ void launchSleepCommit(CommandList &cmd, HostRingBuffer &ring, SleepPipelines &p
 struct WakeDetectCall
 {
     TouchClearArgsGpu clear;
-    TouchAccumArgsGpu accum;         // .slots pre-filled
-    TouchAccumJointsArgsGpu accumJ;  // .j.count/.sp.count pre-filled
-    WakeRequestArgsGpu request;      // .slots/.wakeLinVel/.wakeAngVel pre-filled
+    TouchAccumArgsGpu accum;        // .slots pre-filled
+    TouchAccumJointsArgsGpu accumJ; // .j.count/.sp.count pre-filled
+    WakeRequestArgsGpu request;     // .slots/.wakeLinVel/.wakeAngVel pre-filled
     WakeRequestJointsArgsGpu requestJ;
     WakeLostSupportArgsGpu lostSupport;
     int dynCount = 0;
@@ -121,32 +121,31 @@ struct WakeDetectCall
 
 void launchWakeDetect(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl, WakeDetectCall &call);
 
-void launchWakeIslandSeed(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl,
-                           const WakeIslandSeedArgsGpu &args, int dynCount);
+void launchWakeIslandSeed(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl, const WakeIslandSeedArgsGpu &args,
+                          int dynCount);
 
-void launchWakeApply(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl,
-                      const WakeApplyArgsGpu &args, int dynCount);
+void launchWakeApply(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl, const WakeApplyArgsGpu &args,
+                     int dynCount);
 
-void launchWakeAll(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl,
-                    const WakeAllArgsGpu &args, int dynCount);
+void launchWakeAll(CommandList &cmd, HostRingBuffer &ring, WakePipelines &pl, const WakeAllArgsGpu &args, int dynCount);
 
 // ---------------------------------------------------------------------------
 // mutate.slang launchers
 // ---------------------------------------------------------------------------
 
-void launchMutateApply(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl,
-                        const MutateApplyArgsGpu &args, int count);
-void launchJointWrite(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl,
-                      const JointWriteArgsGpu &args, int count);
+void launchMutateApply(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl, const MutateApplyArgsGpu &args,
+                       int count);
+void launchJointWrite(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl, const JointWriteArgsGpu &args,
+                      int count);
 
 void launchWakeSeedRegion(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl,
-                           const WakeSeedRegionArgsGpu &args, int dynCount);
+                          const WakeSeedRegionArgsGpu &args, int dynCount);
 
 void launchWakeFloodJoints(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl,
-                            const WakeFloodJointsArgsGpu &args, int edgeCount);
+                           const WakeFloodJointsArgsGpu &args, int edgeCount);
 
-void launchWakeSeedMerge(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl,
-                          const WakeSeedMergeArgsGpu &args, int dynCount);
+void launchWakeSeedMerge(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl, const WakeSeedMergeArgsGpu &args,
+                         int dynCount);
 
 // M4: `count` wake-flood rounds recorded back to back, no readback between them.
 // Round r dispatches the contact flood (if slots > 0) and the joint flood (if
@@ -155,11 +154,11 @@ void launchWakeSeedMerge(CommandList &cmd, HostRingBuffer &ring, MutatePipelines
 // nothing: over-recording is exact, and the first zero slot is the convergence round.
 // The args' own `changed` fields are overwritten per round.
 void recordWakeFloodRounds(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl,
-                           WakeFloodContactsArgsGpu contactsArgs, WakeFloodJointsArgsGpu jointsArgs,
-                           int slots, int edgeCount, VkDeviceAddress changedSlots, int firstRound, int count);
+                           WakeFloodContactsArgsGpu contactsArgs, WakeFloodJointsArgsGpu jointsArgs, int slots,
+                           int edgeCount, VkDeviceAddress changedSlots, int firstRound, int count);
 
-void launchBodyGather(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl,
-                       const BodyGatherArgsGpu &args, int count);
+void launchBodyGather(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &pl, const BodyGatherArgsGpu &args,
+                      int count);
 
 // The whole explicit-mutation flood, exactly mirroring the launch seam's
 // launchWakeFlood: contacts and joints both flood to a fixed point (round cap 64,
@@ -170,10 +169,8 @@ void launchBodyGather(CommandList &cmd, HostRingBuffer &ring, MutatePipelines &p
 // a Device plus its own CommandList/HostRingBuffer rather than an externally-recorded
 // one. `floodChanged` must be a 4-byte device buffer the caller has already zeroed.
 void launchWakeFlood(Device &dev, MutatePipelines &mutPl, WakePipelines &wakePl,
-                      const WakeFloodContactsArgsGpu &contactsArgs,
-                      const WakeFloodJointsArgsGpu &jointsArgs,
-                      const WakeSeedMergeArgsGpu &mergeArgs,
-                      int slots, int edgeCount, int dynCount,
-                      Buffer &floodChanged);
+                     const WakeFloodContactsArgsGpu &contactsArgs, const WakeFloodJointsArgsGpu &jointsArgs,
+                     const WakeSeedMergeArgsGpu &mergeArgs, int slots, int edgeCount, int dynCount,
+                     Buffer &floodChanged);
 
 } // namespace avbdvk
