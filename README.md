@@ -4,6 +4,10 @@ A rigid-body physics engine that runs the whole simulation step on the GPU throu
 
 **Status: experimental, waiting for human review, v1.0.0, ABI 1.0.** Tested on Windows 10 with an NVIDIA GPU and on Linux (Fedora, GCC, Mesa RADV). macOS (MoltenVK) is an intended target and has not been built or run. See [limitations](docs/limitations.md).
 
+![Panel House Destruction](https://raw.githubusercontent.com/5weetdev/AVBD-3D-Physics-Engine-Vulkan/refs/heads/main/docs/gifs/panel_house.gif)
+![10k Cubes Destruction](https://raw.githubusercontent.com/5weetdev/AVBD-3D-Physics-Engine-Vulkan/refs/heads/main/docs/gifs/10k_cube.gif)
+![joint towers destruction](https://raw.githubusercontent.com/5weetdev/AVBD-3D-Physics-Engine-Vulkan/refs/heads/main/docs/gifs/joint_towers.gif)
+
 ## What it is
 
 The solver is Augmented Vertex Block Descent (AVBD): an implicit-Euler method that solves each body's 6x6 system and updates contact and joint penalties with multipliers. It was designed for stable stacks, large mass ratios and breakable joints at few iterations.
