@@ -877,6 +877,9 @@ int main(int argc, char **argv)
             g_swapDirty = true;
         }
     };
+    host.setFullscreen = [](bool on)
+    { SDL_SetWindowFullscreen(window, on ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0); };
+    host.isFullscreen = []() { return (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP) != 0; };
     static const char *kExtraSceneNames[] = {"Spheres & Capsules"};
     host.extraSceneNames.assign(std::begin(kExtraSceneNames), std::end(kExtraSceneNames));
 

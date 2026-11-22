@@ -23,7 +23,7 @@ enum BackgroundTheme
 struct RenderOptions
 {
     bool cull = true;
-    ShadowMode shadowMode = SHADOW_GROUND_PLANAR;
+    ShadowMode shadowMode = SHADOW_MAP;
     float shadowStrength = 0.40f;
     bool blockColoring = false;
     // Forces the per-instance colour through regardless of blockColoring. The debug
@@ -32,7 +32,7 @@ struct RenderOptions
     // it -- and without silently rewriting that preference behind their back.
     bool forceInstanceColor = false;
     vec3 blockBaseColor = {0.80f, 0.84f, 0.90f};
-    bool blockOutlines = true;
+    bool blockOutlines = false;
     float outlineThickness = 1.0f;
     vec3 outlineColor = {0.10f, 0.12f, 0.14f};
     bool unlit = false;
@@ -42,7 +42,7 @@ struct RenderOptions
     vec3 groundPlanePoint = {0, 0, 0};
     vec3 groundPlaneNormal = {0, 1, 0};
 
-    bool ssaoEnabled = false;
+    bool ssaoEnabled = true;
     float ssaoRadius = 10.0f;
     float ssaoBias = 0.1f;
     float ssaoStrength = 1.0f;

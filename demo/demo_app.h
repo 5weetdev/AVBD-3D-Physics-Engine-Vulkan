@@ -35,6 +35,9 @@ struct DemoHost
     // The renderer's own section of the panel ("Graphics"). Optional.
     std::function<void()> graphicsUI;
     std::function<void(bool)> setVsync;
+    // Borderless desktop fullscreen. Optional.
+    std::function<void(bool)> setFullscreen;
+    std::function<bool()> isFullscreen;
     // Demo-provided scenes appended after gpuScenes[] in the scene combo. Selecting
     // the i'th name loads index gpuSceneCount + i; DemoApp::loadScene owns what those
     // indices mean (currently the one "Spheres & Capsules" scene).
@@ -133,8 +136,8 @@ public:
 
     // --- Camera -----------------------------------------------------------------------
     vec3 camEye() const;
-    vec3 camTarget() const { return m_camTarget; }
-    float camDistance() const { return m_camDistance; }
+    vec3 camTarget() const { return m_dispTarget; }
+    float camDistance() const { return m_dispDistance; }
     // Column-major view matrix, looking from camEye() at camTarget(), +Y up.
     void viewMatrix(float out[16]) const;
     // Column-major perspective. vulkanClip: depth 0..1 and Y flipped; otherwise -1..1 depth (OpenGL-style).
@@ -179,6 +182,10 @@ private:
     void updateGrabFromCursor();
     void spawnAlongRay(vec3 rayOrigin, vec3 rayDir);
     void updateCameraKeys(float dtSec);
+    void updateSmoothCamera(float dtSec);
+    vec3 rawEye() const;
+    vec3 dispForward() const;
+    vec3 dispRight() const;
     vec3 camForward() const;
     vec3 camRight() const;
     void overlayToggle(const char *label, OverlayMode mode, const char *tip);
@@ -221,6 +228,15 @@ private:
     float m_camElevation = 0.35f;
     vec3 m_camTarget = {0, 0, 5.0f};
     float m_camMoveSpeed = 25.0f;
+    float m_lookSensitivity = 0.005f; // radians per pixel of mouse look
+    // Displayed (smoothed) camera; the m_cam* values above are the raw input-driven one.
+    float m_dispDistance = 40.0f;
+    float m_dispAzimuth = 1.5707963f;
+    float m_dispElevation = 0.35f;
+    vec3 m_dispTarget = {0, 0, 5.0f};
+    bool m_smoothCamera = true;
+    float m_smoothCameraAmount = 0.25f;
+    bool m_camSnap = true;
 
     enum SpawnKind
     {

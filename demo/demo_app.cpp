@@ -95,11 +95,44 @@ void DemoApp::applyParams()
 // Camera
 // ---------------------------------------------------------------------------
 
-vec3 DemoApp::camEye() const
+vec3 DemoApp::rawEye() const
 {
     vec3 dir = {cosf(m_camElevation) * cosf(m_camAzimuth), sinf(m_camElevation),
                 -cosf(m_camElevation) * sinf(m_camAzimuth)};
     return m_camTarget + dir * m_camDistance;
+}
+
+// What is on screen: the input-driven camera above, with its view direction low-pass filtered when smoothing is on.
+vec3 DemoApp::camEye() const
+{
+    vec3 dir = {cosf(m_dispElevation) * cosf(m_dispAzimuth), sinf(m_dispElevation),
+                -cosf(m_dispElevation) * sinf(m_dispAzimuth)};
+    return m_dispTarget + dir * m_dispDistance;
+}
+
+// Frame-rate-independent exponential follow. Smoothness 0..1 maps to a time constant of
+// 0.03 s .. ~1.2 s (quadratic, so the top of the slider is the slow cinematic glide).
+void DemoApp::updateSmoothCamera(float dtSec)
+{
+    if (!m_smoothCamera || m_camSnap)
+    {
+        m_dispTarget = m_camTarget;
+        m_dispDistance = m_camDistance;
+        m_dispAzimuth = m_camAzimuth;
+        m_dispElevation = m_camElevation;
+        m_camSnap = false;
+        return;
+    }
+    const float s = clamp(m_smoothCameraAmount, 0.0f, 1.0f);
+    const float tau = 0.03f + 1.17f * s * s;
+    const float a = 1.0f - expf(-dtSec / tau);
+    // Only the view direction is filtered; the eye stays exactly where the input put it.
+    m_dispAzimuth += (m_camAzimuth - m_dispAzimuth) * a;
+    m_dispElevation += (m_camElevation - m_dispElevation) * a;
+    m_dispDistance = m_camDistance;
+    const vec3 fwd = normalize(vec3{-cosf(m_dispElevation) * cosf(m_dispAzimuth), -sinf(m_dispElevation),
+                                    cosf(m_dispElevation) * sinf(m_dispAzimuth)});
+    m_dispTarget = rawEye() + fwd * m_camDistance;
 }
 
 // Unit view direction, i.e. where the camera is pointing. The eye sits at
@@ -119,10 +152,24 @@ vec3 DemoApp::camRight() const
     return normalize(cross(flat, vec3{0, 1, 0}));
 }
 
+// The same two vectors for the view on screen (they lag the raw ones while smoothing
+// catches up). Movement and zoom follow these, so you travel along what you actually see.
+vec3 DemoApp::dispForward() const
+{
+    return normalize(vec3{-cosf(m_dispElevation) * cosf(m_dispAzimuth), -sinf(m_dispElevation),
+                          cosf(m_dispElevation) * sinf(m_dispAzimuth)});
+}
+
+vec3 DemoApp::dispRight() const
+{
+    vec3 flat = {-cosf(m_dispAzimuth), 0.0f, sinf(m_dispAzimuth)};
+    return normalize(cross(flat, vec3{0, 1, 0}));
+}
+
 void DemoApp::viewMatrix(float out[16]) const
 {
     const vec3 eye = camEye();
-    vec3 f = normalize(m_camTarget - eye);
+    vec3 f = normalize(m_dispTarget - eye);
     vec3 s = normalize(cross(f, vec3{0, 1, 0}));
     vec3 u = cross(s, f);
 
@@ -202,7 +249,7 @@ bool DemoApp::rayFromPixel(int mouseX, int mouseY, vec3 &rayOrigin, vec3 &rayDir
     float ndcX = (float)mouseX / (float)screenW * 2.0f - 1.0f;
     float ndcY = 1.0f - (float)mouseY / (float)screenH * 2.0f;
 
-    vec3 forward = normalize(m_camTarget - eye);
+    vec3 forward = normalize(m_dispTarget - eye);
     vec3 right = cross(forward, vec3{0, 1, 0});
     if (lengthSq(right) < 1e-6f)
         right = cross(forward, vec3{0, 0, 1});
@@ -240,7 +287,7 @@ void DemoApp::updateCameraKeys(float dtSec)
 
     // Moving the look point drags the eye along with it, since the eye is defined
     // relative to it -- that is the whole camera flying, not a pan around a fixed pivot.
-    m_camTarget += camForward() * (fwd * step) + camRight() * (side * step) + vec3{0, lift * step, 0};
+    m_camTarget += dispForward() * (fwd * step) + dispRight() * (side * step) + vec3{0, lift * step, 0};
 }
 
 // ---------------------------------------------------------------------------
@@ -288,6 +335,7 @@ void DemoApp::loadScene(int index, bool resetCamera)
     {
         m_camDistance = view.camDistance;
         m_camTarget = vec3{0, view.camTargetHeight, 0};
+        m_camSnap = true;
     }
 }
 
@@ -413,7 +461,10 @@ bool DemoApp::loadInitialScene(const DemoLaunch &launch)
     }
 
     if (launch.camDist > 0.0f)
+    {
         m_camDistance = launch.camDist;
+        m_camSnap = true;
+    }
     return true;
 }
 
@@ -768,7 +819,9 @@ void DemoApp::handleEvent(const SDL_Event &e)
     case SDL_KEYDOWN:
         if (io.WantCaptureKeyboard)
             break;
-        if (e.key.keysym.sym == SDLK_ESCAPE)
+        if (e.key.keysym.sym == SDLK_F11 && m_host.setFullscreen && m_host.isFullscreen)
+            m_host.setFullscreen(!m_host.isFullscreen());
+        else if (e.key.keysym.sym == SDLK_ESCAPE)
             m_running = false;
         else if (e.key.keysym.sym == SDLK_SPACE)
             setPaused(!m_paused);
@@ -802,9 +855,9 @@ void DemoApp::handleEvent(const SDL_Event &e)
         // holding the eye still means recomputing camTarget once the angles have moved.
         if (e.motion.state & SDL_BUTTON_RMASK)
         {
-            const vec3 eye = camEye();
-            m_camAzimuth -= e.motion.xrel * 0.01f;
-            m_camElevation += e.motion.yrel * 0.01f;
+            const vec3 eye = rawEye();
+            m_camAzimuth -= e.motion.xrel * m_lookSensitivity;
+            m_camElevation += e.motion.yrel * m_lookSensitivity;
             m_camElevation = clamp(m_camElevation, -1.5f, 1.5f);
             m_camTarget = eye + camForward() * m_camDistance;
         }
@@ -819,8 +872,13 @@ void DemoApp::handleEvent(const SDL_Event &e)
     case SDL_MOUSEWHEEL:
         if (io.WantCaptureMouse)
             break;
-        m_camDistance *= (e.wheel.y > 0) ? 0.9f : 1.1f;
-        m_camDistance = clamp(m_camDistance, 1.0f, 3000.0f);
+    {
+        // Dolly: slide the eye along the view you see, keeping the look point fixed.
+        const float newDist = clamp(m_camDistance * ((e.wheel.y > 0) ? 0.9f : 1.1f), 1.0f, 3000.0f);
+        const vec3 eye = rawEye() + dispForward() * (m_camDistance - newDist);
+        m_camDistance = newDist;
+        m_camTarget = eye + camForward() * newDist;
+    }
         break;
     }
 }
@@ -835,6 +893,7 @@ void DemoApp::update()
     }
 
     updateCameraKeys(m_lastFrameSec);
+    updateSmoothCamera(m_lastFrameSec);
 
     logSettingChanges();
     demolog::setActivity("grab update");
@@ -1198,6 +1257,18 @@ void DemoApp::drawUI()
 
     if (ImGui::CollapsingHeader("Camera & controls"))
     {
+        ImGui::SliderFloat("Look sensitivity", &m_lookSensitivity, 0.001f, 0.02f, "%.4f",
+                           ImGuiSliderFlags_Logarithmic);
+        ImGui::Checkbox("Smooth camera", &m_smoothCamera);
+        if (m_smoothCamera)
+        {
+            ImGui::SliderFloat("Smoothness", &m_smoothCameraAmount, 0.0f, 1.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp);
+            if (m_smoothCameraAmount >= 0.99f)
+            {
+                ImGui::SameLine();
+                ImGui::TextUnformatted("(cinematic)");
+            }
+        }
         ImGui::SliderFloat("Fly speed", &m_camMoveSpeed, 1.0f, 300.0f, "%.0f", ImGuiSliderFlags_Logarithmic);
         ImGui::TextUnformatted("LMB drag  RMB look  MMB spawn  wheel dolly");
         ImGui::TextUnformatted("WASD fly  Q/E down/up  shift fast");
@@ -1209,6 +1280,12 @@ void DemoApp::drawUI()
         ImGui::SameLine();
         if (ImGui::Checkbox("VSync", &m_vsync) && m_host.setVsync)
             m_host.setVsync(m_vsync);
+        if (m_host.setFullscreen && m_host.isFullscreen)
+        {
+            bool fs = m_host.isFullscreen();
+            if (ImGui::Checkbox("Fullscreen (F11)", &fs))
+                m_host.setFullscreen(fs);
+        }
     }
 
     if (m_host.graphicsUI && ImGui::CollapsingHeader("Graphics"))
