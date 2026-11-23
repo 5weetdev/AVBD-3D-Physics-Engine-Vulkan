@@ -24,7 +24,6 @@
 #include "vk_renderer.h"
 
 #include "demo_app.h"
-#include "demo_log.h"
 #include "maths.h"
 #include "vk_context.h"
 
@@ -521,7 +520,6 @@ static void printUsage(FILE *f)
                "  --camdist D            camera distance from the look point\n"
                "  --no-sleep             start with sleeping off (\"Never sleep\"), for benchmarks\n"
                "  --verbose              print the selected device and whether validation is on\n"
-               "  --log                  start with the session log on (panel: Logging)\n"
                "  --smoke                unattended run of every scene with validation on; the window is\n"
                "                         created hidden and never shown. Exit code is nonzero on a\n"
                "                         step failure or a validation message\n"
@@ -588,6 +586,11 @@ static void smokeTick()
         if (resizeScene)
             SDL_SetWindowSize(window, WinWidth, WinHeight);
         break;
+    case 17:
+    case 18:
+    case 19:
+        app.smokeEdit(f - 17, w, h);
+        break;
     default:
         break;
     }
@@ -596,25 +599,16 @@ static void smokeTick()
 // A fatal engine error (VK_CHECK, a device loss) prints its cause to stderr and calls
 // abort(), which would close the window and its console with nothing on screen. In an
 // interactive run, hold the process on a message box so the console line can be read.
-// With the session log open, the abort is also recorded there (with a backtrace) first.
 static bool g_abortBox = false;
 static void onAbort(int)
 {
     fflush(stderr);
-    demolog::fatal("abort()");
     if (!g_abortBox)
         return;
-    char msg[1400];
-    if (demolog::active())
-        snprintf(msg, sizeof(msg),
-                 "The demo hit a fatal error and must close.\n"
-                 "The cause is printed in the console window and written to the log:\n%s",
-                 demolog::path());
-    else
-        snprintf(msg, sizeof(msg),
-                 "The demo hit a fatal error and must close.\n"
-                 "The cause is printed in the console window.");
-    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "avbd3d_demo: fatal error", msg, nullptr);
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "avbd3d_demo: fatal error",
+                             "The demo hit a fatal error and must close.\n"
+                             "The cause is printed in the console window.",
+                             nullptr);
 }
 
 // One ImGui frame with centered text, presented and waited on. Used only before the main
@@ -699,8 +693,6 @@ int main(int argc, char **argv)
             smoke = true;
         else if (strcmp(a, "--no-sleep") == 0)
             launch.noSleep = true;
-        else if (strcmp(a, "--log") == 0)
-            launch.log = true;
         else if (strcmp(a, "--frames") == 0 && hasValue)
             launch.benchFrames = atoi(argv[++i]);
         else if (strcmp(a, "--screenshot") == 0 && hasValue)
@@ -734,15 +726,9 @@ int main(int argc, char **argv)
     }
     const int benchFrames = launch.benchFrames;
     launch.unattended = smoke || benchFrames > 0;
-    // The handlers are installed in every mode; they only write anything once the log is
-    // open, and only an interactive run holds the process on a message box.
+    // Only an interactive run holds the process on a message box.
     g_abortBox = !launch.unattended;
     signal(SIGABRT, onAbort);
-    demolog::installCrashHandler();
-    std::string commandLine;
-    for (int i = 0; i < argc; i++)
-        commandLine += (i ? " " : "") + std::string(argv[i]);
-    launch.commandLine = commandLine.c_str();
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
@@ -925,7 +911,6 @@ int main(int argc, char **argv)
         if (smoke)
             smokeTick();
         app.update();
-        demolog::setActivity("render");
 
         if (g_swapDirty && g_swapchain)
         {
@@ -1173,8 +1158,6 @@ int main(int argc, char **argv)
     g_device.destroy();
     app.shutdown();
     avbd3d_destroy_gpu(g_gpu);
-    demolog::line("exit code %d", exitCode);
-    demolog::close();
 
     SDL_DestroyWindow(window);
     SDL_Quit();

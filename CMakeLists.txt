@@ -240,8 +240,8 @@ if(AVBD3D_BUILD_DEMO)
         demo/main.cpp
         demo/vk_renderer.cpp
         demo/demo_app.cpp
+        demo/demo_editor.cpp
         demo/scene_import.cpp
-        demo/demo_log.cpp
         demo/render_options.cpp
         external/imgui/backends/imgui_impl_vulkan.cpp
         ${scene_hdr})
@@ -252,10 +252,6 @@ if(AVBD3D_BUILD_DEMO)
         ${AVBD_SRC}/core ${AVBD_SRC}/scene
         ${AVBD_DEMO_GEN_DIR})
     target_link_libraries(avbd3d_demo PRIVATE avbd3d avbd3d_core_static imgui SDL2::SDL2 SDL2::SDL2main Vulkan::Vulkan)
-    if(WIN32)
-        # demo/demo_log.cpp: the crash handler resolves symbols with DbgHelp.
-        target_link_libraries(avbd3d_demo PRIVATE dbghelp)
-    endif()
     # SDL2 is built as a shared library; avbd3d_demo needs it beside the executable.
     add_custom_command(TARGET avbd3d_demo POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different

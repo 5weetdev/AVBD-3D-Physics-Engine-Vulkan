@@ -2,7 +2,6 @@
 // to the world m_world names.
 
 #include "demo_app.h"
-#include "demo_log.h"
 
 #include "spawn_objects.h"
 
@@ -274,6 +273,8 @@ void DemoApp::updateCameraKeys(float dtSec)
     if (ImGui::GetIO().WantCaptureKeyboard)
         return;
 
+    if (m_paused && (SDL_GetModState() & KMOD_CTRL))
+        return; // Ctrl+A / Ctrl+D ... are editor hotkeys, not fly keys
     const Uint8 *keys = SDL_GetKeyboardState(nullptr);
     float fwd = (keys[SDL_SCANCODE_W] ? 1.0f : 0.0f) - (keys[SDL_SCANCODE_S] ? 1.0f : 0.0f);
     float side = (keys[SDL_SCANCODE_D] ? 1.0f : 0.0f) - (keys[SDL_SCANCODE_A] ? 1.0f : 0.0f);
@@ -297,15 +298,14 @@ void DemoApp::updateCameraKeys(float dtSec)
 void DemoApp::loadScene(int index, bool resetCamera)
 {
     m_stepFailMsg[0] = '\0';
+    m_accum = 0.0f;
+    editorReset();
     m_dragging = false;
     m_dragBody = Avbd3dBodyId{};
     m_dragGroup.clear();
     m_dragSeed = Avbd3dBodyId{};
     if (m_world)
         must(avbd3d_grab_end(m_world), "grab_end");
-    demolog::setActivity("loadScene");
-    demolog::line("load scene %d '%s'", index,
-                  index < gpuSceneCount ? gpuSceneNames[index] : m_host.extraSceneNames[index - gpuSceneCount]);
 
     // The world's buffers may still be referenced by a submitted command buffer from the
     // frame in flight, and destroying the world frees them. Scene switches are rare; drain first.
@@ -327,10 +327,6 @@ void DemoApp::loadScene(int index, bool resetCamera)
     m_cellSize = desc.cellSize;
     applyParams();
     m_stepCount = 0;
-    demolog::line("  built: bodies %d (dynamic %d) joints %d springs %d", (int)desc.pos.size(),
-                  (int)desc.dynamicIdx.size(), desc.jointCount, desc.springCount);
-    logParams();
-    demolog::setActivity("frame");
     if (resetCamera)
     {
         m_camDistance = view.camDistance;
@@ -416,9 +412,6 @@ bool DemoApp::loadInitialScene(const DemoLaunch &launch)
     m_vsync = !m_unattended;
     if (m_host.setVsync)
         m_host.setVsync(m_vsync);
-    m_commandLine = launch.commandLine ? launch.commandLine : "";
-    if (launch.log)
-        setLogging(true);
 
     const int sceneTotal = sceneCount();
     if (launch.scene >= 0 && launch.scene < sceneTotal)
@@ -457,7 +450,6 @@ bool DemoApp::loadInitialScene(const DemoLaunch &launch)
         // scene switches; EnableSleeping(false) also wakes what the scene authored asleep.
         m_author.params.sleepEnabled = false;
         applyParams();
-        demolog::line("--no-sleep: sleepEnabled = 0, wakeAll");
     }
 
     if (launch.camDist > 0.0f)
@@ -481,7 +473,10 @@ void DemoApp::setPaused(bool paused)
 {
     m_paused = paused;
     if (!paused)
+    {
         m_stepFailMsg[0] = '\0'; // resuming acknowledges the failure
+        editorReset();
+    }
 }
 
 // A capacity ceiling made the step commit clamped results. Stop the sim so the state
@@ -545,8 +540,6 @@ void DemoApp::beginGrab(Avbd3dBodyId hit, vec3 worldHit, vec3 localHit)
                            m_dragGroup.data(), AVBD3D_MAX_GRAB_BODIES, &n),
          "grab_begin");
     m_dragGroup.resize(n);
-    demolog::line("grab body %d at (%.3f %.3f %.3f): group %d (connected %d, radius %.2f)", hit.index1 - 1, worldHit.x,
-                  worldHit.y, worldHit.z, n, m_grabConnected ? 1 : 0, m_grabRadius);
     if (m_dragGroup.empty())
         return;
 
@@ -602,8 +595,6 @@ void DemoApp::dropDetached()
          "grab_survivors");
     if (survivors == (int)m_dragGroup.size())
         return;
-    demolog::line("grab: %d of %d bodies came off, still holding %d", (int)m_dragGroup.size() - survivors,
-                  (int)m_dragGroup.size(), survivors);
 
     size_t w = 0;
     for (size_t i = 0; i < m_dragGroup.size(); i++)
@@ -647,7 +638,6 @@ void DemoApp::updateGrabFromCursor()
 
 void DemoApp::endGrab()
 {
-    demolog::line("grab released");
     m_dragging = false;
     m_dragBody = Avbd3dBodyId{};
     m_dragGroup.clear();
@@ -664,27 +654,17 @@ void DemoApp::endGrab()
 // cache survives, and authored joints keep their duals and fracture flags.
 void DemoApp::spawnBody(vec3 size, float density, float friction, vec3 position, vec3 velocity)
 {
-    demolog::setActivity("spawn");
     m_author.spawnBody(size, density, friction, position, velocity);
     const SceneDesc desc = m_author.finalize();
     m_import.importTail(m_world, desc);
-    demolog::line("spawn box size %.2f density %.2f at (%.2f %.2f %.2f) vel (%.2f %.2f %.2f): bodies %d", size.x,
-                  density, position.x, position.y, position.z, velocity.x, velocity.y, velocity.z,
-                  (int)desc.pos.size());
-    demolog::setActivity("frame");
 }
 
 void DemoApp::spawnAssembly(const SpawnEmitter &emitter, vec3 origin, quat rotation, float scale, float massMultiplier,
                             vec3 velocity)
 {
-    demolog::setActivity("spawn");
     emitter.commit(m_author, origin, rotation, scale, massMultiplier, velocity);
     const SceneDesc desc = m_author.finalize();
     m_import.importTail(m_world, desc);
-    demolog::line("spawn %s scale %.2f mass x%.2f at (%.2f %.2f %.2f) vel (%.2f %.2f %.2f): bodies %d joints %d",
-                  spawnKindNames[m_spawnKind], scale, massMultiplier, origin.x, origin.y, origin.z, velocity.x,
-                  velocity.y, velocity.z, (int)desc.pos.size(), desc.jointCount);
-    demolog::setActivity("frame");
 }
 
 // Throws the currently selected object along the cursor ray.
@@ -821,6 +801,8 @@ void DemoApp::handleEvent(const SDL_Event &e)
             break;
         if (e.key.keysym.sym == SDLK_F11 && m_host.setFullscreen && m_host.isFullscreen)
             m_host.setFullscreen(!m_host.isFullscreen());
+        else if (m_paused && editorKey(e.key))
+            break;
         else if (e.key.keysym.sym == SDLK_ESCAPE)
             m_running = false;
         else if (e.key.keysym.sym == SDLK_SPACE)
@@ -836,14 +818,25 @@ void DemoApp::handleEvent(const SDL_Event &e)
         int px, py;
         toPixels(e.button.x, e.button.y, px, py);
         if (e.button.button == SDL_BUTTON_LEFT)
-            grabAtPixel(px, py);
+        {
+            if (m_paused)
+                editorMouseDown(px, py);
+            else
+                grabAtPixel(px, py);
+        }
         else if (e.button.button == SDL_BUTTON_MIDDLE)
             spawnAtPixel(px, py);
         break;
     }
 
     case SDL_MOUSEBUTTONUP:
-        if (e.button.button == SDL_BUTTON_LEFT && m_dragging)
+        if (e.button.button == SDL_BUTTON_LEFT && m_edDown)
+        {
+            int px, py;
+            toPixels(e.button.x, e.button.y, px, py);
+            editorMouseUp(px, py);
+        }
+        else if (e.button.button == SDL_BUTTON_LEFT && m_dragging)
             endGrab(); // the drag is a joint, so letting go has to switch it off
         break;
 
@@ -861,6 +854,8 @@ void DemoApp::handleEvent(const SDL_Event &e)
             m_camElevation = clamp(m_camElevation, -1.5f, 1.5f);
             m_camTarget = eye + camForward() * m_camDistance;
         }
+        if (m_edDown)
+            toPixels(e.motion.x, e.motion.y, m_edX1, m_edY1);
         if (m_dragging && !isNull(m_dragBody))
         {
             int px, py;
@@ -895,41 +890,92 @@ void DemoApp::update()
     updateCameraKeys(m_lastFrameSec);
     updateSmoothCamera(m_lastFrameSec);
 
-    logSettingChanges();
-    demolog::setActivity("grab update");
     updateGrabFromCursor();
 
-    if (!m_paused || m_stepOnce)
+    runPhysics();
+    editorUpdate();
+
+    updateGrabFromCursor();
+}
+
+// Physics runs at a fixed rate (SolverParams::dt), whatever the frame rate is. Each frame
+// adds its wall-clock time to an accumulator and takes whole ticks out of it, so a 144 Hz
+// display steps at the physics rate rather than 144 times a second, and a frame that took
+// longer than a tick runs several. When the ticks cost more than they are worth -- a cap on
+// ticks per frame and a wall-clock budget -- the backlog is dropped: the simulation runs in
+// slow motion and the frame rate stays up, instead of the usual spiral of ever more ticks.
+// (The solver shares the render queue, so ticks cannot run on another thread.)
+void DemoApp::runPhysics()
+{
+    float dt = m_author.params.dt;
+    // Top of the rate slider: no fixed rate, one tick per frame covering that frame's time.
+    const bool matchFrame = !m_unattended && !m_stepOnce && !m_paused && dt <= 1.0f / kMaxTickHz + 1e-6f;
+    if (matchFrame)
+        dt = clamp(m_lastFrameSec * m_timeScale, 0.001f, 0.05f);
+    int steps = 0;
+    if (matchFrame)
+        steps = 1;
+    else if (m_unattended)
+        steps = (!m_paused || m_stepOnce) ? 1 : 0; // benchmarks and --smoke: one tick per frame
+    else if (m_stepOnce)
+        steps = 1;
+    else if (!m_paused)
+        m_accum += m_lastFrameSec * m_timeScale;
+    if (m_paused && !m_stepOnce)
+        m_accum = 0.0f;
+    if (m_stepOnce && !m_unattended)
+        m_accum = 0.0f;
+
+    const int kMaxTicks = 8;
+    const float kBudgetMs = 24.0f;
+    const bool fixedRate = !m_unattended && !m_stepOnce && !m_paused && !matchFrame;
+    const Uint64 t0 = SDL_GetPerformanceCounter();
+    int done = 0;
+    for (;;)
     {
-        demolog::setActivity("step");
+        if (fixedRate)
+        {
+            if (m_accum < dt || done >= kMaxTicks)
+                break;
+            if (done > 0 && (float)(SDL_GetPerformanceCounter() - t0) * 1000.0f / (float)SDL_GetPerformanceFrequency() > kBudgetMs)
+                break;
+            m_accum -= dt;
+        }
+        else if (done >= steps)
+            break;
+
         applyParams();
-        const Avbd3dResult res = avbd3d_step(m_world, m_author.params.dt);
+        const Avbd3dResult res = avbd3d_step(m_world, dt);
         Avbd3dStats r{};
         if (res == AVBD3D_OK)
             must(avbd3d_get_stats(m_world, &r), "get_stats");
         m_stepCount++;
-        logStep(res, r);
+        done++;
         noteStepResult(res, r);
-        m_stepOnce = false;
-        DemoStats s;
-        stats(s);
-        if (s.stepMs >= 0.0f)
-            m_avgStepMs += (s.stepMs - m_avgStepMs) * 0.1f;
-        m_histHostMs[m_histPos] = std::max(s.stepMs, 0.0f);
-        m_histGpuMs[m_histPos] = std::max(s.gpuMs, 0.0f);
-        m_histPos = (m_histPos + 1) % kTimeHistory;
+        if (m_paused && fixedRate)
+            break; // a failed step pauses
     }
+    if (fixedRate && m_accum >= dt)
+        m_accum = fmodf(m_accum, dt); // behind: drop the backlog, keep the phase
+    m_stepOnce = false;
 
-    demolog::setActivity("grab update");
-    updateGrabFromCursor();
-    demolog::setActivity("frame");
+    const float inst = m_lastFrameSec > 0.0f ? (float)done / m_lastFrameSec : 0.0f;
+    m_simHz += (inst - m_simHz) * 0.05f;
+    if (done == 0)
+        return;
+    DemoStats s;
+    stats(s);
+    if (s.stepMs >= 0.0f)
+        m_avgStepMs += (s.stepMs - m_avgStepMs) * 0.1f;
+    m_histHostMs[m_histPos] = std::max(s.stepMs, 0.0f);
+    m_histGpuMs[m_histPos] = std::max(s.gpuMs, 0.0f);
+    m_histPos = (m_histPos + 1) % kTimeHistory;
 }
 
 void DemoApp::endFrame(float frameMs)
 {
     m_lastFrameSec = clamp(frameMs * 0.001f, 0.0f, 0.1f);
     m_avgFrameMs += (frameMs - m_avgFrameMs) * 0.1f;
-    demolog::setFrame(++m_frameCount);
 
     if (m_benchFrames <= 0)
         return;
@@ -951,110 +997,6 @@ void DemoApp::endFrame(float frameMs)
     }
     if (m_frameNo >= m_benchFrames)
         m_running = false;
-}
-
-// ---------------------------------------------------------------------------
-// Session log
-//
-// Enough to replay a session by hand: every scene load with the full parameter set,
-// every setting changed afterwards (diffed once a frame, so a slider drag is logged as
-// the values it passed through), every grab, spawn, pause and step-once, every step that
-// was rerun or failed, and a stats line every 60 steps -- or every step, when asked.
-// ---------------------------------------------------------------------------
-
-#define AVBD_LOG_PARAMS(X)                                                                                             \
-    X(dt, "%g", double)                                                                                                \
-    X(gravity.y, "%g", double) X(iterations, "%d", int) X(primalLanes, "%d", int) X(alpha, "%g", double)               \
-        X(betaLin, "%g", double) X(betaAng, "%g", double) X(gamma, "%g", double) X(sleepEnabled, "%d", int)            \
-            X(sleepFrames, "%d", int) X(sleepLinVel, "%g", double) X(sleepAngVel, "%g", double)                        \
-                X(sleepDisp, "%g", double) X(sleepFracture, "%g", double) X(autoKStart, "%d", int)                     \
-                    X(dualDamping, "%g", double) X(dualDampVel, "%g", double) X(killFallenEnabled, "%d", int)          \
-                        X(killHeight, "%g", double) X(grabStrength, "%g", double) X(sleepLeak, "%g", double)
-
-void DemoApp::setLogging(bool on)
-{
-    if (on == demolog::active())
-        return;
-    if (!on)
-    {
-        demolog::close();
-        return;
-    }
-    if (!demolog::open(m_commandLine))
-        return;
-    demolog::setFrame(m_frameCount);
-    demolog::line("device: %s", m_deviceName);
-    demolog::line("current scene %d, step %d, paused %d", m_scene, m_stepCount, m_paused ? 1 : 0);
-    logParams();
-}
-
-void DemoApp::logParams()
-{
-    if (!demolog::active())
-        return;
-    const SolverParams &p = m_author.params;
-    char buf[1024];
-    int n = 0;
-#define X(f, fmt, T) n += snprintf(buf + n, n < (int)sizeof(buf) ? sizeof(buf) - n : 0, " " #f "=" fmt, (T)p.f);
-    AVBD_LOG_PARAMS(X)
-#undef X
-    demolog::line("  params:%s", buf);
-    m_loggedParams = p;
-    m_loggedOverlay = m_overlay.mode;
-    m_loggedDebug = m_debug;
-    m_loggedPaused = m_paused;
-}
-
-void DemoApp::logSettingChanges()
-{
-    if (!demolog::active())
-        return;
-    const SolverParams &p = m_author.params;
-#define X(f, fmt, T)                                                                                                   \
-    if (p.f != m_loggedParams.f)                                                                                       \
-        demolog::line("set " #f ": " fmt " -> " fmt, (T)m_loggedParams.f, (T)p.f);
-    AVBD_LOG_PARAMS(X)
-#undef X
-    m_loggedParams = p;
-
-    if (m_overlay.mode != m_loggedOverlay)
-        demolog::line("set overlay mode: %d -> %d", (int)m_loggedOverlay, (int)m_overlay.mode);
-    m_loggedOverlay = m_overlay.mode;
-
-    const DebugDrawOptions &d = m_debug, &o = m_loggedDebug;
-    if (d.contactPoints != o.contactPoints || d.contactNormals != o.contactNormals ||
-        d.manifoldLinks != o.manifoldLinks || d.jointLoadRods != o.jointLoadRods || d.contactTint != o.contactTint ||
-        d.maxMarkers != o.maxMarkers)
-        demolog::line("set contact markers: points %d normals %d links %d jointRods %d tint %d budget %d",
-                      d.contactPoints, d.contactNormals, d.manifoldLinks, d.jointLoadRods, (int)d.contactTint,
-                      d.maxMarkers);
-    m_loggedDebug = m_debug;
-
-    if (m_paused != m_loggedPaused)
-        demolog::line(m_paused ? "paused" : "resumed");
-    m_loggedPaused = m_paused;
-}
-
-void DemoApp::logStep(Avbd3dResult res, const Avbd3dStats &r)
-{
-    if (!demolog::active())
-        return;
-    const int reruns = r.capacity_reruns + r.flood_reruns + r.island_reruns + r.jp_reruns + r.color_reruns;
-    if (res != AVBD3D_OK || !r.ok || r.truncated || reruns > 0 || r.submits != 1)
-        demolog::line("step %d: ok %d truncated %d submits %d reruns capacity %d flood %d island %d jp %d "
-                      "color %d (%s)",
-                      m_stepCount, r.ok ? 1 : 0, r.truncated ? 1 : 0, r.submits, r.capacity_reruns, r.flood_reruns,
-                      r.island_reruns, r.jp_reruns, r.color_reruns, avbd3d_result_string(res));
-    if (m_logEveryStep || m_stepCount % 60 == 0)
-    {
-        DemoStats s;
-        stats(s);
-        demolog::line("step %d: bodies %d awake %d joints %d springs %d pairs %d/%d manifolds %d/%d "
-                      "contacts %d/%d colors %d jp %d | step %.3f gpu %.3f ms | dev %.1f MB",
-                      m_stepCount, s.bodies, s.awake, s.joints, s.springs, s.pairs, s.pairCapacity, s.manifolds,
-                      s.manifoldCapacity, s.contacts, s.contactCapacity, s.colors, s.jpRounds, s.stepMs, s.gpuMs,
-                      s.deviceMB);
-    }
 }
 
 // ---------------------------------------------------------------------------
@@ -1098,9 +1040,9 @@ void DemoApp::drawUI()
     ImGui::SameLine();
     if (ImGui::Button("Step"))
     {
-        demolog::line("step once");
         m_paused = true;
         m_stepOnce = true;
+        m_accum = 0.0f;
     }
     ImGui::SameLine();
     if (ImGui::Button("Reset"))
@@ -1114,6 +1056,27 @@ void DemoApp::drawUI()
     // one group you are currently tuning.
     if (ImGui::CollapsingHeader("Solver"))
     {
+        ImGui::SliderFloat("Time rate", &m_timeScale, 0.05f, 4.0f, "%.2fx", ImGuiSliderFlags_Logarithmic);
+        itemTooltip("How fast simulated time runs compared to the clock: 1x is real time, 0.25x is slow motion, "
+                    "2x makes blocks fall twice as fast. The physics rate below is unchanged, so slow motion "
+                    "runs fewer ticks per second and fast forward runs more.");
+        int hz = (int)lroundf(1.0f / std::max(params.dt, 1e-4f));
+        if (ImGui::SliderInt("Physics rate", &hz, 10, (int)kMaxTickHz,
+                             hz >= (int)kMaxTickHz ? "Max (match frame rate)" : "%d Hz"))
+            params.dt = 1.0f / (float)std::max(hz, 1);
+        itemTooltip("Physics ticks per second. Each tick advances the world by 1/rate seconds, and the "
+                    "simulation is stepped on its own clock: rendering keeps its own frame rate, a fast display "
+                    "does not step the physics faster, and a slow frame runs several ticks to catch up. Dragging to "
+                    "the maximum removes the cap: one tick per rendered frame, as long as that frame. Higher "
+                    "rates are more accurate and stiffer per second of simulated time but cost proportionally "
+                    "more GPU time. If the ticks cannot keep up (more than 8 per frame, or about 24 ms of "
+                    "work) the backlog is dropped and the simulation runs in slow motion while the frame "
+                    "rate stays up. A tick is one step of simulated time; Iterations below are solver passes "
+                    "inside each tick. Raise the rate for fast motion that tunnels or looks choppy, raise "
+                    "iterations for stacks that sink or sag.");
+        if (!m_paused && m_simHz > 0.0f)
+            ImGui::TextDisabled("running at %.0f ticks/s%s", m_simHz,
+                                m_simHz < 0.9f / std::max(params.dt, 1e-4f) ? "  (behind: slow motion)" : "");
         ImGui::SliderInt("Iterations", &params.iterations, 1, 64);
         itemTooltip("AVBD iterations per step. Each one is a primal pass (every body's "
                     "position is updated in parallel, by colour) followed by the dual "
@@ -1121,7 +1084,9 @@ void DemoApp::drawUI()
                     "linear in this; the paper's large scenes run at 3-5. Unlike a dual "
                     "method, a low count here does not make the sim explode -- it just "
                     "leaves more constraint error, which the multipliers carry into the "
-                    "next step rather than turning into momentum.");
+                    "next step rather than turning into momentum. These passes repeat inside one "
+                    "physics tick and do not advance time (see Physics rate): more iterations make each step "
+                    "stiffer and more accurate, not smoother in time.");
 
         ImGui::SliderFloat("Alpha", &params.alpha, 0.0f, 1.0f);
         itemTooltip("Stabilisation, paper Eq. 18: the solver targets "
@@ -1286,7 +1251,16 @@ void DemoApp::drawUI()
             if (ImGui::Checkbox("Fullscreen (F11)", &fs))
                 m_host.setFullscreen(fs);
         }
+        ImGui::Checkbox("FPS & scene overlay", &m_showOverlay);
+        itemTooltip("Frame rate and the current scene's name, in the top right corner.");
+        ImGui::BeginDisabled(!m_showOverlay);
+        ImGui::SliderFloat("Overlay font size", &m_overlayFontSize, 8.0f, 64.0f, "%.0f px");
+        itemTooltip("Size of the top right overlay text, in pixels.");
+        ImGui::EndDisabled();
     }
+
+    if (ImGui::CollapsingHeader("Editor"))
+        editorPanel();
 
     if (m_host.graphicsUI && ImGui::CollapsingHeader("Graphics"))
         m_host.graphicsUI();
@@ -1525,19 +1499,30 @@ void DemoApp::drawUI()
                         100.0f * m_avgDrawMs / busy, 100.0f * m_avgUiMs / busy);
     }
 
-    if (ImGui::CollapsingHeader("Logging"))
-    {
-        bool logOn = demolog::active();
-        if (ImGui::Checkbox("Write log file", &logOn))
-            setLogging(logOn);
-        itemTooltip("Writes a session log beside avbd3d_demo.exe: scene loads, every setting you change, grabs, "
-                    "spawns, step reruns and failures, periodic stats, everything printed to the console, and on a "
-                    "crash what was running plus a backtrace. Turn it on, reproduce the problem, and send the file.");
-        ImGui::Checkbox("Log every step", &m_logEveryStep);
-        itemTooltip("A stats line per step instead of every 60 steps.");
-        if (demolog::path()[0])
-            ImGui::TextWrapped("%s%s", demolog::active() ? "" : "(closed) ", demolog::path());
-    }
-
     ImGui::End();
+
+    editorDrawUI();
+
+    if (m_showOverlay)
+    {
+        const char *name = m_scene < gpuSceneCount ? gpuSceneNames[m_scene]
+                                                   : m_host.extraSceneNames[m_scene - gpuSceneCount];
+        char fps[32];
+        snprintf(fps, sizeof(fps), "%.0f FPS", m_avgFrameMs > 0.0f ? 1000.0f / m_avgFrameMs : 0.0f);
+        ImDrawList *dl = ImGui::GetForegroundDrawList();
+        ImFont *font = ImGui::GetFont();
+        const float fs = m_overlayFontSize;
+        const float right = ImGui::GetIO().DisplaySize.x - 12.0f;
+        float y = 8.0f;
+        char tps[32];
+        snprintf(tps, sizeof(tps), "%.0f ticks/s", m_paused ? 0.0f : m_simHz);
+        for (const char *line : {(const char *)fps, (const char *)tps, name})
+        {
+            const ImVec2 sz = font->CalcTextSizeA(fs, FLT_MAX, 0.0f, line);
+            const ImVec2 p(right - sz.x, y);
+            dl->AddText(font, fs, ImVec2(p.x + 1.0f, p.y + 1.0f), IM_COL32(0, 0, 0, 200), line);
+            dl->AddText(font, fs, p, IM_COL32(235, 240, 250, 255), line);
+            y += sz.y + 2.0f;
+        }
+    }
 }

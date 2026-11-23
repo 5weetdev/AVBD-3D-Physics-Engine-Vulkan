@@ -26,6 +26,7 @@ public:
     // Create everything in `d` past what is already imported.
     void importTail(Avbd3dWorld *w, const SceneDesc &d);
 
+    int bodyCount() const { return (int)m_bodies.size(); }
     Avbd3dBodyId body(int descIndex) const
     {
         return descIndex >= 0 && descIndex < (int)m_bodies.size() ? m_bodies[descIndex] : Avbd3dBodyId{};

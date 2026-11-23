@@ -55,8 +55,6 @@ struct DemoLaunch
     float camDist = -1.0f;           // > 0 overrides the scene's camera distance
     bool unattended = false;         // bench/smoke: step failures go to stderr
     bool noSleep = false;            // start with "Never sleep" ticked (benchmarks)
-    bool log = false;                // start with the session log on (--log)
-    const char *commandLine = "";    // for the log header
 };
 
 struct DemoStats
@@ -131,6 +129,9 @@ public:
             endGrab();
     }
     bool grabbing() const { return m_dragging; }
+    // The editor's paths, scripted: 0 pause + marquee over the window, 1 duplicate and move
+    // the selection along X, 2 delete it. Pixels are drawable pixels.
+    void smokeEdit(int step, int w, int h);
     // Steps that came back not ok / truncated since launch.
     int stepFailures() const { return m_stepFailures; }
 
@@ -171,6 +172,8 @@ private:
     int m_pendingScene = -1;
     bool m_pendingResetCamera = true;
     void setPaused(bool paused);
+    // Runs the fixed-rate physics ticks the elapsed frame time asks for (see update()).
+    void runPhysics();
     void noteStepResult(Avbd3dResult res, const Avbd3dStats &r);
     bool rayFromPixel(int px, int py, vec3 &origin, vec3 &dir) const;
     void toPixels(int x, int y, int &px, int &py) const;
@@ -192,12 +195,6 @@ private:
     // Pushes the live SolverParams into the world (plain field copies; done every step).
     void applyParams();
 
-    // Session log (demo_log.h). Every hook is a no-op while the log is closed.
-    void setLogging(bool on);
-    void logParams();
-    void logSettingChanges();
-    void logStep(Avbd3dResult res, const Avbd3dStats &r);
-
     // Scene construction flows one way -- gpuScenes[i](&m_author), m_author.finalize(),
     // m_import.importTail -- and interaction reaches the live world directly.
     SceneView buildSpheresCapsulesScene();
@@ -205,6 +202,67 @@ private:
     void spawnBody(vec3 size, float density, float friction, vec3 position, vec3 velocity);
     void spawnAssembly(const SpawnEmitter &emitter, vec3 origin, quat rotation, float scale, float massMultiplier,
                        vec3 velocity);
+
+    // --- Scene editor (demo_editor.cpp; paused only) -----------------------------------
+    // Selection is a set of desc body indices (the SceneImport order). Everything that
+    // touches the world runs from update() / handleEvent(), never from drawUI(), which
+    // executes while the frame's command buffer is being recorded.
+    enum EditAction
+    {
+        EditNone = 0,
+        EditSelectAll,
+        EditSelectNone,
+        EditInvert,
+        EditDelete,
+        EditDuplicate,
+        EditFocus
+    };
+    void editorReset();
+    void editorUpdate();       // per frame: pending actions, gizmo drag, selection centre
+    void editorMouseDown(int px, int py);
+    void editorMouseUp(int px, int py);
+    bool editorKey(const SDL_KeyboardEvent &k); // true when the key was an editor hotkey
+    void editorDrawUI();       // selection outlines, box, gizmo (ImGui draw lists)
+    void editorPanel();        // the "Editor" section of the panel
+    void editorRun(EditAction a);
+    int  editorBodyCount() const { return m_import.bodyCount(); }
+    bool editorAlive(int i) const { return i >= 0 && i < m_import.bodyCount() && !(i < (int)m_edDeleted.size() && m_edDeleted[i]); }
+    bool editorStatic(int i) const;
+    bool editorSelected(int i) const { return i >= 0 && i < (int)m_edMask.size() && m_edMask[i]; }
+    void editorSelect(int i, bool on);
+    void editorClear();
+    int  editorPick(int px, int py) const; // desc index under the pixel, or -1
+    bool project(vec3 p, float &sx, float &sy) const; // world -> drawable pixels
+    bool gizmoAxes(float out[3][4], float &len) const; // screen segments of the three axes
+    int  gizmoHit(int px, int py) const;
+    bool axisParam(int px, int py, vec3 origin, vec3 axis, float &t) const;
+    void editorApplyDelta(vec3 delta);
+
+    std::vector<int> m_edSel;
+    std::vector<uint8_t> m_edMask, m_edDeleted;
+    EditAction m_edPending = EditNone;
+    bool m_edDown = false;      // left button held in editor mode
+    bool m_edBox = false;       // ... and it has become a box selection
+    int m_edX0 = 0, m_edY0 = 0, m_edX1 = 0, m_edY1 = 0; // drawable pixels
+    int m_edMode = 0;           // 0 replace, 1 add (shift), 2 toggle (ctrl)
+    vec3 m_edCenter = {0, 0, 0};
+    int m_edAxisHover = -1, m_edAxis = -1; // gizmo axis under the cursor / being dragged
+    vec3 m_edAxisDir = {1, 0, 0}, m_edAnchor = {0, 0, 0};
+    float m_edT0 = 0.0f;
+    std::vector<vec3> m_edStartPos;
+    std::vector<quat> m_edStartRot;
+    bool m_edSnap = false;
+    float m_edSnapStep = 0.5f;
+
+    // --- Fixed-rate physics ----------------------------------------------------------------
+    static constexpr float kMaxTickHz = 240.0f; // top of the rate slider = uncapped
+    float m_timeScale = 1.0f; // simulated seconds per wall-clock second
+    float m_accum = 0.0f;   // wall-clock seconds not yet turned into physics ticks
+    float m_simHz = 0.0f;   // smoothed ticks per second actually executed
+
+    // --- Overlay (top right) ---------------------------------------------------------------
+    bool m_showOverlay = true;
+    float m_overlayFontSize = 18.0f;
 
     SceneBuilder m_author; // scene authoring + params only
     Avbd3dGpu *m_gpu = nullptr;
@@ -284,13 +342,5 @@ private:
 
     int m_benchFrames = 0;
     int m_frameNo = 0;
-
-    const char *m_commandLine = "";
-    bool m_logEveryStep = false;
-    int m_frameCount = 0; // every frame, for the log prefix (m_frameNo counts bench frames)
-    int m_stepCount = 0;  // steps since the scene was loaded
-    SolverParams m_loggedParams = {};
-    OverlayMode m_loggedOverlay = OVERLAY_NONE;
-    DebugDrawOptions m_loggedDebug;
-    bool m_loggedPaused = false;
+    int m_stepCount = 0; // ticks since the scene was loaded
 };
